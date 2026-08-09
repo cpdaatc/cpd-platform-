@@ -38,6 +38,16 @@ insert into public.user_roles(organization_id,membership_id,role_id)
 select '70000000-0000-0000-0000-000000000010','73000000-0000-0000-0000-000000000004',id from public.roles where code='COMMITTEE_CHAIR'
 on conflict do nothing;
 
+select public._assert(
+  not exists(
+    select 1 from public.role_permissions rp
+    join public.roles r on r.id=rp.role_id
+    join public.permissions p on p.id=rp.permission_id
+    where r.code='ORGANIZATION_SYSTEM_ADMIN' and p.code='evidence.record_offline'
+  ),
+  'System Admin alone cannot record OFFLINE_REVIEWED evidence'
+);
+
 set role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000701',false);
 create temporary table p2_activity as
@@ -49,7 +59,6 @@ select public.assign_activity_officer_command(
   '70000000-0000-0000-0000-000000000010','ORGANIZATION_SYSTEM_ADMIN',(select id from p2_activity),'73000000-0000-0000-0000-000000000002'
 );
 
--- Secretary cannot use the intake preparation permission merely because the secretary can review later.
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000703',false);
 do $$
 begin
@@ -65,7 +74,6 @@ begin
   end;
 end $$;
 
--- Assigned Activity Officer may create the complete structured record atomically.
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000702',false);
 select public.save_activity_intake_command(
   '70000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p2_activity),
@@ -116,33 +124,36 @@ select public._assert(
   'speaker contact data is preserved as an activity-specific snapshot'
 );
 
--- Uploaded evidence can later be marked offline-reviewed only by an authorized verifier.
 create temporary table p2_evidence as
 select public.register_activity_evidence_command(
   '70000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p2_activity),
   'DISCLOSURE','70000000-0000-0000-0000-000000000010/demo/disclosure.pdf',repeat('b',64),'Demo disclosure'
 ) as id;
 
--- Secretary records the review, but an Activity Officer cannot be claimed as verifier.
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000703',false);
 do $$
 begin
   begin
     perform public.record_offline_evidence_review(
-      (select id from p2_evidence),'00000000-0000-0000-0000-000000000702',now(),'Physical committee file',true,null
+      (select id from p2_evidence),'COMMITTEE_SECRETARY','00000000-0000-0000-0000-000000000702',now(),'Physical committee file',true,null
     );
     raise exception 'unauthorized verifier unexpectedly accepted';
   exception when others then
     if sqlerrm='unauthorized verifier unexpectedly accepted' then raise; end if;
+    if sqlstate <> '42501' then raise; end if;
   end;
 end $$;
 
 select public.record_offline_evidence_review(
-  (select id from p2_evidence),'00000000-0000-0000-0000-000000000704',now(),'Physical committee file',true,null
+  (select id from p2_evidence),'COMMITTEE_SECRETARY','00000000-0000-0000-0000-000000000704',now(),'Physical committee file',true,null
 );
 select public._assert(
   exists(select 1 from public.evidence_reviews where evidence_id=(select id from p2_evidence) and recorded_by='00000000-0000-0000-0000-000000000703' and verified_by='00000000-0000-0000-0000-000000000704'),
   'OFFLINE_REVIEWED separates recorder from authorized verifier'
+);
+select public._assert(
+  exists(select 1 from public.audit_logs where entity_type='activity_evidence' and entity_id=(select id from p2_evidence) and action='activity.evidence_offline_review_recorded' and role_context='COMMITTEE_SECRETARY'),
+  'offline evidence review is audited under secretary role context'
 );
 
 reset role;
