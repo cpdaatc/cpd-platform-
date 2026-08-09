@@ -5,12 +5,14 @@ import {
   AuthenticationRequiredError,
   ContextSelectionRequiredError,
   requireServerAuthContext,
+  type RequiredServerAuthContext,
 } from '@/lib/auth/server-context';
 
 export default async function ProtectedAppLayout({ children }: { children: ReactNode }) {
+  let context: RequiredServerAuthContext;
+
   try {
-    const context = await requireServerAuthContext();
-    return <AppShell context={context}>{children}</AppShell>;
+    context = await requireServerAuthContext();
   } catch (error) {
     if (error instanceof AuthenticationRequiredError) {
       redirect('/login');
@@ -20,4 +22,6 @@ export default async function ProtectedAppLayout({ children }: { children: React
     }
     throw error;
   }
+
+  return <AppShell context={context}>{children}</AppShell>;
 }
