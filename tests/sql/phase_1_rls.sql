@@ -69,18 +69,46 @@ select public._assert(
   'Admin A cannot read Organization B activities'
 );
 
-insert into public.activities(
-  organization_id,activity_code,title_ar,reporting_year,created_by
-) values (
-  '10000000-0000-0000-0000-000000000001','CPD-2026-003','نشاط أ 3',2026,
-  '00000000-0000-0000-0000-000000000101'
+-- Direct table writes are intentionally blocked even for System Admin.
+-- Business writes must use governed commands so the change and audit event are atomic.
+do $$
+begin
+  begin
+    insert into public.activities(
+      organization_id,activity_code,title_ar,reporting_year,created_by
+    ) values (
+      '10000000-0000-0000-0000-000000000001','CPD-DIRECT-BLOCKED','Direct write should fail',2026,
+      '00000000-0000-0000-0000-000000000101'
+    );
+    raise exception 'direct admin insert unexpectedly succeeded';
+  exception
+    when insufficient_privilege then null;
+    when others then
+      if sqlerrm = 'direct admin insert unexpectedly succeeded' then raise; end if;
+      if sqlstate <> '42501' then raise; end if;
+  end;
+end $$;
+
+-- The governed command remains the authorized creation path.
+select public.create_activity_command(
+  '10000000-0000-0000-0000-000000000001',
+  'ORGANIZATION_SYSTEM_ADMIN',
+  'نشاط أ 3',
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  2026
 );
 
 select public._assert(
-  exists (select 1 from public.activities where activity_code='CPD-2026-003'),
-  'Admin A can create an activity in own organization'
+  exists (select 1 from public.activities where title_ar='نشاط أ 3'),
+  'Admin A can create through the governed command'
 );
 
+-- Cross-tenant direct write remains denied.
 do $$
 begin
   begin
