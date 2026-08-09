@@ -46,3 +46,5 @@ jobs:
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
       - name: RBAC acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_rbac.sql
+      - name: Audit acceptance (RED until migration exists)
+        run: psql "$DATABASE_URL" -f tests/sql/phase_1_audit.sql
