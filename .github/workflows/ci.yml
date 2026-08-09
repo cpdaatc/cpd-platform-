@@ -88,6 +88,8 @@ jobs:
         run: psql "$DATABASE_URL" -f supabase/migrations/0018_ai_settings_governance.sql
       - name: Apply Phase 3 command hardening
         run: psql "$DATABASE_URL" -f supabase/migrations/0019_ai_command_hardening.sql
+      - name: Apply Phase 3 alignment rule
+        run: psql "$DATABASE_URL" -f supabase/migrations/0020_alignment_rule.sql
       - name: Foundation schema acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
       - name: RBAC acceptance
