@@ -79,3 +79,5 @@ jobs:
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_auth.sql
       - name: Governed activity command acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_activity_commands.sql
+      - name: Single active Activity Officer invariant (RED until migration exists)
+        run: psql "$DATABASE_URL" -f tests/sql/phase_1_assignment_invariant.sql
