@@ -62,6 +62,18 @@ select public._assert(
   'activity creation writes audit event in same governed command'
 );
 
+select public._assert(
+  exists (
+    select 1 from public.activity_status_history
+    where activity_id=(select id from command_result)
+      and from_state is null
+      and to_state='CREATED'
+      and changed_by='00000000-0000-0000-0000-000000000401'
+      and role_context='ORGANIZATION_SYSTEM_ADMIN'
+  ),
+  'activity creation writes initial status history'
+);
+
 select public.create_activity_command(
   '30000000-0000-0000-0000-000000000001',
   'ORGANIZATION_SYSTEM_ADMIN',
