@@ -8,6 +8,7 @@ export type ReviewStatus =
   | 'HUMAN_REVIEW_REQUIRED';
 
 export type FindingSeverity = 'CRITICAL' | 'MAJOR' | 'ADVISORY';
+export type LearningDomain = 'KNOWLEDGE' | 'SKILL' | 'ATTITUDE' | 'HUMAN_REVIEW_REQUIRED';
 
 export type ReadinessFinding = {
   ruleCode: string;
@@ -48,6 +49,8 @@ const measurableObjectiveVerbs = [
   'demonstrate',
   'perform',
   'identify',
+  'explain',
+  'describe',
   'analyze',
   'analyse',
   'evaluate',
@@ -67,7 +70,12 @@ const measurableObjectiveVerbs = [
   'document',
   'recognize',
   'recognise',
+  'advocate',
 ];
+
+const skillVerbs = new Set(['apply','demonstrate','perform','use','implement','construct']);
+const knowledgeVerbs = new Set(['identify','explain','describe','analyze','analyse','compare','differentiate','calculate','classify','interpret','recognize','recognise','evaluate']);
+const attitudeVerbs = new Set(['advocate','value','support','commit','promote']);
 
 function normalizedWords(value: string): string[] {
   return value.toLowerCase().replace(/[^a-z\s-]/g, ' ').split(/\s+/).filter(Boolean);
@@ -95,6 +103,50 @@ export function reviewObjective(objective: string): {
     status: 'ALIGNED',
     weakVerbs: [],
     message: 'الهدف يستخدم فعلًا قابلًا للملاحظة والقياس. يلزم بقاء المراجعة البشرية للتحقق من السياق والمواءمة الكاملة.',
+  };
+}
+
+export function classifyLearningDomain(objective: string): LearningDomain {
+  const words = normalizedWords(objective);
+  if (words.some((word) => skillVerbs.has(word))) return 'SKILL';
+  if (words.some((word) => attitudeVerbs.has(word))) return 'ATTITUDE';
+  if (words.some((word) => knowledgeVerbs.has(word))) return 'KNOWLEDGE';
+  return 'HUMAN_REVIEW_REQUIRED';
+}
+
+export function reviewObjectiveMethodEvaluationAlignment(
+  objective: string,
+  learningMethods: string,
+  evaluationMethod: string,
+): { domain: LearningDomain; status: 'ALIGNED' | 'NEEDS_IMPROVEMENT' | 'HUMAN_REVIEW_REQUIRED'; message: string } {
+  const domain = classifyLearningDomain(objective);
+  const methods = learningMethods.toLowerCase();
+  const evaluation = evaluationMethod.toLowerCase();
+
+  if (domain === 'HUMAN_REVIEW_REQUIRED') {
+    return {
+      domain,
+      status: 'HUMAN_REVIEW_REQUIRED',
+      message: 'لا يمكن تحديد المجال والمواءمة بثقة من النص وحده؛ يلزم تحقق بشري.',
+    };
+  }
+
+  if (domain === 'SKILL') {
+    const hasPracticeMethod = /(simulation|hands-on|hands on|practice|practical|role.?play|workshop|demonstration)/i.test(methods);
+    const hasObservedEvaluation = /(observ|checklist|dops|osce|performance|skill|practical|simulation)/i.test(evaluation);
+    if (!hasPracticeMethod || !hasObservedEvaluation) {
+      return {
+        domain,
+        status: 'NEEDS_IMPROVEMENT',
+        message: 'هدف مهاري يحتاج عادةً فرصة ممارسة وأداة تقييم أداء مناسبة؛ تحقق بشريًا من مواءمة الطريقة والأداة الفعلية.',
+      };
+    }
+  }
+
+  return {
+    domain,
+    status: 'ALIGNED',
+    message: 'لا يظهر تعارض مباشر في الفحص الحتمي، لكن المواءمة النهائية تحتاج مراجعة بشرية للسياق والمحتوى.',
   };
 }
 
@@ -168,6 +220,21 @@ export function runDeterministicPreReview(input: PreReviewInput): ReadinessFindi
           `activity_learning_objectives[${index}]`,
           0.95,
         ));
+      } else if (input.learningMethods.trim() && input.evaluationMethod.trim()) {
+        const alignment = reviewObjectiveMethodEvaluationAlignment(objective,input.learningMethods,input.evaluationMethod);
+        if (alignment.status !== 'ALIGNED') {
+          findings.push(finding(
+            'ACT-ALIGN-001',
+            'CPD_EDUCATIONAL_GUIDANCE',
+            'BLOOM_SMART',
+            alignment.status,
+            'ADVISORY',
+            `الهدف رقم ${index + 1} يحتاج مراجعة مواءمة إضافية بين المجال التعليمي وطريقة التعليم والتقييم.`,
+            alignment.message,
+            `activity_learning_objectives[${index}]`,
+            0.75,
+          ));
+        }
       }
     });
   }
