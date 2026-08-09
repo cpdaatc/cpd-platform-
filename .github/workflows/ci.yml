@@ -60,3 +60,5 @@ jobs:
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_rls.sql
       - name: Auth profile bootstrap acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_auth.sql
+      - name: Governed activity command acceptance (RED until migration exists)
+        run: psql "$DATABASE_URL" -f tests/sql/phase_1_activity_commands.sql
