@@ -34,8 +34,11 @@ export default async function MyActivitiesPage() {
                 <span className="rounded-full bg-teal-50 px-3 py-1.5 text-xs font-bold text-teal-900">{getInternalStateLabel(activity.internalState)}</span>
               </div>
               <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4 text-sm text-slate-600">
-                <span>يمكنك التعبئة الرقمية، رفع PDF مكتمل، أو استخدام المسار الهجين.</span>
-                <Link href={`/activities/${activity.id}/intake`} className="rounded-xl bg-teal-800 px-4 py-2.5 font-bold text-white hover:bg-teal-900">فتح ملف النشاط</Link>
+                <span>يمكنك التعبئة الرقمية، رفع PDF مكتمل، أو تشغيل مراجعة الجاهزية قبل اللجنة.</span>
+                <div className="flex flex-wrap gap-2">
+                  <Link href={`/activities/${activity.id}/intake`} className="rounded-xl bg-teal-800 px-4 py-2.5 font-bold text-white hover:bg-teal-900">فتح ملف النشاط</Link>
+                  <Link href={`/activities/${activity.id}/readiness`} className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 font-bold text-slate-800 hover:bg-slate-50">Pre‑Review</Link>
+                </div>
               </div>
             </article>
           ))

@@ -82,6 +82,14 @@ jobs:
         run: psql "$DATABASE_URL" -f supabase/migrations/0015_offline_evidence_role_context.sql
       - name: Apply Phase 2 session speaker key fix
         run: psql "$DATABASE_URL" -f supabase/migrations/0016_fix_session_speaker_keys.sql
+      - name: Apply Phase 3 rules and AI review model
+        run: psql "$DATABASE_URL" -f supabase/migrations/0017_ai_rules.sql
+      - name: Apply Phase 3 AI privacy governance
+        run: psql "$DATABASE_URL" -f supabase/migrations/0018_ai_settings_governance.sql
+      - name: Apply Phase 3 command hardening
+        run: psql "$DATABASE_URL" -f supabase/migrations/0019_ai_command_hardening.sql
+      - name: Apply Phase 3 alignment rule
+        run: psql "$DATABASE_URL" -f supabase/migrations/0020_alignment_rule.sql
       - name: Foundation schema acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
       - name: RBAC acceptance
@@ -100,3 +108,5 @@ jobs:
         run: psql "$DATABASE_URL" -f tests/sql/phase_2_intake.sql
       - name: Phase 2 governed command acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_2_commands.sql
+      - name: Phase 3 AI/rules acceptance
+        run: psql "$DATABASE_URL" -f tests/sql/phase_3_ai.sql
