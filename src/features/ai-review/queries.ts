@@ -16,39 +16,40 @@ export type ReadinessWorkspace = {
   openSourceConflicts: number;
 };
 
-export async function getReadinessWorkspace(activityId: string): Promise<ReadinessWorkspace> {
+export async function getReadinessWorkspace(activityId: string, organizationId: string): Promise<ReadinessWorkspace> {
   const supabase = await createServerSupabaseClient();
   const { data: activity, error: activityError } = await supabase
     .from('activities')
     .select('id,activity_code,title_ar,title_en')
     .eq('id', activityId)
+    .eq('organization_id', organizationId)
     .single();
-  if (activityError || !activity) throw new Error('Activity is not available.');
+  if (activityError || !activity) throw new Error('Activity is not available in the active organization.');
 
   const [profileResult, committeeResult, objectivesResult, speakersResult, disclosuresResult, latestReviewResult, policyResult, conflictsResult] = await Promise.all([
-    supabase.from('activity_intake_profiles').select('learning_gap,learning_methods,participant_evaluation_method').eq('activity_id', activityId).maybeSingle(),
-    supabase.from('activity_scientific_committees').select('id').eq('activity_id', activityId).maybeSingle(),
-    supabase.from('activity_learning_objectives').select('id,objective_text,learning_domain').eq('activity_id', activityId).order('sort_order'),
-    supabase.from('activity_speakers').select('id').eq('activity_id', activityId),
-    supabase.from('disclosure_records').select('declaration_status').eq('activity_id', activityId),
-    supabase.from('ai_reviews').select('*').eq('activity_id', activityId).eq('review_type','PRE_REVIEW').order('completed_at',{ ascending:false }).limit(1),
-    supabase.from('organization_ai_settings').select('external_ai_enabled,privacy_approved,provider,processing_region').limit(1).maybeSingle(),
-    supabase.from('source_conflicts').select('id',{ count:'exact', head:true }).eq('status','OPEN'),
+    supabase.from('activity_intake_profiles').select('learning_gap,learning_methods,participant_evaluation_method').eq('activity_id', activityId).eq('organization_id',organizationId).maybeSingle(),
+    supabase.from('activity_scientific_committees').select('id').eq('activity_id', activityId).eq('organization_id',organizationId).maybeSingle(),
+    supabase.from('activity_learning_objectives').select('id,objective_text,learning_domain').eq('activity_id', activityId).eq('organization_id',organizationId).order('sort_order'),
+    supabase.from('activity_speakers').select('id').eq('activity_id', activityId).eq('organization_id',organizationId),
+    supabase.from('disclosure_records').select('declaration_status').eq('activity_id', activityId).eq('organization_id',organizationId),
+    supabase.from('ai_reviews').select('*').eq('activity_id', activityId).eq('organization_id',organizationId).eq('review_type','PRE_REVIEW').order('completed_at',{ ascending:false }).limit(1),
+    supabase.from('organization_ai_settings').select('external_ai_enabled,privacy_approved,provider,processing_region').eq('organization_id',organizationId).maybeSingle(),
+    supabase.from('source_conflicts').select('id',{ count:'exact', head:true }).eq('organization_id',organizationId).eq('status','OPEN'),
   ]);
 
   const committeeId = committeeResult.data?.id ? String(committeeResult.data.id) : null;
   const committeeMembersResult = committeeId
-    ? await supabase.from('activity_scientific_committee_members').select('id').eq('activity_scientific_committee_id', committeeId)
+    ? await supabase.from('activity_scientific_committee_members').select('id').eq('activity_scientific_committee_id', committeeId).eq('organization_id',organizationId)
     : { data: [] as Array<{ id: string }>, error: null };
 
   const speakerIds = (speakersResult.data ?? []).map((speaker) => String(speaker.id));
   const speakerDocumentsResult = speakerIds.length > 0
-    ? await supabase.from('activity_speaker_documents').select('activity_speaker_id').in('activity_speaker_id', speakerIds).eq('document_type','CV')
+    ? await supabase.from('activity_speaker_documents').select('activity_speaker_id').eq('organization_id',organizationId).in('activity_speaker_id', speakerIds).eq('document_type','CV')
     : { data: [] as Array<{ activity_speaker_id: string }>, error: null };
 
   const latestReview = latestReviewResult.data?.[0] ?? null;
   const findingsResult = latestReview
-    ? await supabase.from('ai_findings').select('*').eq('ai_review_id', latestReview.id).order('severity')
+    ? await supabase.from('ai_findings').select('*').eq('organization_id',organizationId).eq('ai_review_id', latestReview.id).order('severity')
     : { data: [] as Array<Record<string, unknown>>, error: null };
 
   const errors = [
