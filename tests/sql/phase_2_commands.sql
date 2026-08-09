@@ -1,10 +1,10 @@
 \set ON_ERROR_STOP on
 
 insert into auth.users(id,email) values
-  ('00000000-0000-0000-0000-000000000701','phase2-admin@example.test'),
-  ('00000000-0000-0000-0000-000000000702','phase2-officer@example.test'),
-  ('00000000-0000-0000-0000-000000000703','phase2-secretary@example.test'),
-  ('00000000-0000-0000-0000-000000000704','phase2-chair@example.test')
+  ('00000000-0000-0000-0000-000000000701','phase2-command-admin@example.test'),
+  ('00000000-0000-0000-0000-000000000702','phase2-command-officer@example.test'),
+  ('00000000-0000-0000-0000-000000000703','phase2-command-secretary@example.test'),
+  ('00000000-0000-0000-0000-000000000704','phase2-command-chair@example.test')
 on conflict (id) do nothing;
 
 insert into public.users(id,display_name) values
