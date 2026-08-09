@@ -46,6 +46,8 @@ jobs:
         run: psql "$DATABASE_URL" -f supabase/migrations/0003_audit.sql
       - name: Apply RLS migration
         run: psql "$DATABASE_URL" -f supabase/migrations/0004_rls.sql
+      - name: Apply audit RPC hardening
+        run: psql "$DATABASE_URL" -f supabase/migrations/0005_audit_rpc_security.sql
       - name: Foundation schema acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
       - name: RBAC acceptance
