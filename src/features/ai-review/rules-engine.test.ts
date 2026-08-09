@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { runDeterministicPreReview, reviewObjective, sanitizeAiPayload } from './rules-engine';
+import {
+  classifyLearningDomain,
+  reviewObjectiveMethodEvaluationAlignment,
+  runDeterministicPreReview,
+  reviewObjective,
+  sanitizeAiPayload,
+  type PreReviewInput,
+} from './rules-engine';
 
 describe('Phase 3 deterministic readiness engine', () => {
   it('flags an activity scientific committee with fewer than two members', () => {
@@ -44,6 +51,33 @@ describe('Phase 3 deterministic readiness engine', () => {
     expect(result.message.toLowerCase()).not.toContain('compliance score');
   });
 
+  it('classifies clear learning domains conservatively', () => {
+    expect(classifyLearningDomain('Demonstrate correct airway positioning')).toBe('SKILL');
+    expect(classifyLearningDomain('Explain the causes of medication error')).toBe('KNOWLEDGE');
+    expect(classifyLearningDomain('Advocate for transparent safety reporting')).toBe('ATTITUDE');
+    expect(classifyLearningDomain('Improve patient care')).toBe('HUMAN_REVIEW_REQUIRED');
+  });
+
+  it('flags a skill objective paired only with lecture and satisfaction survey', () => {
+    const result = reviewObjectiveMethodEvaluationAlignment(
+      'Demonstrate correct hand hygiene technique',
+      'Lecture presentation',
+      'Participant satisfaction survey',
+    );
+    expect(result.domain).toBe('SKILL');
+    expect(result.status).toBe('NEEDS_IMPROVEMENT');
+  });
+
+  it('recognizes a plausible skill alignment but keeps it advisory', () => {
+    const result = reviewObjectiveMethodEvaluationAlignment(
+      'Demonstrate correct hand hygiene technique',
+      'Simulation and hands-on practice',
+      'Observed performance checklist',
+    );
+    expect(result.status).toBe('ALIGNED');
+    expect(result.message).toMatch(/بشرية|human/i);
+  });
+
   it('redacts contact and identity-like fields before external AI payload', () => {
     const sanitized = sanitizeAiPayload({
       fullName: 'Demo Speaker',
@@ -57,5 +91,19 @@ describe('Phase 3 deterministic readiness engine', () => {
     expect(sanitized.mobile).toBe('[REDACTED]');
     expect(sanitized.nationalId).toBe('[REDACTED]');
     expect(sanitized.learningGap).toBe('Practice gap');
+  });
+
+  it('keeps the pre-review input type explicit', () => {
+    const input: PreReviewInput = {
+      committeeMemberCount: 2,
+      learningGap: 'gap',
+      objectives: ['Apply protocol'],
+      learningMethods: 'case discussion',
+      evaluationMethod: 'case assessment',
+      speakerCount: 1,
+      speakerCvCount: 1,
+      disclosureStatuses: ['DECLARED_NO_CONFLICT'],
+    };
+    expect(input.committeeMemberCount).toBe(2);
   });
 });
