@@ -11,6 +11,34 @@ export class RoleContextError extends Error {
   }
 }
 
+export type ResolvedOrganizationContext = {
+  organizationId: string | null;
+  requiresSelection: boolean;
+};
+
+export function resolveOrganizationContext(
+  organizationIds: readonly string[],
+  requestedOrganizationId: string | null,
+): ResolvedOrganizationContext {
+  if (organizationIds.length === 0) {
+    throw new RoleContextError('No active organization membership is assigned to this user.');
+  }
+
+  if (requestedOrganizationId !== null) {
+    if (!organizationIds.includes(requestedOrganizationId)) {
+      throw new RoleContextError('Requested organization is not assigned to this user.');
+    }
+
+    return { organizationId: requestedOrganizationId, requiresSelection: false };
+  }
+
+  if (organizationIds.length === 1) {
+    return { organizationId: organizationIds[0], requiresSelection: false };
+  }
+
+  return { organizationId: null, requiresSelection: true };
+}
+
 export type ResolvedRoleContext = {
   activeRole: GovernanceRole | null;
   requiresSelection: boolean;
