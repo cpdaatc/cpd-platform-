@@ -94,3 +94,5 @@ jobs:
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_assignment_invariant.sql
       - name: Phase 2 intake acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_2_intake.sql
+      - name: Phase 2 governed command acceptance
+        run: psql "$DATABASE_URL" -f tests/sql/phase_2_commands.sql
