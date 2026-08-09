@@ -74,6 +74,8 @@ jobs:
         run: psql "$DATABASE_URL" -f supabase/migrations/0011_storage.sql
       - name: Apply Phase 2 governed intake commands
         run: psql "$DATABASE_URL" -f supabase/migrations/0012_intake_commands.sql
+      - name: Apply Phase 2 governed file commands
+        run: psql "$DATABASE_URL" -f supabase/migrations/0013_intake_files.sql
       - name: Foundation schema acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
       - name: RBAC acceptance
