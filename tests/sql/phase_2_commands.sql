@@ -109,10 +109,15 @@ select public._assert(
   (select count(*) from public.activity_scientific_committee_members m join public.activity_scientific_committees c on c.id=m.activity_scientific_committee_id where c.activity_id=(select id from p2_activity))=2,
   'activity-specific scientific committee remains activity-scoped'
 );
+
+-- Audit is intentionally not readable by the Activity Officer; verify it as the test administrator.
+reset role;
 select public._assert(
   exists(select 1 from public.audit_logs where entity_id=(select id from p2_activity) and action='activity.intake_saved' and role_context='ACTIVITY_OFFICER'),
   'intake save is audited with active role context'
 );
+set role authenticated;
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000702',false);
 
 select public.save_activity_speaker_contact_command(
   '70000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',
@@ -151,9 +156,9 @@ select public._assert(
   exists(select 1 from public.evidence_reviews where evidence_id=(select id from p2_evidence) and recorded_by='00000000-0000-0000-0000-000000000703' and verified_by='00000000-0000-0000-0000-000000000704'),
   'OFFLINE_REVIEWED separates recorder from authorized verifier'
 );
+
+reset role;
 select public._assert(
   exists(select 1 from public.audit_logs where entity_type='activity_evidence' and entity_id=(select id from p2_evidence) and action='activity.evidence_offline_review_recorded' and role_context='COMMITTEE_SECRETARY'),
   'offline evidence review is audited under secretary role context'
 );
-
-reset role;
