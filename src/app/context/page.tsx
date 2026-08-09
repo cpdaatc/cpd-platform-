@@ -3,20 +3,8 @@ import {
   AuthenticationRequiredError,
   getServerAuthState,
 } from '@/lib/auth/server-context';
-import type { GovernanceRole } from '@/lib/auth/permissions';
+import { ROLE_LABELS_AR } from '@/lib/auth/labels';
 import { selectOrganizationAction, selectRoleAction } from './actions';
-
-const roleLabels: Record<GovernanceRole, string> = {
-  PLATFORM_SUPER_ADMIN: 'مسؤول المنصة العام',
-  ORGANIZATION_SYSTEM_ADMIN: 'مسؤول النظام المؤسسي',
-  ACTIVITY_OFFICER: 'مسؤول النشاط',
-  COMMITTEE_SECRETARY: 'سكرتير اللجنة',
-  COMMITTEE_CHAIR: 'رئيس اللجنة',
-  COMMITTEE_MEMBER: 'عضو اللجنة',
-  MANAGEMENT_VIEWER: 'عرض الإدارة',
-  MANAGEMENT_APPROVER: 'المخول الإداري',
-  AUDITOR: 'مدقق',
-};
 
 export default async function ContextPage() {
   let state;
@@ -79,7 +67,7 @@ export default async function ContextPage() {
                     type="submit"
                     className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-5 text-right transition hover:border-teal-700 hover:bg-teal-50"
                   >
-                    <span className="block font-black text-slate-950">{roleLabels[role]}</span>
+                    <span className="block font-black text-slate-950">{ROLE_LABELS_AR[role]}</span>
                     <span className="mt-1 block text-xs font-medium text-slate-500" dir="ltr">{role}</span>
                   </button>
                 </form>
