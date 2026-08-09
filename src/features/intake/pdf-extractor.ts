@@ -16,7 +16,7 @@ export type MappedExtractionField = {
 
 export async function extractNativePdfText(data: Uint8Array): Promise<ExtractedPageText[]> {
   const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
-  const loadingTask = pdfjs.getDocument({ data, isEvalSupported: false, useWorkerFetch: false });
+  const loadingTask = pdfjs.getDocument({ data });
   const document = await loadingTask.promise;
   const pages: ExtractedPageText[] = [];
 
