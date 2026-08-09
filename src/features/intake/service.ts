@@ -16,7 +16,8 @@ export type IntakeDraft = {
   participantEvaluationMethod: string;
 };
 
-const requiredStringFields: Array<keyof Omit<IntakeDraft, 'languages' | 'intakeRoute'>> = [
+type RequiredStringField = keyof Omit<IntakeDraft, 'languages' | 'intakeRoute'>;
+const requiredStringFields: RequiredStringField[] = [
   'titleAr',
   'titleEn',
   'activityType',
@@ -30,7 +31,7 @@ const requiredStringFields: Array<keyof Omit<IntakeDraft, 'languages' | 'intakeR
 ];
 
 export function validateIntakeDraft(draft: IntakeDraft): { ok: boolean; missing: string[] } {
-  const missing = requiredStringFields.filter((field) => draft[field].trim().length === 0);
+  const missing: string[] = requiredStringFields.filter((field) => draft[field].trim().length === 0);
   if (draft.languages.length === 0) missing.push('languages');
   return { ok: missing.length === 0, missing };
 }
