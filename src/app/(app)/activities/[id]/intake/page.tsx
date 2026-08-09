@@ -3,7 +3,7 @@ import { IntakeWorkspaceForm } from '@/features/intake/intake-workspace-form';
 import { getActivityIntakeWorkspace } from '@/features/intake/queries';
 import { requireServerAuthContext } from '@/lib/auth/server-context';
 import { applyConfirmedExtractionAction, confirmExtractionFieldAction } from './actions';
-import { uploadEvidenceAction, uploadSpeakerCvAction } from './file-actions';
+import { saveSpeakerContactAction, uploadEvidenceAction, uploadSpeakerCvAction } from './file-actions';
 
 function labelForField(key: string): string {
   const labels: Record<string,string> = {
@@ -78,17 +78,26 @@ export default async function ActivityIntakePage({ params }: { params: Promise<{
       />
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-black">السير الذاتية للمتحدثين</h2>
-        <p className="mt-2 text-sm leading-7 text-slate-600">بعد حفظ بيانات المتحدث يظهر هنا سجل النشاط الخاص به. يحتفظ النظام بإصدارات CV ولا يغيّر السجل التاريخي للنشاط.</p>
+        <h2 className="text-xl font-black">بيانات المتحدثين والسير الذاتية</h2>
+        <p className="mt-2 text-sm leading-7 text-slate-600">Mobile وE-mail ورقم التسجيل تُحفظ كـSnapshot خاص بالنشاط، وCV يحتفظ بإصداراته. لا تُرسل هذه البيانات إلى AI افتراضيًا.</p>
         <div className="mt-5 grid gap-4">
           {workspace.speakers.length === 0 ? <p className="text-sm text-slate-500">احفظ بيانات المتحدثين أولًا.</p> : workspace.speakers.map((speaker) => {
             const speakerId=String(speaker.id); const count=cvByActivitySpeaker.get(speakerId) ?? 0;
-            return <form action={uploadSpeakerCvAction} key={speakerId} className="grid gap-3 rounded-xl bg-slate-50 p-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
-              <input type="hidden" name="activityId" value={id}/><input type="hidden" name="activitySpeakerId" value={speakerId}/>
-              <div><div className="font-bold text-slate-900">{String(speaker.full_name_snapshot)}</div><div className="mt-1 text-xs text-slate-500">CV versions: {count}</div></div>
-              <label className="text-xs font-bold text-slate-600">CV / supporting qualification<input className={`${inputClass} mt-2`} type="file" name="file" accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png" required /></label>
-              <button className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white">رفع CV</button>
-            </form>;
+            return <div key={speakerId} className="rounded-xl bg-slate-50 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3"><div><div className="font-bold text-slate-900">{String(speaker.full_name_snapshot)}</div><div className="mt-1 text-xs text-slate-500">CV versions: {count}</div></div></div>
+              <form action={saveSpeakerContactAction} className="mt-4 grid gap-3 md:grid-cols-3 md:items-end">
+                <input type="hidden" name="activityId" value={id}/><input type="hidden" name="activitySpeakerId" value={speakerId}/>
+                <label className="text-xs font-bold text-slate-600">Mobile<input name="mobile" defaultValue={speaker.mobile_snapshot==null?'':String(speaker.mobile_snapshot)} dir="ltr" className={`${inputClass} mt-2 text-left`} /></label>
+                <label className="text-xs font-bold text-slate-600">E-mail<input name="email" type="email" defaultValue={speaker.email_snapshot==null?'':String(speaker.email_snapshot)} dir="ltr" className={`${inputClass} mt-2 text-left`} /></label>
+                <label className="text-xs font-bold text-slate-600">SCFHS Registration #<input name="scfhsRegistrationNumber" defaultValue={speaker.scfhs_registration_number_snapshot==null?'':String(speaker.scfhs_registration_number_snapshot)} dir="ltr" className={`${inputClass} mt-2 text-left`} /></label>
+                <button className="justify-self-start rounded-xl border border-teal-800 px-4 py-2.5 text-sm font-bold text-teal-900 md:col-span-3">حفظ بيانات الاتصال</button>
+              </form>
+              <form action={uploadSpeakerCvAction} className="mt-4 grid gap-3 border-t border-slate-200 pt-4 md:grid-cols-[1fr_auto] md:items-end">
+                <input type="hidden" name="activityId" value={id}/><input type="hidden" name="activitySpeakerId" value={speakerId}/>
+                <label className="text-xs font-bold text-slate-600">CV / supporting qualification<input className={`${inputClass} mt-2`} type="file" name="file" accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png" required /></label>
+                <button className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white">رفع CV</button>
+              </form>
+            </div>;
           })}
         </div>
       </section>
