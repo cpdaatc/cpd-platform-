@@ -34,13 +34,13 @@ export class ActivityPersistenceError extends Error {
 }
 
 type ActivityRpcRow = {
-  id: unknown;
-  activity_code: unknown;
-  organization_id: unknown;
-  title_ar: unknown;
-  title_en: unknown;
-  reporting_year: unknown;
-  internal_state: unknown;
+  id: string;
+  activity_code: string;
+  organization_id: string;
+  title_ar: string;
+  title_en: string | null;
+  reporting_year: number;
+  internal_state: 'CREATED';
 };
 
 function isActivityRpcRow(value: unknown): value is ActivityRpcRow {
@@ -67,7 +67,7 @@ export function mapActivityRpcRow(value: unknown): CreatedActivity {
     activityCode: value.activity_code,
     organizationId: value.organization_id,
     titleAr: value.title_ar,
-    titleEn: value.title_en as string | null,
+    titleEn: value.title_en,
     reportingYear: value.reporting_year,
     internalState: 'CREATED',
   };
