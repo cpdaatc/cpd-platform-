@@ -39,7 +39,7 @@ export async function getActivityIntakeWorkspace(activityId: string): Promise<In
     supabase.from('activity_learning_objectives').select('*').eq('activity_id', activityId).order('sort_order'),
     supabase.from('activity_scientific_committees').select('id').eq('activity_id', activityId).maybeSingle(),
     supabase.from('activity_speakers').select('*').eq('activity_id', activityId).order('sort_order'),
-    supabase.from('activity_sessions').select('*').eq('activity_id', activityId).order('sort_order'),
+    supabase.from('activity_sessions').select('*, session_speakers(activity_speaker_id)').eq('activity_id', activityId).order('sort_order'),
     supabase.from('disclosure_records').select('*').eq('activity_id', activityId).order('created_at'),
     supabase.from('intake_documents').select('id, document_role, original_filename, sha256, mime_type, file_size_bytes, uploaded_at').eq('activity_id', activityId).order('uploaded_at', { ascending: false }),
     supabase.from('extraction_runs').select('*').eq('activity_id', activityId).order('created_at', { ascending: false }).limit(1),
@@ -58,6 +58,21 @@ export async function getActivityIntakeWorkspace(activityId: string): Promise<In
   const errors = [profileResult.error, needsResult.error, objectivesResult.error, committeeResult.error, speakersResult.error, sessionsResult.error, disclosuresResult.error, documentsResult.error, extractionRunsResult.error, committeeMembersResult.error, extractionFieldsResult.error].filter(Boolean);
   if (errors.length > 0) throw new Error('Unable to load activity intake workspace.');
 
+  const speakerKeyById = new Map<string,string>();
+  for (const speaker of speakersResult.data ?? []) {
+    const id = String(speaker.id);
+    const key = speaker.client_key ? String(speaker.client_key) : '';
+    if (key) speakerKeyById.set(id,key);
+  }
+
+  const sessions = (sessionsResult.data ?? []).map((row) => {
+    const links = Array.isArray(row.session_speakers) ? row.session_speakers : [];
+    const speakerKeys = links
+      .map((link) => speakerKeyById.get(String((link as { activity_speaker_id?: unknown }).activity_speaker_id ?? '')))
+      .filter((value): value is string => Boolean(value));
+    return { ...row, speaker_keys: speakerKeys } as Record<string, unknown>;
+  });
+
   return {
     activity: {
       id: String(activity.id),
@@ -74,7 +89,7 @@ export async function getActivityIntakeWorkspace(activityId: string): Promise<In
     objectives: (objectivesResult.data ?? []) as Array<Record<string, unknown>>,
     committeeMembers: (committeeMembersResult.data ?? []) as Array<Record<string, unknown>>,
     speakers: (speakersResult.data ?? []) as Array<Record<string, unknown>>,
-    sessions: (sessionsResult.data ?? []) as Array<Record<string, unknown>>,
+    sessions,
     disclosures: (disclosuresResult.data ?? []) as Array<Record<string, unknown>>,
     documents: (documentsResult.data ?? []) as Array<Record<string, unknown>>,
     latestExtractionRun: (latestExtractionRun as Record<string, unknown> | null) ?? null,
