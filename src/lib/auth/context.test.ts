@@ -1,9 +1,30 @@
 import { describe, expect, it } from 'vitest';
 import {
   RoleContextError,
+  resolveOrganizationContext,
   resolveRoleContext,
   requirePermissionInRoleContext,
 } from './context';
+
+describe('organization context', () => {
+  it('automatically selects the only organization membership', () => {
+    expect(resolveOrganizationContext(['org-a'], null)).toEqual({
+      organizationId: 'org-a',
+      requiresSelection: false,
+    });
+  });
+
+  it('requires explicit organization selection when multiple memberships exist', () => {
+    expect(resolveOrganizationContext(['org-a', 'org-b'], null)).toEqual({
+      organizationId: null,
+      requiresSelection: true,
+    });
+  });
+
+  it('rejects an organization that is not assigned to the user', () => {
+    expect(() => resolveOrganizationContext(['org-a'], 'org-b')).toThrow(RoleContextError);
+  });
+});
 
 describe('role context', () => {
   it('automatically selects the only role', () => {
