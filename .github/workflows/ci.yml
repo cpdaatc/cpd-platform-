@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [phase-1-foundation]
+    branches: ['phase-*']
   pull_request:
     branches: [main]
 
@@ -68,6 +68,20 @@ jobs:
         run: psql "$DATABASE_URL" -f supabase/migrations/0008_governed_write_boundary.sql
       - name: Apply single-active-officer invariant
         run: psql "$DATABASE_URL" -f supabase/migrations/0009_single_active_activity_officer.sql
+      - name: Apply Phase 2 intake model
+        run: psql "$DATABASE_URL" -f supabase/migrations/0010_intake.sql
+      - name: Apply Phase 2 storage configuration
+        run: psql "$DATABASE_URL" -f supabase/migrations/0011_storage.sql
+      - name: Apply Phase 2 governed intake commands
+        run: psql "$DATABASE_URL" -f supabase/migrations/0012_intake_commands.sql
+      - name: Apply Phase 2 governed file commands
+        run: psql "$DATABASE_URL" -f supabase/migrations/0013_intake_files.sql
+      - name: Apply Phase 2 speaker contact snapshots
+        run: psql "$DATABASE_URL" -f supabase/migrations/0014_speaker_contact_snapshots.sql
+      - name: Apply Phase 2 offline evidence role-context hardening
+        run: psql "$DATABASE_URL" -f supabase/migrations/0015_offline_evidence_role_context.sql
+      - name: Apply Phase 2 session speaker key fix
+        run: psql "$DATABASE_URL" -f supabase/migrations/0016_fix_session_speaker_keys.sql
       - name: Foundation schema acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
       - name: RBAC acceptance
@@ -82,3 +96,7 @@ jobs:
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_activity_commands.sql
       - name: Single active Activity Officer invariant
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_assignment_invariant.sql
+      - name: Phase 2 intake acceptance
+        run: psql "$DATABASE_URL" -f tests/sql/phase_2_intake.sql
+      - name: Phase 2 governed command acceptance
+        run: psql "$DATABASE_URL" -f tests/sql/phase_2_commands.sql
