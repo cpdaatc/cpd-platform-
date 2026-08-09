@@ -65,11 +65,13 @@ export async function saveActivityIntakeAction(
   const context = await requireServerAuthContext('activity.fill_submit');
   const activityId = String(formData.get('activityId') ?? '');
   const payloadText = String(formData.get('payload') ?? '');
+  const targetStatus = String(formData.get('targetStatus') ?? 'DRAFT') === 'CONFIRMED' ? 'CONFIRMED' : 'DRAFT';
   if (!activityId || !payloadText) return { error: 'بيانات النشاط غير مكتملة.' };
 
   let payload: z.infer<typeof payloadSchema>;
   try {
     payload = payloadSchema.parse(JSON.parse(payloadText));
+    payload.profile.formStatus = targetStatus;
   } catch {
     return { error: 'تعذر التحقق من بيانات النموذج.' };
   }
@@ -93,7 +95,7 @@ export async function saveActivityIntakeAction(
     participantEvaluationMethod: payload.profile.participantEvaluationMethod,
   };
   const validation = validateIntakeDraft(validationDraft);
-  if (!validation.ok && payload.profile.formStatus !== 'DRAFT') {
+  if (!validation.ok && targetStatus === 'CONFIRMED') {
     return { error: `أكمل الحقول المطلوبة قبل تأكيد النموذج (${validation.missing.join(', ')}).` };
   }
 
@@ -105,7 +107,7 @@ export async function saveActivityIntakeAction(
     p_payload: payload,
   });
   if (error) return { error: 'تعذر حفظ ملف النشاط. لم يتم اعتماد تغيير جزئي.' };
-  redirect(`/activities/${activityId}/intake?saved=1`);
+  redirect(`/activities/${activityId}/intake?${targetStatus === 'CONFIRMED' ? 'confirmed' : 'saved'}=1`);
 }
 
 export async function uploadCompletedPdfAction(
