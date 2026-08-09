@@ -70,6 +70,10 @@ jobs:
         run: psql "$DATABASE_URL" -f supabase/migrations/0009_single_active_activity_officer.sql
       - name: Apply Phase 2 intake model
         run: psql "$DATABASE_URL" -f supabase/migrations/0010_intake.sql
+      - name: Apply Phase 2 storage configuration
+        run: psql "$DATABASE_URL" -f supabase/migrations/0011_storage.sql
+      - name: Apply Phase 2 governed intake commands
+        run: psql "$DATABASE_URL" -f supabase/migrations/0012_intake_commands.sql
       - name: Foundation schema acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
       - name: RBAC acceptance
