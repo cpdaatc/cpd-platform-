@@ -30,6 +30,24 @@ async function uploadPrivateFile(activityId: string, prefix: string, file: File)
   return { context, supabase, storagePath, sha256, error: error ? 'UPLOAD_FAILED' as const : null };
 }
 
+export async function saveSpeakerContactAction(formData: FormData): Promise<void> {
+  const context = await requireServerAuthContext('activity.fill_submit');
+  const activityId = String(formData.get('activityId') ?? '');
+  const activitySpeakerId = String(formData.get('activitySpeakerId') ?? '');
+  if (!activityId || !activitySpeakerId) redirect(`/activities/${activityId}/intake?contactError=1`);
+  const supabase = await createServerSupabaseClient();
+  const { error } = await supabase.rpc('save_activity_speaker_contact_command', {
+    p_organization_id: context.organizationId,
+    p_role_context: context.activeRole,
+    p_activity_speaker_id: activitySpeakerId,
+    p_mobile: String(formData.get('mobile') ?? ''),
+    p_email: String(formData.get('email') ?? ''),
+    p_scfhs_registration_number: String(formData.get('scfhsRegistrationNumber') ?? ''),
+  });
+  if (error) redirect(`/activities/${activityId}/intake?contactError=1`);
+  redirect(`/activities/${activityId}/intake?speakerContactSaved=1`);
+}
+
 export async function uploadSpeakerCvAction(formData: FormData): Promise<void> {
   const activityId = String(formData.get('activityId') ?? '');
   const activitySpeakerId = String(formData.get('activitySpeakerId') ?? '');
