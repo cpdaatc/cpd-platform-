@@ -67,6 +67,8 @@ jobs:
         run: psql "$DATABASE_URL" -f supabase/migrations/0007_activity_commands.sql
       - name: Apply governed write boundary
         run: psql "$DATABASE_URL" -f supabase/migrations/0008_governed_write_boundary.sql
+      - name: Apply single-active-officer invariant
+        run: psql "$DATABASE_URL" -f supabase/migrations/0009_single_active_activity_officer.sql
       - name: Foundation schema acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
       - name: RBAC acceptance
@@ -79,5 +81,5 @@ jobs:
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_auth.sql
       - name: Governed activity command acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_activity_commands.sql
-      - name: Single active Activity Officer invariant (RED until migration exists)
+      - name: Single active Activity Officer invariant
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_assignment_invariant.sql
