@@ -50,6 +50,8 @@ jobs:
         run: psql "$DATABASE_URL" -f supabase/migrations/0005_audit_rpc_security.sql
       - name: Apply auth profile bootstrap
         run: psql "$DATABASE_URL" -f supabase/migrations/0006_auth_profile_bootstrap.sql
+      - name: Apply governed activity commands
+        run: psql "$DATABASE_URL" -f supabase/migrations/0007_activity_commands.sql
       - name: Foundation schema acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
       - name: RBAC acceptance
@@ -60,5 +62,5 @@ jobs:
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_rls.sql
       - name: Auth profile bootstrap acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_auth.sql
-      - name: Governed activity command acceptance (RED until migration exists)
+      - name: Governed activity command acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_activity_commands.sql
