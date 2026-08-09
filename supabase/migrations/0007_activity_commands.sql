@@ -151,6 +151,24 @@ begin
     v_actor
   ) returning public.activities.id into v_activity_id;
 
+  insert into public.activity_status_history(
+    organization_id,
+    activity_id,
+    from_state,
+    to_state,
+    changed_by,
+    role_context,
+    reason
+  ) values (
+    p_organization_id,
+    v_activity_id,
+    null,
+    'CREATED',
+    v_actor,
+    p_role_context,
+    'Activity created'
+  );
+
   perform public.log_audit_event(
     p_organization_id,
     v_actor,
