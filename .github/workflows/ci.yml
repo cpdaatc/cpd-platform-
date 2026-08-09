@@ -38,5 +38,7 @@ jobs:
         run: npm test
       - name: Prepare local Supabase compatibility
         run: psql "$DATABASE_URL" -f tests/sql/00_supabase_stub.sql
-      - name: Foundation schema acceptance (RED until migration exists)
+      - name: Apply foundation migration
+        run: psql "$DATABASE_URL" -f supabase/migrations/0001_foundation.sql
+      - name: Foundation schema acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
