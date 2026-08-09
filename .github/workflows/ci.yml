@@ -80,6 +80,8 @@ jobs:
         run: psql "$DATABASE_URL" -f supabase/migrations/0014_speaker_contact_snapshots.sql
       - name: Apply Phase 2 offline evidence role-context hardening
         run: psql "$DATABASE_URL" -f supabase/migrations/0015_offline_evidence_role_context.sql
+      - name: Apply Phase 2 session speaker key fix
+        run: psql "$DATABASE_URL" -f supabase/migrations/0016_fix_session_speaker_keys.sql
       - name: Foundation schema acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
       - name: RBAC acceptance
