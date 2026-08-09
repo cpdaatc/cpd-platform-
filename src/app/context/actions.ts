@@ -66,3 +66,10 @@ export async function selectRoleAction(formData: FormData) {
   cookieStore.set(ROLE_CONTEXT_COOKIE, role.data, cookieOptions);
   redirect('/dashboard');
 }
+
+export async function resetContextAction() {
+  const cookieStore = await cookies();
+  cookieStore.delete(ROLE_CONTEXT_COOKIE);
+  cookieStore.delete(ORGANIZATION_CONTEXT_COOKIE);
+  redirect('/context');
+}
