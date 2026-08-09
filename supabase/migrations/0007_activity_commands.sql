@@ -99,11 +99,27 @@ begin
     raise exception using errcode='22023', message='Planned end date cannot be before start date.';
   end if;
 
+  -- Create the sequence row if it does not exist. Then lock/update it and advance
+  -- from the greater of (a) its stored value and (b) any imported historical
+  -- activity code already present for the organization/year.
   insert into public.activity_code_sequences(organization_id, reporting_year, last_value)
-  values (p_organization_id, p_reporting_year, 1)
-  on conflict on constraint activity_code_sequences_pkey
-  do update set last_value = public.activity_code_sequences.last_value + 1
-  returning last_value into v_sequence;
+  values (p_organization_id, p_reporting_year, 0)
+  on conflict on constraint activity_code_sequences_pkey do nothing;
+
+  update public.activity_code_sequences s
+  set last_value = greatest(
+    s.last_value,
+    coalesce((
+      select max(substring(a.activity_code from '-([0-9]+)$')::integer)
+      from public.activities a
+      where a.organization_id = p_organization_id
+        and a.reporting_year = p_reporting_year
+        and substring(a.activity_code from '-([0-9]+)$') is not null
+    ), 0)
+  ) + 1
+  where s.organization_id = p_organization_id
+    and s.reporting_year = p_reporting_year
+  returning s.last_value into v_sequence;
 
   v_code := 'CPD-' || p_reporting_year::text || '-' || lpad(v_sequence::text, 3, '0');
 
