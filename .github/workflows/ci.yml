@@ -68,6 +68,8 @@ jobs:
         run: psql "$DATABASE_URL" -f supabase/migrations/0008_governed_write_boundary.sql
       - name: Apply single-active-officer invariant
         run: psql "$DATABASE_URL" -f supabase/migrations/0009_single_active_activity_officer.sql
+      - name: Apply Phase 2 intake model
+        run: psql "$DATABASE_URL" -f supabase/migrations/0010_intake.sql
       - name: Foundation schema acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
       - name: RBAC acceptance
