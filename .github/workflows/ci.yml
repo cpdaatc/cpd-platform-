@@ -42,9 +42,11 @@ jobs:
         run: psql "$DATABASE_URL" -f supabase/migrations/0001_foundation.sql
       - name: Apply RBAC seed
         run: psql "$DATABASE_URL" -f supabase/migrations/0002_seed_rbac.sql
+      - name: Apply audit migration
+        run: psql "$DATABASE_URL" -f supabase/migrations/0003_audit.sql
       - name: Foundation schema acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
       - name: RBAC acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_rbac.sql
-      - name: Audit acceptance (RED until migration exists)
+      - name: Audit acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_audit.sql
