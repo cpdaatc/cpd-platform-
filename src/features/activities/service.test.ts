@@ -7,8 +7,8 @@ import {
   createActivity,
   type ActivityActionContext,
   type ActivityRepository,
-  type AuditWriter,
   type CreatedActivity,
+  type GovernedActivityEvent,
 } from './service';
 
 function context(activeRole: GovernanceRole): ActivityActionContext {
@@ -25,6 +25,7 @@ class InMemoryActivities implements ActivityRepository {
   public activities: CreatedActivity[] = [];
   public assignments: Array<{ activityId: string; membershipId: string }> = [];
   public officerMemberships = new Set(['officer-a']);
+  public events: GovernedActivityEvent[] = [];
 
   async createActivity(input: Parameters<ActivityRepository['createActivity']>[0]) {
     const activity: CreatedActivity = {
@@ -37,6 +38,13 @@ class InMemoryActivities implements ActivityRepository {
       internalState: 'CREATED',
     };
     this.activities.push(activity);
+    this.events.push({
+      action: 'activity.created',
+      organizationId: input.organizationId,
+      userId: input.actorUserId,
+      roleContext: input.roleContext,
+      entityId: activity.id,
+    });
     return activity;
   }
 
@@ -50,31 +58,30 @@ class InMemoryActivities implements ActivityRepository {
     );
     if (!belongs) return false;
     this.assignments.push({ activityId: input.activityId, membershipId: input.membershipId });
+    this.events.push({
+      action: 'activity.officer_assigned',
+      organizationId: input.organizationId,
+      userId: input.actorUserId,
+      roleContext: input.roleContext,
+      entityId: input.activityId,
+    });
     return true;
   }
 }
 
-class InMemoryAudit implements AuditWriter {
-  public events: Parameters<AuditWriter['write']>[0][] = [];
-  async write(event: Parameters<AuditWriter['write']>[0]) {
-    this.events.push(event);
-  }
-}
-
 describe('governed activity actions', () => {
-  it('allows System Admin to create an activity and records the active role context', async () => {
+  it('allows System Admin to create an activity and records the active role context atomically', async () => {
     const repository = new InMemoryActivities();
-    const audit = new InMemoryAudit();
 
     const activity = await createActivity(
       { titleAr: 'ورشة تحسين الجودة', reportingYear: 2026 },
       context('ORGANIZATION_SYSTEM_ADMIN'),
-      { repository, audit },
+      repository,
     );
 
     expect(activity.activityCode).toBe('CPD-2026-001');
-    expect(audit.events).toHaveLength(1);
-    expect(audit.events[0]).toMatchObject({
+    expect(repository.events).toHaveLength(1);
+    expect(repository.events[0]).toMatchObject({
       action: 'activity.created',
       organizationId: 'org-a',
       userId: 'user-admin',
@@ -85,26 +92,24 @@ describe('governed activity actions', () => {
 
   it('does not merge Admin permission into Secretary role context', async () => {
     const repository = new InMemoryActivities();
-    const audit = new InMemoryAudit();
 
     await expect(
       createActivity(
         { titleAr: 'نشاط', reportingYear: 2026 },
         context('COMMITTEE_SECRETARY'),
-        { repository, audit },
+        repository,
       ),
     ).rejects.toBeInstanceOf(ActivityAuthorizationError);
   });
 
   it('rejects invalid activity input before repository access', async () => {
     const repository = new InMemoryActivities();
-    const audit = new InMemoryAudit();
 
     await expect(
       createActivity(
         { titleAr: '', reportingYear: 1900 },
         context('ORGANIZATION_SYSTEM_ADMIN'),
-        { repository, audit },
+        repository,
       ),
     ).rejects.toBeInstanceOf(ActivityValidationError);
     expect(repository.activities).toHaveLength(0);
@@ -112,19 +117,19 @@ describe('governed activity actions', () => {
 
   it('assigns only a membership that has the Activity Officer role in the same organization', async () => {
     const repository = new InMemoryActivities();
-    const audit = new InMemoryAudit();
     const admin = context('ORGANIZATION_SYSTEM_ADMIN');
     const activity = await createActivity(
       { titleAr: 'نشاط قابل للإسناد', reportingYear: 2026 },
       admin,
-      { repository, audit },
+      repository,
     );
 
-    await assignActivityOfficer(activity.id, 'officer-a', admin, { repository, audit });
+    await assignActivityOfficer(activity.id, 'officer-a', admin, repository);
     expect(repository.assignments).toEqual([{ activityId: activity.id, membershipId: 'officer-a' }]);
+    expect(repository.events.at(-1)?.action).toBe('activity.officer_assigned');
 
     await expect(
-      assignActivityOfficer(activity.id, 'foreign-or-non-officer', admin, { repository, audit }),
+      assignActivityOfficer(activity.id, 'foreign-or-non-officer', admin, repository),
     ).rejects.toBeInstanceOf(ActivityAuthorizationError);
   });
 });
