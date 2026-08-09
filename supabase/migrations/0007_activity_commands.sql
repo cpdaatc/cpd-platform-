@@ -101,7 +101,7 @@ begin
 
   insert into public.activity_code_sequences(organization_id, reporting_year, last_value)
   values (p_organization_id, p_reporting_year, 1)
-  on conflict (organization_id, reporting_year)
+  on conflict on constraint activity_code_sequences_pkey
   do update set last_value = public.activity_code_sequences.last_value + 1
   returning last_value into v_sequence;
 
