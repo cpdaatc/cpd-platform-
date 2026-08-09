@@ -3,6 +3,7 @@ import { IntakeWorkspaceForm } from '@/features/intake/intake-workspace-form';
 import { getActivityIntakeWorkspace } from '@/features/intake/queries';
 import { requireServerAuthContext } from '@/lib/auth/server-context';
 import { applyConfirmedExtractionAction, confirmExtractionFieldAction } from './actions';
+import { uploadEvidenceAction, uploadSpeakerCvAction } from './file-actions';
 
 function labelForField(key: string): string {
   const labels: Record<string,string> = {
@@ -13,11 +14,18 @@ function labelForField(key: string): string {
   return labels[key] ?? key;
 }
 
+const inputClass = 'w-full rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm focus:border-teal-700';
+
 export default async function ActivityIntakePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   await requireServerAuthContext('activity.fill_submit');
   const workspace = await getActivityIntakeWorkspace(id);
   const latestRunId = workspace.latestExtractionRun?.id ? String(workspace.latestExtractionRun.id) : null;
+  const cvByActivitySpeaker = new Map<string, number>();
+  for (const document of workspace.speakerDocuments) {
+    const speakerId = String(document.activity_speaker_id ?? '');
+    cvByActivitySpeaker.set(speakerId, (cvByActivitySpeaker.get(speakerId) ?? 0) + 1);
+  }
 
   return (
     <section className="space-y-7">
@@ -68,6 +76,37 @@ export default async function ActivityIntakePage({ params }: { params: Promise<{
         sessions={workspace.sessions}
         disclosures={workspace.disclosures}
       />
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-black">السير الذاتية للمتحدثين</h2>
+        <p className="mt-2 text-sm leading-7 text-slate-600">بعد حفظ بيانات المتحدث يظهر هنا سجل النشاط الخاص به. يحتفظ النظام بإصدارات CV ولا يغيّر السجل التاريخي للنشاط.</p>
+        <div className="mt-5 grid gap-4">
+          {workspace.speakers.length === 0 ? <p className="text-sm text-slate-500">احفظ بيانات المتحدثين أولًا.</p> : workspace.speakers.map((speaker) => {
+            const speakerId=String(speaker.id); const count=cvByActivitySpeaker.get(speakerId) ?? 0;
+            return <form action={uploadSpeakerCvAction} key={speakerId} className="grid gap-3 rounded-xl bg-slate-50 p-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
+              <input type="hidden" name="activityId" value={id}/><input type="hidden" name="activitySpeakerId" value={speakerId}/>
+              <div><div className="font-bold text-slate-900">{String(speaker.full_name_snapshot)}</div><div className="mt-1 text-xs text-slate-500">CV versions: {count}</div></div>
+              <label className="text-xs font-bold text-slate-600">CV / supporting qualification<input className={`${inputClass} mt-2`} type="file" name="file" accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png" required /></label>
+              <button className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white">رفع CV</button>
+            </form>;
+          })}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-black">Evidence Register</h2>
+        <p className="mt-2 text-sm leading-7 text-slate-600">غياب ملف مرفوع لا يعني تلقائيًا عدم تحقق المعيار. الأدلة التي راجعتها اللجنة خارج المنصة ستوثق لاحقًا كـ OFFLINE_REVIEWED بواسطة المراجع المخول.</p>
+        <form action={uploadEvidenceAction} className="mt-5 grid gap-3 md:grid-cols-2">
+          <input type="hidden" name="activityId" value={id}/>
+          <label className="text-xs font-bold text-slate-600">Evidence type<select name="evidenceType" className={`${inputClass} mt-2`}><option value="NEEDS_ASSESSMENT">Needs Assessment</option><option value="DISCLOSURE">Disclosure</option><option value="SCIENTIFIC_CONTENT">Scientific Content</option><option value="AGENDA">Agenda / Program</option><option value="SPEAKER_QUALIFICATION">Speaker Qualification</option><option value="OTHER">Other</option></select></label>
+          <label className="text-xs font-bold text-slate-600">File<input className={`${inputClass} mt-2`} type="file" name="file" accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png" required /></label>
+          <label className="text-xs font-bold text-slate-600 md:col-span-2">Notes<input className={`${inputClass} mt-2`} name="notes" /></label>
+          <button className="justify-self-end rounded-xl bg-teal-800 px-5 py-3 text-sm font-bold text-white md:col-span-2">إضافة الدليل</button>
+        </form>
+        <div className="mt-6 grid gap-2">
+          {workspace.evidence.length === 0 ? <p className="text-sm text-slate-500">لا توجد أدلة مسجلة بعد.</p> : workspace.evidence.map((item)=><div key={String(item.id)} className="grid gap-2 rounded-xl bg-slate-50 p-4 text-sm sm:grid-cols-[1fr_auto]"><div><strong>{String(item.evidence_type)}</strong>{item.notes ? <p className="mt-1 text-xs text-slate-500">{String(item.notes)}</p> : null}</div><span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700">{String(item.status)}</span></div>)}
+        </div>
+      </section>
 
       {workspace.documents.length > 0 ? <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h2 className="text-xl font-black">النسخ الأصلية المحفوظة</h2><div className="mt-4 space-y-2">{workspace.documents.map((doc)=><div key={String(doc.id)} className="flex flex-wrap justify-between gap-3 rounded-xl bg-slate-50 p-4 text-sm"><span className="font-bold">{String(doc.original_filename)}</span><span className="font-mono text-xs text-slate-500" dir="ltr">SHA-256 {String(doc.sha256).slice(0,16)}…</span></div>)}</div></section> : null}
     </section>
