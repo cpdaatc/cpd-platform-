@@ -99,6 +99,32 @@ begin
   end;
 end $$;
 
+-- Security-definer RPCs must not become a tenant-isolation bypass.
+do $$
+begin
+  begin
+    perform public.log_audit_event(
+      '20000000-0000-0000-0000-000000000001',
+      '00000000-0000-0000-0000-000000000101',
+      'ORGANIZATION_SYSTEM_ADMIN',
+      'security.cross_tenant_probe',
+      'organization',
+      '20000000-0000-0000-0000-000000000001',
+      null,
+      null,
+      null,
+      'rls-test',
+      'req-cross-tenant'
+    );
+    raise exception 'cross-tenant audit RPC unexpectedly succeeded';
+  exception
+    when insufficient_privilege then null;
+    when others then
+      if sqlerrm = 'cross-tenant audit RPC unexpectedly succeeded' then raise; end if;
+      if sqlstate <> '42501' then raise; end if;
+  end;
+end $$;
+
 reset role;
 
 -- Officer A: assignment-scoped visibility and no activity creation.
