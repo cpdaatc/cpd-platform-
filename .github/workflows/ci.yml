@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [phase-1-foundation]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: cpd-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: cpd_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/cpd_test
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
+      - name: Unit tests
+        run: npm test
+      - name: TypeScript
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Build
+        run: npm run build
+      - name: Prepare local Supabase compatibility
+        run: psql "$DATABASE_URL" -f tests/sql/00_supabase_stub.sql
+      - name: Apply foundation migration
+        run: psql "$DATABASE_URL" -f supabase/migrations/0001_foundation.sql
+      - name: Apply RBAC seed
+        run: psql "$DATABASE_URL" -f supabase/migrations/0002_seed_rbac.sql
+      - name: Apply audit migration
+        run: psql "$DATABASE_URL" -f supabase/migrations/0003_audit.sql
+      - name: Apply RLS migration
+        run: psql "$DATABASE_URL" -f supabase/migrations/0004_rls.sql
+      - name: Apply audit RPC hardening
+        run: psql "$DATABASE_URL" -f supabase/migrations/0005_audit_rpc_security.sql
+      - name: Apply auth profile bootstrap
+        run: psql "$DATABASE_URL" -f supabase/migrations/0006_auth_profile_bootstrap.sql
+      - name: Apply governed activity commands
+        run: psql "$DATABASE_URL" -f supabase/migrations/0007_activity_commands.sql
+      - name: Apply governed write boundary
+        run: psql "$DATABASE_URL" -f supabase/migrations/0008_governed_write_boundary.sql
+      - name: Apply single-active-officer invariant
+        run: psql "$DATABASE_URL" -f supabase/migrations/0009_single_active_activity_officer.sql
+      - name: Foundation schema acceptance
+        run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
+      - name: RBAC acceptance
+        run: psql "$DATABASE_URL" -f tests/sql/phase_1_rbac.sql
+      - name: Audit acceptance
+        run: psql "$DATABASE_URL" -f tests/sql/phase_1_audit.sql
+      - name: RLS acceptance
+        run: psql "$DATABASE_URL" -f tests/sql/phase_1_rls.sql
+      - name: Auth profile bootstrap acceptance
+        run: psql "$DATABASE_URL" -f tests/sql/phase_1_auth.sql
+      - name: Governed activity command acceptance
+        run: psql "$DATABASE_URL" -f tests/sql/phase_1_activity_commands.sql
+      - name: Single active Activity Officer invariant
+        run: psql "$DATABASE_URL" -f tests/sql/phase_1_assignment_invariant.sql
