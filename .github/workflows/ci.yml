@@ -48,6 +48,8 @@ jobs:
         run: psql "$DATABASE_URL" -f supabase/migrations/0004_rls.sql
       - name: Apply audit RPC hardening
         run: psql "$DATABASE_URL" -f supabase/migrations/0005_audit_rpc_security.sql
+      - name: Apply auth profile bootstrap
+        run: psql "$DATABASE_URL" -f supabase/migrations/0006_auth_profile_bootstrap.sql
       - name: Foundation schema acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
       - name: RBAC acceptance
@@ -56,5 +58,5 @@ jobs:
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_audit.sql
       - name: RLS acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_rls.sql
-      - name: Auth profile bootstrap acceptance (RED until migration exists)
+      - name: Auth profile bootstrap acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_auth.sql
