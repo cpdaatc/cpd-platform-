@@ -52,6 +52,8 @@ jobs:
         run: psql "$DATABASE_URL" -f supabase/migrations/0006_auth_profile_bootstrap.sql
       - name: Apply governed activity commands
         run: psql "$DATABASE_URL" -f supabase/migrations/0007_activity_commands.sql
+      - name: Apply governed write boundary
+        run: psql "$DATABASE_URL" -f supabase/migrations/0008_governed_write_boundary.sql
       - name: Foundation schema acceptance
         run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
       - name: RBAC acceptance
