@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { NavIcon } from '@/components/nav-icon';
 import { requireServerAuthContext } from '@/lib/auth/server-context';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
@@ -21,4 +22,4 @@ export default async function ReportsPage(){
   </section>;
 }
 function Summary({icon,title,value}:{icon:'impact'|'annual'|'committee';title:string;value:number}){return <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><span className="text-teal-700"><NavIcon name={icon}/></span><span className="mt-3 block text-xs text-slate-500">{title}</span><strong className="mt-1 block text-3xl">{value}</strong></div>}
-function ReportSection({title,empty,children}:{title:string;empty:string;children:React.ReactNode}){const items=Array.isArray(children)?children:[children];return <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><h2 className="text-xl font-black">{title}</h2><div className="mt-4 grid gap-2">{items.length&&items[0]?children:<p className="text-sm text-slate-500">{empty}</p>}</div></section>}
+function ReportSection({title,empty,children}:{title:string;empty:string;children:ReactNode}){const items=Array.isArray(children)?children:[children];return <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><h2 className="text-xl font-black">{title}</h2><div className="mt-4 grid gap-2">{items.length&&items[0]?children:<p className="text-sm text-slate-500">{empty}</p>}</div></section>}
