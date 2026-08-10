@@ -51,13 +51,12 @@ export function AppShell({context,locale,children}:{context:RequiredServerAuthCo
           {can('external.view')?<NavItem href="/external" icon="external" label={t('التتبع الخارجي','External Tracking')}/>:null}
           {can('impact.view')?<NavItem href="/impact" icon="impact" label={t('قياس الأثر وHTVI','Impact & HTVI')}/>:null}
           {can('annual.view')?<NavItem href="/annual-reports" icon="annual" label={t('التقرير السنوي','Annual Report')}/>:null}
+          {can('report.view')?<NavItem href="/reports" icon="reports" label={t('التقارير والطباعة','Reports & Printing')}/>:null}
           {can('evidence.readiness.view')?<NavItem href="/evidence" icon="evidence" label={t('جاهزية الأدلة','Evidence Readiness')}/>:null}
           {can('notification.view')?<NavItem href="/notifications" icon="notifications" label={t('الإشعارات','Notifications')}/>:null}
           {can('template.manage')||can('template.approve')?<NavItem href="/admin/templates" icon="templates" label={t('القوالب والإصدارات','Templates & Versions')}/>:null}
         </nav>
-        <div className="mt-3 hidden rounded-2xl border border-slate-200 bg-white p-4 text-xs leading-6 text-slate-500 shadow-sm lg:block">
-          <div>{t('السياق النشط','Active context')}</div><strong className="text-slate-800">{roleLabel}</strong><div className="mt-2 border-t border-slate-100 pt-2 text-[10px] leading-5">{t('الموافقة الداخلية تعني جاهزية الرفع فقط ولا تمثل اعتمادًا خارجيًا.','Internal approval means submission readiness only; it is not external accreditation.')}</div>
-        </div>
+        <div className="mt-3 hidden rounded-2xl border border-slate-200 bg-white p-4 text-xs leading-6 text-slate-500 shadow-sm lg:block"><div>{t('السياق النشط','Active context')}</div><strong className="text-slate-800">{roleLabel}</strong><div className="mt-2 border-t border-slate-100 pt-2 text-[10px] leading-5">{t('الموافقة الداخلية تعني جاهزية الرفع فقط ولا تمثل اعتمادًا خارجيًا.','Internal approval means submission readiness only; it is not external accreditation.')}</div></div>
       </aside>
       <main className="app-shell-main min-w-0">{children}</main>
     </div>
