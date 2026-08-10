@@ -11,3 +11,15 @@ export const ROLE_LABELS_AR: Record<GovernanceRole, string> = {
   MANAGEMENT_APPROVER: 'المخول الإداري',
   AUDITOR: 'مدقق',
 };
+
+export const ROLE_LABELS_EN: Record<GovernanceRole, string> = {
+  PLATFORM_SUPER_ADMIN: 'Platform Super Admin',
+  ORGANIZATION_SYSTEM_ADMIN: 'Organization System Administrator',
+  ACTIVITY_OFFICER: 'Activity Officer',
+  COMMITTEE_SECRETARY: 'Committee Secretary',
+  COMMITTEE_CHAIR: 'Committee Chair',
+  COMMITTEE_MEMBER: 'Committee Member',
+  MANAGEMENT_VIEWER: 'Management Viewer',
+  MANAGEMENT_APPROVER: 'Management Approver',
+  AUDITOR: 'Auditor',
+};

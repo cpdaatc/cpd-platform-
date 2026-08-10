@@ -1,0 +1,10 @@
+import Link from 'next/link';
+import { requireServerAuthContext } from '@/lib/auth/server-context';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
+
+export default async function CommitteeMemberPage(){
+  const c=await requireServerAuthContext('committee.comment'); const s=await createServerSupabaseClient();
+  const {data,error}=await s.from('committee_reviews').select('id,status,recorded_at,activity:activities!committee_reviews_activity_id_fkey(activity_code,title_ar,title_en,internal_state),revision:activity_revisions!committee_reviews_revision_id_fkey(revision_no,status)').eq('organization_id',c.organizationId).in('status',['DRAFT','RECORDED','DECIDED']).order('recorded_at',{ascending:false});
+  if(error)throw new Error('تعذر تحميل مراجعات اللجنة.');
+  return <section className="space-y-6"><header className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><p className="text-xs font-black uppercase tracking-[.18em] text-teal-700">Committee Member</p><h1 className="mt-2 text-3xl font-black">مراجعات اللجنة العلمية المؤسسية</h1><p className="mt-3 text-sm leading-7 text-slate-600">يمكن للعضو الاطلاع وإضافة الملاحظات وفق الصلاحية. نتيجة MEET/PARTIAL/NOT_MEET هي نتيجة جماعية يوثقها السكرتير، والقرار النهائي لرئيس اللجنة.</p></header><div className="grid gap-3">{(data??[]).map(r=>{const a=r.activity as unknown as Record<string,unknown>|null;const rev=r.revision as unknown as Record<string,unknown>|null;return <Link key={String(r.id)} href={`/committee/reviews/${String(r.id)}`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-teal-500"><div className="flex flex-wrap justify-between gap-3"><div><div className="font-mono text-xs font-bold text-slate-500" dir="ltr">{String(a?.activity_code??'—')}</div><h2 className="mt-1 font-black">{String(a?.title_ar??'Activity')}</h2><p className="mt-1 text-xs text-slate-500">Revision #{String(rev?.revision_no??'—')}</p></div><span className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-black">{String(r.status)}</span></div></Link>})}</div></section>;
+}

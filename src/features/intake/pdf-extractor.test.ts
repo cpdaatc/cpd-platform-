@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mapOfficialFormText } from './pdf-extractor';
+import { assessNativeExtractionQuality, mapOfficialFormText } from './pdf-extractor';
 
 describe('official form PDF mapping', () => {
   it('extracts only values that can be located with reasonable confidence', () => {
@@ -24,12 +24,26 @@ Medication error reporting is inconsistent
     expect(byKey.titleAr.normalizedValue).toBe('ورشة سلامة الدواء');
     expect(byKey.specialty.normalizedValue).toBe('Patient Safety');
     expect(byKey.targetAudience.normalizedValue).toBe('Healthcare practitioners');
+    expect(assessNativeExtractionQuality([{pageNumber:1,text}],fields).requiresFallback).toBe(false);
   });
 
   it('does not invent a value when a label is present but no usable value follows', () => {
-    const fields = mapOfficialFormText('Activity Title in English *\nActivity Title in Arabic *\n');
+    const text='Activity Title in English *\nActivity Title in Arabic *\n';
+    const fields = mapOfficialFormText(text);
     const title = fields.find((field) => field.fieldKey === 'titleEn');
     expect(title?.normalizedValue ?? null).toBeNull();
     expect(title?.status).toBe('UNCERTAIN');
+    const quality=assessNativeExtractionQuality([{pageNumber:1,text}],fields);
+    expect(quality.requiresFallback).toBe(true);
+    expect(quality.suggestedEngine).toBe('OCR');
+  });
+
+  it('requires human fallback when text exists but expected structure is not recognized',()=>{
+    const text='This is a long machine-readable PDF text layer. '.repeat(20);
+    const fields=mapOfficialFormText(text);
+    const quality=assessNativeExtractionQuality([{pageNumber:1,text}],fields);
+    expect(quality.requiresFallback).toBe(true);
+    expect(quality.suggestedEngine).toBe('MANUAL');
+    expect(quality.recognizedFields).toBe(0);
   });
 });
