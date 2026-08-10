@@ -96,6 +96,7 @@ select public._assert(
 );
 
 reset role;
+select set_config('request.jwt.claim.sub','',false);
 select public.save_pre_review_server_command(
   '80000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000802','ACTIVITY_OFFICER',(select id from p3_activity),'ruleset-1.0',repeat('a',64),
   jsonb_build_array(
