@@ -1,4 +1,4 @@
-export type NavIconName='dashboard'|'activities'|'committee'|'external'|'impact'|'annual'|'evidence'|'notifications'|'admin'|'templates';
+export type NavIconName='dashboard'|'activities'|'committee'|'external'|'impact'|'annual'|'reports'|'evidence'|'notifications'|'admin'|'templates';
 
 export function NavIcon({name}:{name:NavIconName}){
   const common={width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.8,strokeLinecap:'round' as const,strokeLinejoin:'round' as const,'aria-hidden':true};
@@ -8,6 +8,7 @@ export function NavIcon({name}:{name:NavIconName}){
   if(name==='external')return <svg {...common}><path d="M14 3h7v7"/><path d="M10 14 21 3"/><path d="M19 13v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h7"/></svg>;
   if(name==='impact')return <svg {...common}><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/><path d="m4 8 6-4 6 6 5-5"/></svg>;
   if(name==='annual')return <svg {...common}><path d="M4 4h16v16H4z"/><path d="M8 2v4M16 2v4M4 9h16"/><path d="M8 13h2M14 13h2M8 17h2"/></svg>;
+  if(name==='reports')return <svg {...common}><path d="M7 8V3h10v5"/><path d="M6 17H4a2 2 0 0 1-2-2v-4a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v4a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/><path d="M17 11h1"/></svg>;
   if(name==='evidence')return <svg {...common}><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4"/><path d="m9 14 2 2 4-5"/></svg>;
   if(name==='notifications')return <svg {...common}><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>;
   if(name==='templates')return <svg {...common}><path d="M5 3h14v18H5z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>;
