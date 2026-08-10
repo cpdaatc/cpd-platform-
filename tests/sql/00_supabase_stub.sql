@@ -17,6 +17,7 @@ create schema if not exists auth;
 create table if not exists auth.users (
   id uuid primary key default gen_random_uuid(),
   email text unique,
+  raw_user_meta_data jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
 
@@ -26,6 +27,17 @@ language sql
 stable
 as $$
   select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
+$$;
+
+create or replace function public._assert(condition boolean, message text)
+returns void
+language plpgsql
+as $$
+begin
+  if not condition then
+    raise exception 'ASSERTION FAILED: %', message;
+  end if;
+end;
 $$;
 
 grant usage on schema auth to authenticated, service_role;

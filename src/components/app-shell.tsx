@@ -38,7 +38,7 @@ export function AppShell({context,locale,children}:{context:RequiredServerAuthCo
       </div>
     </header>
 
-    <div className="mx-auto grid w-full max-w-[1600px] gap-5 px-3 py-4 sm:px-5 lg:grid-cols-[270px_minmax(0,1fr)] lg:px-8 lg:py-6">
+    <div className="app-shell-content mx-auto grid w-full max-w-[1600px] gap-5 px-3 py-4 sm:px-5 lg:grid-cols-[270px_minmax(0,1fr)] lg:px-8 lg:py-6">
       <aside className="app-shell-nav no-print min-w-0 lg:sticky lg:top-24 lg:self-start">
         <nav className="flex gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-sm lg:max-h-[calc(100vh-7rem)] lg:flex-col lg:overflow-y-auto" aria-label={t('التنقل الرئيسي','Main navigation')}>
           <NavItem href="/dashboard" icon="dashboard" label={t('لوحة القيادة','Dashboard')}/>

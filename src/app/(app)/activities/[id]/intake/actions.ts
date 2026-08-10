@@ -7,6 +7,7 @@ import { assessNativeExtractionQuality, extractNativePdfText, mapOfficialFormPag
 import { validateIntakeDraft, type IntakeDraft } from '@/features/intake/service';
 import { requireServerAuthContext } from '@/lib/auth/server-context';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { removePrivateDocument, uploadPrivateDocument } from '@/lib/storage/private-documents';
 
 export type IntakeActionState = { error: string | null };
 
@@ -35,9 +36,9 @@ export async function uploadCompletedPdfAction(_previousState:IntakeActionState,
   const context=await requireServerAuthContext('activity.fill_submit'); const activityId=String(formData.get('activityId')??''); const file=formData.get('file');
   if(!activityId||!(file instanceof File))return{error:'اختر ملف PDF مكتمل.'}; if(file.type!=='application/pdf')return{error:'المسار يقبل PDF فقط.'}; if(file.size<=0||file.size>20*1024*1024)return{error:'حجم ملف PDF يجب ألا يتجاوز 20 MB.'};
   const bytes=new Uint8Array(await file.arrayBuffer()); const sha256=createHash('sha256').update(bytes).digest('hex'); const storagePath=`${context.organizationId}/${activityId}/${Date.now()}-${safeFilename(file.name)}`; const supabase=await createServerSupabaseClient();
-  const {error:uploadError}=await supabase.storage.from('cpd-documents').upload(storagePath,bytes,{contentType:'application/pdf',upsert:false}); if(uploadError)return{error:'تعذر رفع الملف إلى التخزين الخاص.'};
+  try{await uploadPrivateDocument({organizationId:context.organizationId,storagePath,bytes,contentType:'application/pdf'});}catch{return{error:'تعذر رفع الملف إلى التخزين الخاص.'};}
   const {data:documentId,error:registerError}=await supabase.rpc('register_intake_document_command',{p_organization_id:context.organizationId,p_role_context:context.activeRole,p_activity_id:activityId,p_document_role:'COMPLETED_ACTIVITY_FORM',p_original_filename:file.name,p_storage_path:storagePath,p_sha256:sha256,p_mime_type:file.type,p_file_size_bytes:file.size});
-  if(registerError||!documentId){await supabase.storage.from('cpd-documents').remove([storagePath]);return{error:'تم إلغاء الرفع لأن تسجيل نسخة الأصل لم يكتمل.'};}
+  if(registerError||!documentId){await removePrivateDocument(context.organizationId,storagePath).catch(()=>undefined);return{error:'تم إلغاء الرفع لأن تسجيل نسخة الأصل لم يكتمل.'};}
   try{
     const pages=await extractNativePdfText(bytes); const fields=mapOfficialFormPages(pages); const quality=assessNativeExtractionQuality(pages,fields);
     const {data:runId,error:extractionError}=await supabase.rpc('complete_extraction_run_command',{p_organization_id:context.organizationId,p_role_context:context.activeRole,p_activity_id:activityId,p_document_id:documentId,p_engine:'NATIVE_PDF',p_fields:fields});

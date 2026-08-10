@@ -14,7 +14,9 @@ select public._assert(
 do $$
 begin
   begin
-    update public.audit_logs set action='tamper' where event_sequence=(select min(event_sequence) from public.audit_logs);
+    update public.audit_logs set action='tamper'
+    where organization_id is null
+      and event_sequence=(select min(event_sequence) from public.audit_logs where organization_id is null);
     raise exception 'UPDATE unexpectedly succeeded';
   exception
     when others then
@@ -25,7 +27,9 @@ end $$;
 do $$
 begin
   begin
-    delete from public.audit_logs where event_sequence=(select min(event_sequence) from public.audit_logs);
+    delete from public.audit_logs
+    where organization_id is null
+      and event_sequence=(select min(event_sequence) from public.audit_logs where organization_id is null);
     raise exception 'DELETE unexpectedly succeeded';
   exception
     when others then
@@ -36,7 +40,8 @@ end $$;
 alter table public.audit_logs disable trigger audit_logs_immutable_guard;
 update public.audit_logs
 set action='tampered.out.of.band'
-where event_sequence=(select min(event_sequence) from public.audit_logs);
+where organization_id is null
+  and event_sequence=(select min(event_sequence) from public.audit_logs where organization_id is null);
 alter table public.audit_logs enable trigger audit_logs_immutable_guard;
 
 select public._assert(
