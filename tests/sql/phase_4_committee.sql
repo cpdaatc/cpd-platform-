@@ -1,106 +1,124 @@
 \set ON_ERROR_STOP on
 
+-- Phase 4: permanent institutional scientific committee, immutable revisions,
+-- collective review, Chair-only decision, immutable minutes and controlled correction.
+
 insert into auth.users(id,email) values
-  ('00000000-0000-0000-0000-000000000901','phase4-admin@example.test'),
-  ('00000000-0000-0000-0000-000000000902','phase4-officer@example.test'),
-  ('00000000-0000-0000-0000-000000000903','phase4-secretary@example.test'),
-  ('00000000-0000-0000-0000-000000000904','phase4-chair@example.test'),
-  ('00000000-0000-0000-0000-000000000905','phase4-member@example.test')
+  ('00000000-0000-0000-0000-000000000901','p4-admin@example.test'),
+  ('00000000-0000-0000-0000-000000000902','p4-officer@example.test'),
+  ('00000000-0000-0000-0000-000000000903','p4-secretary@example.test'),
+  ('00000000-0000-0000-0000-000000000904','p4-chair@example.test'),
+  ('00000000-0000-0000-0000-000000000905','p4-member@example.test')
 on conflict(id) do nothing;
-insert into public.users(id,display_name) values
-  ('00000000-0000-0000-0000-000000000901','P4 Admin'),
-  ('00000000-0000-0000-0000-000000000902','P4 Officer'),
-  ('00000000-0000-0000-0000-000000000903','P4 Secretary'),
-  ('00000000-0000-0000-0000-000000000904','P4 Chair'),
-  ('00000000-0000-0000-0000-000000000905','P4 Member')
-on conflict(id) do nothing;
+
 insert into public.organizations(id,name,slug) values
-  ('90000000-0000-0000-0000-000000000010','Phase 4 Committee Org','phase4-committee')
+  ('90000000-0000-0000-0000-000000000010','Phase 4 Org','phase-4-org')
 on conflict(id) do nothing;
-insert into public.organization_memberships(id,organization_id,user_id) values
-  ('93000000-0000-0000-0000-000000000001','90000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000901'),
-  ('93000000-0000-0000-0000-000000000002','90000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000902'),
-  ('93000000-0000-0000-0000-000000000003','90000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000903'),
-  ('93000000-0000-0000-0000-000000000004','90000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000904'),
-  ('93000000-0000-0000-0000-000000000005','90000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000905')
+
+insert into public.organization_memberships(id,organization_id,user_id,status) values
+  ('90000000-0000-0000-0000-000000000101','90000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000901','ACTIVE'),
+  ('90000000-0000-0000-0000-000000000102','90000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000902','ACTIVE'),
+  ('90000000-0000-0000-0000-000000000103','90000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000903','ACTIVE'),
+  ('90000000-0000-0000-0000-000000000104','90000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000904','ACTIVE'),
+  ('90000000-0000-0000-0000-000000000105','90000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000905','ACTIVE')
 on conflict(id) do nothing;
-insert into public.user_roles(organization_id,membership_id,role_id)
-select '90000000-0000-0000-0000-000000000010','93000000-0000-0000-0000-000000000001',id from public.roles where code='ORGANIZATION_SYSTEM_ADMIN'
-on conflict do nothing;
-insert into public.user_roles(organization_id,membership_id,role_id)
-select '90000000-0000-0000-0000-000000000010','93000000-0000-0000-0000-000000000002',id from public.roles where code='ACTIVITY_OFFICER'
-on conflict do nothing;
-insert into public.user_roles(organization_id,membership_id,role_id)
-select '90000000-0000-0000-0000-000000000010','93000000-0000-0000-0000-000000000003',id from public.roles where code='COMMITTEE_SECRETARY'
-on conflict do nothing;
-insert into public.user_roles(organization_id,membership_id,role_id)
-select '90000000-0000-0000-0000-000000000010','93000000-0000-0000-0000-000000000004',id from public.roles where code='COMMITTEE_CHAIR'
-on conflict do nothing;
-insert into public.user_roles(organization_id,membership_id,role_id)
-select '90000000-0000-0000-0000-000000000010','93000000-0000-0000-0000-000000000005',id from public.roles where code='COMMITTEE_MEMBER'
+
+insert into public.user_roles(organization_id,membership_id,role_id) values
+  ('90000000-0000-0000-0000-000000000010','90000000-0000-0000-0000-000000000101',(select id from public.roles where code='ORGANIZATION_SYSTEM_ADMIN')),
+  ('90000000-0000-0000-0000-000000000010','90000000-0000-0000-0000-000000000102',(select id from public.roles where code='ACTIVITY_OFFICER')),
+  ('90000000-0000-0000-0000-000000000010','90000000-0000-0000-0000-000000000103',(select id from public.roles where code='COMMITTEE_SECRETARY')),
+  ('90000000-0000-0000-0000-000000000010','90000000-0000-0000-0000-000000000104',(select id from public.roles where code='COMMITTEE_CHAIR')),
+  ('90000000-0000-0000-0000-000000000010','90000000-0000-0000-0000-000000000105',(select id from public.roles where code='COMMITTEE_MEMBER'))
 on conflict do nothing;
 
 set role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000901',false);
+
+create temporary table p4_activity as
+select (public.create_activity_command(
+  '90000000-0000-0000-0000-000000000010','ORGANIZATION_SYSTEM_ADMIN','نشاط اللجنة',null,
+  'COURSE','GROUP_INTERACTIVE','2026-12-01','2026-12-01',2026
+)).id as id;
+
+select public.assign_activity_officer_command(
+  '90000000-0000-0000-0000-000000000010','ORGANIZATION_SYSTEM_ADMIN',(select id from p4_activity),
+  '00000000-0000-0000-0000-000000000902','P4 assignment'
+);
+
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000902',false);
+select public.save_activity_intake_command(
+  '90000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p4_activity),
+  jsonb_build_object(
+    'profile',jsonb_build_object(
+      'intakeRoute','DIGITAL','specialty','Medical Education','activityLanguages',jsonb_build_array('EN'),
+      'targetAudience','Healthcare professionals','selectAllMedicalFields',false,
+      'learningGap','Measured governance gap','aimAndOutcomes','Improve governed practice',
+      'learningMethods','Interactive case discussion','participantEvaluationMethod','Post-test',
+      'activityScope','LOCAL','formStatus','CONFIRMED'
+    ),
+    'needsAssessmentTools',jsonb_build_array(jsonb_build_object('toolCode','SURVEY')),
+    'objectives',jsonb_build_array(jsonb_build_object('objectiveText','Apply governed workflow','learningDomain','SKILL','sortOrder',1)),
+    'committeeMembers',jsonb_build_array(
+      jsonb_build_object('fullName','Activity Member 1','classificationNumber','A1','sortOrder',1),
+      jsonb_build_object('fullName','Activity Member 2','classificationNumber','A2','sortOrder',2)
+    ),
+    'speakers','[]'::jsonb,'sessions','[]'::jsonb,'disclosures','[]'::jsonb
+  )
+);
+select public.save_pre_review_command(
+  '90000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p4_activity),
+  'PRE_REVIEW','COMPLETED','[]'::jsonb
+);
+create temporary table p4_rev1 as
+select public.submit_activity_revision_command(
+  '90000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p4_activity),'Initial submission'
+) as id;
+
+select public._assert((select status from public.activity_revisions where id=(select id from p4_rev1))='SUBMITTED','submitted revision is immutable snapshot');
+select public._assert((select internal_state from public.activities where id=(select id from p4_activity))='READY_FOR_COMMITTEE','submission advances to committee readiness');
+
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000901',false);
 create temporary table p4_committee as
-select public.configure_institutional_committee_command(
-  '90000000-0000-0000-0000-000000000010','ORGANIZATION_SYSTEM_ADMIN','Institutional Scientific Review Committee','APPT-2026-01','2026-01-01','Hospital Management','2026-01-01',null,
+select public.create_institutional_committee_command(
+  '90000000-0000-0000-0000-000000000010','ORGANIZATION_SYSTEM_ADMIN','Institutional Scientific Committee',
+  'MGMT-P4-001','2026-01-01','Hospital Management','2026-01-01','2026-12-31',
   jsonb_build_array(
     jsonb_build_object('userId','00000000-0000-0000-0000-000000000904','fullName','P4 Chair','committeeRole','CHAIR'),
     jsonb_build_object('userId','00000000-0000-0000-0000-000000000903','fullName','P4 Secretary','committeeRole','SECRETARY'),
     jsonb_build_object('userId','00000000-0000-0000-0000-000000000905','fullName','P4 Member','committeeRole','MEMBER')
   )
 ) as id;
-
-create temporary table p4_activity as
-select * from public.create_activity_command(
-  '90000000-0000-0000-0000-000000000010','ORGANIZATION_SYSTEM_ADMIN','نشاط اللجنة','Committee Activity','COURSE',null,'2026-12-01','2026-12-01','GROUP_INTERACTIVE',2026
-);
-select public.assign_activity_officer_command('90000000-0000-0000-0000-000000000010','ORGANIZATION_SYSTEM_ADMIN',(select id from p4_activity),'93000000-0000-0000-0000-000000000002');
-
-select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000902',false);
-select public.save_activity_intake_command(
-  '90000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p4_activity),
-  jsonb_build_object(
-    'profile',jsonb_build_object('intakeRoute','DIGITAL','specialty','Quality','activityLanguages',jsonb_build_array('AR'),'collaboration',false,'contentDevelopedByProvider',true,'targetAudience','Practitioners','selectAllMedicalFields',false,'learningGap','Documented gap v1','aimAndOutcomes','Improve practice','learningMethods','Interactive workshop','participantEvaluationMethod','Observed checklist','activityScope','LOCAL','formStatus','CONFIRMED'),
-    'needsAssessmentTools',jsonb_build_array(jsonb_build_object('toolCode','SURVEY')),
-    'objectives',jsonb_build_array(jsonb_build_object('objectiveText','Demonstrate correct protocol','learningDomain','SKILL','sortOrder',1)),
-    'committeeMembers',jsonb_build_array(jsonb_build_object('fullName','ASC Member 1','sortOrder',1),jsonb_build_object('fullName','ASC Member 2','sortOrder',2)),
-    'speakers',jsonb_build_array(jsonb_build_object('clientKey','spk-p4','fullName','Speaker P4','sortOrder',1)),
-    'sessions',jsonb_build_array(jsonb_build_object('topicName','Practice','sortOrder',1,'speakerKeys',jsonb_build_array('spk-p4'))),
-    'disclosures',jsonb_build_array(jsonb_build_object('personName','Speaker P4','personRole','SPEAKER','declarationStatus','DECLARED_NO_CONFLICT'))
-  )
-);
-select public.save_pre_review_command(
-  '90000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p4_activity),'ruleset-1.0','p4-v1',
-  jsonb_build_array(jsonb_build_object('ruleCode','ACT-READINESS-SUMMARY','sourceCode','INTERNAL_READINESS_ENGINE','sourceVersion','1.0','evidenceLocation','activity_record','status','ALIGNED','severity','ADVISORY','rationale','Ready for human review','recommendation','Proceed to committee review','confidence',1))
-);
-create temporary table p4_rev1 as
-select public.submit_activity_revision_command('90000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p4_activity),null) as id;
-select public._assert((select internal_state from public.activities where id=(select id from p4_activity))='READY_FOR_COMMITTEE','submission advances to READY_FOR_COMMITTEE');
-select public._assert((select snapshot_sha256 is not null from public.activity_revisions where id=(select id from p4_rev1)),'submitted revision is hashed');
+create temporary table p4_meeting as
+select public.create_committee_meeting_command(
+  '90000000-0000-0000-0000-000000000010','COMMITTEE_SECRETARY',(select id from p4_committee),
+  'P4-MTG-001','2026-12-05 10:00+00','Committee room'
+) as id;
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000903',false);
-create temporary table p4_meeting as
-select public.create_committee_meeting_command('90000000-0000-0000-0000-000000000010','COMMITTEE_SECRETARY','2026-11-01 10:00+03','Meeting Room','MTG-01') as id;
 select public.record_meeting_attendance_command(
   '90000000-0000-0000-0000-000000000010','COMMITTEE_SECRETARY',(select id from p4_meeting),
-  (select jsonb_agg(jsonb_build_object('committeeMemberId',m.id,'status','PRESENT')) from public.institutional_committee_members m where m.committee_id=(select id from p4_committee))
-);
-create temporary table p4_review1 as
-select public.open_committee_review_command('90000000-0000-0000-0000-000000000010','COMMITTEE_SECRETARY',(select id from p4_activity),(select id from p4_meeting)) as id;
-select public.record_collective_assessment_command(
-  '90000000-0000-0000-0000-000000000010','COMMITTEE_SECRETARY',(select id from p4_review1),
   jsonb_build_array(
-    jsonb_build_object('criterionCode','C01','criterionText','Scientific relevance','sourceRuleCode','ACT-GOV-001','evidenceAvailability','UPLOADED','assessment','MEET'),
-    jsonb_build_object('criterionCode','C02','criterionText','Learning need and objectives','sourceRuleCode','ACT-NEED-001','evidenceAvailability','UPLOADED','assessment','PARTIAL','notes','Clarify the gap','correctiveAction','Revise gap statement')
+    jsonb_build_object('memberId',(select id from public.institutional_committee_members where committee_id=(select id from p4_committee) and committee_role='CHAIR'),'status','PRESENT'),
+    jsonb_build_object('memberId',(select id from public.institutional_committee_members where committee_id=(select id from p4_committee) and committee_role='SECRETARY'),'status','PRESENT'),
+    jsonb_build_object('memberId',(select id from public.institutional_committee_members where committee_id=(select id from p4_committee) and committee_role='MEMBER'),'status','PRESENT')
   )
 );
+create temporary table p4_review1 as
+select public.open_committee_review_command(
+  '90000000-0000-0000-0000-000000000010','COMMITTEE_SECRETARY',(select id from p4_activity),(select id from p4_rev1),(select id from p4_meeting)
+) as id;
+select public.record_collective_assessment_command(
+  '90000000-0000-0000-0000-000000000010','COMMITTEE_SECRETARY',(select id from p4_review1),
+  jsonb_build_array(jsonb_build_object('criterionCode','C01','criterionText','Scientific relevance','sourceRuleCode','ACT-GOV-001','evidenceAvailability','UPLOADED','assessment','PARTIAL','notes','Needs correction'))
+);
 
+-- Secretary cannot exercise Chair decision authority.
 do $$
 begin
   begin
-    perform public.final_committee_decision_command('90000000-0000-0000-0000-000000000010','COMMITTEE_SECRETARY',(select id from p4_review1),'RETURNED_FOR_CORRECTION','Needs correction');
+    perform public.final_committee_decision_command(
+      '90000000-0000-0000-0000-000000000010','COMMITTEE_SECRETARY',(select id from p4_review1),'RETURNED_FOR_CORRECTION','Fix criterion C01'
+    );
     raise exception 'secretary unexpectedly made final decision';
   exception when others then
     if sqlerrm='secretary unexpectedly made final decision' then raise; end if;
@@ -109,36 +127,48 @@ begin
 end $$;
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000904',false);
-select public.final_committee_decision_command('90000000-0000-0000-0000-000000000010','COMMITTEE_CHAIR',(select id from p4_review1),'RETURNED_FOR_CORRECTION','Revise learning gap');
-select public._assert((select internal_state from public.activities where id=(select id from p4_activity))='RETURNED_FOR_CORRECTION','Chair return moves activity to correction state');
-select public._assert((select status from public.activity_revisions where id=(select id from p4_rev1))='RETURNED','submitted revision remains historical and marked returned');
-select public._assert((select count(*) from public.activity_revisions where activity_id=(select id from p4_activity) and status='WORKING')=1,'return creates one working N+1 revision');
+select public.final_committee_decision_command(
+  '90000000-0000-0000-0000-000000000010','COMMITTEE_CHAIR',(select id from p4_review1),'RETURNED_FOR_CORRECTION','Fix criterion C01'
+);
+select public._assert((select internal_state from public.activities where id=(select id from p4_activity))='RETURNED','Chair return creates returned workflow state');
+select public._assert((select revision_no from public.activity_revisions where activity_id=(select id from p4_activity) and status='WORKING')=2,'Chair return creates immutable revision N+1 working copy');
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000902',false);
 select public.save_activity_intake_command(
   '90000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p4_activity),
   jsonb_build_object(
-    'profile',jsonb_build_object('intakeRoute','DIGITAL','specialty','Quality','activityLanguages',jsonb_build_array('AR'),'collaboration',false,'contentDevelopedByProvider',true,'targetAudience','Practitioners','selectAllMedicalFields',false,'learningGap','Clarified documented gap v2','aimAndOutcomes','Improve practice','learningMethods','Interactive workshop','participantEvaluationMethod','Observed checklist','activityScope','LOCAL','formStatus','CONFIRMED'),
+    'profile',jsonb_build_object(
+      'intakeRoute','DIGITAL','specialty','Medical Education','activityLanguages',jsonb_build_array('EN'),
+      'targetAudience','Healthcare professionals','selectAllMedicalFields',false,
+      'learningGap','Corrected measured governance gap','aimAndOutcomes','Improve governed practice',
+      'learningMethods','Interactive case discussion','participantEvaluationMethod','Post-test',
+      'activityScope','LOCAL','formStatus','CONFIRMED'
+    ),
     'needsAssessmentTools',jsonb_build_array(jsonb_build_object('toolCode','SURVEY')),
-    'objectives',jsonb_build_array(jsonb_build_object('objectiveText','Demonstrate correct protocol','learningDomain','SKILL','sortOrder',1)),
-    'committeeMembers',jsonb_build_array(jsonb_build_object('fullName','ASC Member 1','sortOrder',1),jsonb_build_object('fullName','ASC Member 2','sortOrder',2)),
-    'speakers',jsonb_build_array(jsonb_build_object('clientKey','spk-p4','fullName','Speaker P4','sortOrder',1)),
-    'sessions',jsonb_build_array(jsonb_build_object('topicName','Practice','sortOrder',1,'speakerKeys',jsonb_build_array('spk-p4'))),
-    'disclosures',jsonb_build_array(jsonb_build_object('personName','Speaker P4','personRole','SPEAKER','declarationStatus','DECLARED_NO_CONFLICT'))
+    'objectives',jsonb_build_array(jsonb_build_object('objectiveText','Apply governed workflow','learningDomain','SKILL','sortOrder',1)),
+    'committeeMembers',jsonb_build_array(
+      jsonb_build_object('fullName','Activity Member 1','classificationNumber','A1','sortOrder',1),
+      jsonb_build_object('fullName','Activity Member 2','classificationNumber','A2','sortOrder',2)
+    ),
+    'speakers','[]'::jsonb,'sessions','[]'::jsonb,'disclosures','[]'::jsonb
   )
 );
 select public.save_pre_review_command(
-  '90000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p4_activity),'ruleset-1.0','p4-v2',
-  jsonb_build_array(jsonb_build_object('ruleCode','ACT-READINESS-SUMMARY','sourceCode','INTERNAL_READINESS_ENGINE','sourceVersion','1.0','evidenceLocation','activity_record','status','ALIGNED','severity','ADVISORY','rationale','Corrected record ready','recommendation','Proceed to committee review','confidence',1))
+  '90000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p4_activity),
+  'PRE_REVIEW','COMPLETED','[]'::jsonb
 );
 create temporary table p4_rev2 as
-select public.submit_activity_revision_command('90000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p4_activity),'Clarified the learning gap after committee return') as id;
-select public._assert((select revision_no from public.activity_revisions where id=(select id from p4_rev2))=2,'resubmission freezes Revision N+1');
-select public._assert((select parent_revision_id from public.activity_revisions where id=(select id from p4_rev2))=(select id from p4_rev1),'Revision N+1 preserves parent link');
+select public.submit_activity_revision_command(
+  '90000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p4_activity),'Corrected submission'
+) as id;
+select public._assert((select revision_no from public.activity_revisions where id=(select id from p4_rev2))=2,'resubmission preserves revision number N+1');
+select public._assert((select status from public.activity_revisions where id=(select id from p4_rev1))='RETURNED','prior submitted revision remains returned immutable history');
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000903',false);
 create temporary table p4_review2 as
-select public.open_committee_review_command('90000000-0000-0000-0000-000000000010','COMMITTEE_SECRETARY',(select id from p4_activity),(select id from p4_meeting)) as id;
+select public.open_committee_review_command(
+  '90000000-0000-0000-0000-000000000010','COMMITTEE_SECRETARY',(select id from p4_activity),(select id from p4_rev2),(select id from p4_meeting)
+) as id;
 select public.record_collective_assessment_command(
   '90000000-0000-0000-0000-000000000010','COMMITTEE_SECRETARY',(select id from p4_review2),
   jsonb_build_array(
@@ -159,6 +189,7 @@ select public.draft_committee_minutes_command('90000000-0000-0000-0000-000000000
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000904',false);
 select public.finalize_committee_minutes_command('90000000-0000-0000-0000-000000000010','COMMITTEE_CHAIR',(select id from p4_minutes));
 select public._assert((select status='FINAL' and snapshot_sha256 is not null from public.committee_minutes where id=(select id from p4_minutes)),'Chair finalizes hashed minutes');
+select public._assert((select internal_state from public.activities where id=(select id from p4_activity))='READY_FOR_SCFHS_SUBMISSION','final Chair-approved minutes advance internally approved activity to SCFHS submission readiness');
 
 reset role;
 do $$
@@ -183,5 +214,6 @@ select public._assert((select status from public.committee_minutes where id=(sel
 select public._assert((select version_no from public.committee_minutes where id=(select id from p4_minutes_v2))=2,'approved correction creates a new minutes version');
 select public.finalize_committee_minutes_command('90000000-0000-0000-0000-000000000010','COMMITTEE_CHAIR',(select id from p4_minutes_v2));
 select public._assert((select status from public.committee_minutes where id=(select id from p4_minutes_v2))='FINAL','corrected minutes version can be finalized without deleting history');
+select public._assert((select internal_state from public.activities where id=(select id from p4_activity))='READY_FOR_SCFHS_SUBMISSION','minutes correction does not regress external submission readiness');
 
 reset role;
