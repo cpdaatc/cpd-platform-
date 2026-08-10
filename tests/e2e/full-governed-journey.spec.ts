@@ -59,6 +59,18 @@ async function logout(page: Page) {
   await expect(page).toHaveURL(/\/login/);
 }
 
+async function proveIntakeHydration(page: Page) {
+  const hybridRoute = page.getByRole('button', { name: 'مسار هجين', exact: true });
+  await expect.poll(async () => {
+    await hybridRoute.click();
+    return (await hybridRoute.getAttribute('class')) ?? '';
+  }, { timeout: 10000 }).toContain('bg-teal-50');
+
+  const digitalRoute = page.getByRole('button', { name: 'تعبئة رقمية', exact: true });
+  await digitalRoute.click();
+  await expect(digitalRoute).toHaveClass(/bg-teal-50/);
+}
+
 test('governed activity journey reaches final immutable institutional committee minutes', async ({ page }) => {
   const suffix = `${Date.now()}-${test.info().retry}`;
   const title = `نشاط E2E للرحلة الحوكمية الكاملة ${suffix}`;
@@ -88,6 +100,7 @@ test('governed activity journey reaches final immutable institutional committee 
   await page.getByRole('link', { name: 'أنشطتي', exact: true }).click();
   await expect(page.getByText(title, { exact: true })).toBeVisible();
   await page.goto(`/activities/${activityId}/intake`);
+  await proveIntakeHydration(page);
 
   await page.getByLabel(/التخصص/).fill('Medical Education');
   await page.getByLabel('العربية').check();
@@ -128,7 +141,7 @@ test('governed activity journey reaches final immutable institutional committee 
       speakers: payload.speakers?.length,
       sessions: payload.sessions?.length,
     };
-  }).toEqual({
+  }, { timeout: 10000 }).toEqual({
     specialty: 'Medical Education',
     targetAudience: 'Healthcare professionals',
     hasArabic: true,
