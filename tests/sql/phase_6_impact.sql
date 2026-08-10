@@ -8,8 +8,9 @@ select '90000000-0000-0000-0000-000000000010','93000000-0000-0000-0000-000000000
 
 set role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000901',false);
-create temporary table p6_policy as select public.configure_impact_followup_policy_command(
+create temporary table p6_policy as select public.configure_impact_followup_policy_version_command(
   '90000000-0000-0000-0000-000000000010','ORGANIZATION_SYSTEM_ADMIN','Impact Follow-up','P6-1',
+  (current_date-interval '1 year')::date,null,
   jsonb_build_array(
     jsonb_build_object('level','L1','dueOffsetDays',0,'gracePeriodDays',7,'required',true),
     jsonb_build_object('level','L2','dueOffsetDays',0,'gracePeriodDays',7,'required',true),
@@ -24,6 +25,7 @@ create temporary table p6_method as select public.configure_impact_methodology_c
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000906',false);
 select public.approve_impact_followup_policy_command('90000000-0000-0000-0000-000000000010','MANAGEMENT_APPROVER',(select id from p6_policy));
 select public.approve_impact_methodology_command('90000000-0000-0000-0000-000000000010','MANAGEMENT_APPROVER',(select id from p6_method));
+select public._assert((select effective_from from public.impact_followup_policies where id=(select id from p6_policy))<=(current_date-interval '200 days')::date,'approved policy covers historical conduct date');
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000901',false);
 select public.mark_activity_conducted_command(
