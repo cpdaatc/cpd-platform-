@@ -48,6 +48,9 @@ const officerUserId = userIdByKey.get('officer');
 const managementUserId = userIdByKey.get('management');
 if (!adminUserId || !officerUserId || !managementUserId) throw new Error('Synthetic role users were not created.');
 
+const officerMembershipId = users.find((user) => user.key === 'officer')?.membershipId;
+if (!officerMembershipId) throw new Error('Synthetic Activity Officer membership is missing.');
+
 const reportActivityId = 'e2000000-0000-0000-0000-000000000101';
 const methodologyId = 'e2000000-0000-0000-0000-000000000102';
 const impactReportId = 'e2000000-0000-0000-0000-000000000103';
@@ -81,6 +84,7 @@ for (const spec of users) {
 
 statements.push(
   `insert into public.activities(id,organization_id,activity_code,title_ar,title_en,activity_type,planned_start_date,planned_end_date,reporting_year,internal_state,created_by) values (${sqlUuid(reportActivityId)},${sqlUuid(organizationId)},'E2E-IMPACT-001',${sqlLiteral('نشاط اصطناعي لاختبار تقرير الأثر')},'Synthetic Impact Report Activity','COURSE','2026-06-01','2026-06-01',2026,'FINAL_IMPACT_REPORT',${sqlUuid(adminUserId)});`,
+  `insert into public.activity_assignments(organization_id,activity_id,membership_id,assignment_role,is_active,assigned_by) values (${sqlUuid(organizationId)},${sqlUuid(reportActivityId)},${sqlUuid(officerMembershipId)},'ACTIVITY_OFFICER',true,${sqlUuid(adminUserId)});`,
   `insert into public.impact_methodology_versions(id,organization_id,name,version_label,status,weights,rating_thresholds,configured_by,approved_by,approved_at) values (${sqlUuid(methodologyId)},${sqlUuid(organizationId)},'HTVI','E2E-1','ACTIVE','{"L1":15,"L2":20,"L3":25,"L4":40}'::jsonb,'{"excellent":85,"very_good":75,"good":65}'::jsonb,${sqlUuid(adminUserId)},${sqlUuid(managementUserId)},now());`,
   `insert into public.impact_reports(id,organization_id,activity_id,kind,version_no,status,methodology_version_id,htvi_status,htvi_score,overall_rating,snapshot_json,snapshot_sha256,generated_by,finalized_at) values (${sqlUuid(impactReportId)},${sqlUuid(organizationId)},${sqlUuid(reportActivityId)},'FINAL',1,'FINAL',${sqlUuid(methodologyId)},'FINAL',96.663,'EXCELLENT',${sqlLiteral(JSON.stringify(snapshot))}::jsonb,${sqlLiteral('a'.repeat(64))},${sqlUuid(officerUserId)},now());`,
   'commit;',
