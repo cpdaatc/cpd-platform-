@@ -11,17 +11,23 @@ async function login(page: Page, email: string) {
 
 async function selectRole(page: Page, role: string) {
   await page.waitForURL(/\/(?:context|dashboard)(?:\?|$|\/)/, { timeout: 10000 });
+  const contextHeading = page.getByRole('heading', { name: 'حدد المؤسسة والدور' });
 
-  if (/\/context(?:\?|$|\/)/.test(page.url())) {
-    await expect(page.getByRole('heading', { name: 'حدد المؤسسة والدور' })).toBeVisible();
+  const stableDestination = await expect.poll(async () => {
+    if (/\/dashboard(?:\?|$|\/)/.test(page.url())) return 'dashboard';
+    if (/\/context(?:\?|$|\/)/.test(page.url()) && await contextHeading.isVisible().catch(() => false)) return 'context';
+    return 'loading';
+  }, { timeout: 10000 }).toMatch(/^(context|dashboard)$/).then(() =>
+    /\/dashboard(?:\?|$|\/)/.test(page.url()) ? 'dashboard' : 'context',
+  );
+
+  if (stableDestination === 'context') {
     const requestedRoleInput = page.locator(`input[name="role"][value="${role}"]`);
     const organizationInput = page.locator('input[name="organizationId"]').first();
-
     await expect.poll(async () => (await requestedRoleInput.count()) + (await organizationInput.count()), { timeout: 10000 }).toBeGreaterThan(0);
 
     if (!(await requestedRoleInput.count()) && await organizationInput.count()) {
       await organizationInput.locator('xpath=ancestor::form[1]').getByRole('button').click();
-      await expect(page.getByRole('heading', { name: 'حدد المؤسسة والدور' })).toBeVisible();
       await expect(requestedRoleInput).toBeAttached({ timeout: 10000 });
     }
 
