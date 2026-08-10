@@ -1,6 +1,7 @@
 import { scanSecurityBoundary } from './security-release-check-lib.mjs';
 
-const failures = await scanSecurityBoundary(process.cwd());
+const scanRoot = process.env.SECURITY_SCAN_ROOT || process.cwd();
+const failures = await scanSecurityBoundary(scanRoot);
 if (failures.length) {
   console.error('Production security release check failed:');
   failures.forEach((failure) => console.error(`- ${failure}`));
