@@ -360,7 +360,7 @@ begin
 end $$;
 
 create or replace function public.generate_impact_report_command(p_organization_id uuid,p_role_context text,p_activity_id uuid,p_kind text)
-returns uuid language plpgsql security definer set search_path='' as $$
+returns uuid language plpgsql security definer set search_path=pg_catalog,extensions,public as $$
 declare v_actor uuid:=auth.uid(); v_method uuid; v_weights jsonb; v_thresholds jsonb; v_scores jsonb; v_domains jsonb; v_objectives jsonb; v_snapshot jsonb; v_hash text; v_htvi numeric; v_rating text; v_version int; v_id uuid; v_state text;
 begin
   if v_actor is null or not public.current_role_has_permission(p_organization_id,p_role_context,'impact.finalize') then raise exception using errcode='42501',message='Not authorized to generate impact report'; end if;
