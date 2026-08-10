@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { redirect } from 'next/navigation';
 import { requireServerAuthContext } from '@/lib/auth/server-context';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { removePrivateDocument, uploadPrivateDocument } from '@/lib/storage/private-documents';
 
 const allowedMimeTypes = new Set([
   'application/pdf',
@@ -25,9 +26,12 @@ async function uploadPrivateFile(activityId: string, prefix: string, file: File)
   const bytes = new Uint8Array(await file.arrayBuffer());
   const sha256 = createHash('sha256').update(bytes).digest('hex');
   const storagePath = `${context.organizationId}/${activityId}/${prefix}/${Date.now()}-${safeFilename(file.name)}`;
-  const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.storage.from('cpd-documents').upload(storagePath, bytes, { contentType: file.type, upsert: false });
-  return { context, supabase, storagePath, sha256, error: error ? 'UPLOAD_FAILED' as const : null };
+  try {
+    await uploadPrivateDocument({ organizationId: context.organizationId, storagePath, bytes, contentType: file.type });
+    return { context, storagePath, sha256, error: null };
+  } catch {
+    return { context, storagePath, sha256, error: 'UPLOAD_FAILED' as const };
+  }
 }
 
 export async function saveSpeakerContactAction(formData: FormData): Promise<void> {
@@ -55,9 +59,9 @@ export async function uploadSpeakerCvAction(formData: FormData): Promise<void> {
   if (!activityId || !activitySpeakerId || !(file instanceof File)) redirect(`/activities/${activityId}/intake?fileError=1`);
 
   const upload = await uploadPrivateFile(activityId, 'speaker-cv', file as File);
-  if (upload.error || !upload.supabase || !upload.storagePath || !upload.sha256) redirect(`/activities/${activityId}/intake?fileError=1`);
-
-  const { error } = await upload.supabase.rpc('register_activity_speaker_document_command', {
+  if (upload.error || !upload.storagePath || !upload.sha256) redirect(`/activities/${activityId}/intake?fileError=1`);
+  const supabase = await createServerSupabaseClient();
+  const { error } = await supabase.rpc('register_activity_speaker_document_command', {
     p_organization_id: upload.context.organizationId,
     p_role_context: upload.context.activeRole,
     p_activity_speaker_id: activitySpeakerId,
@@ -66,7 +70,7 @@ export async function uploadSpeakerCvAction(formData: FormData): Promise<void> {
     p_sha256: upload.sha256,
   });
   if (error) {
-    await upload.supabase.storage.from('cpd-documents').remove([upload.storagePath]);
+    await removePrivateDocument(upload.context.organizationId, upload.storagePath).catch(() => undefined);
     redirect(`/activities/${activityId}/intake?fileError=1`);
   }
   redirect(`/activities/${activityId}/intake?cvUploaded=1`);
@@ -80,8 +84,9 @@ export async function uploadEvidenceAction(formData: FormData): Promise<void> {
   if (!activityId || !(file instanceof File)) redirect(`/activities/${activityId}/intake?fileError=1`);
 
   const upload = await uploadPrivateFile(activityId, 'evidence', file as File);
-  if (upload.error || !upload.supabase || !upload.storagePath || !upload.sha256) redirect(`/activities/${activityId}/intake?fileError=1`);
-  const { error } = await upload.supabase.rpc('register_activity_evidence_command', {
+  if (upload.error || !upload.storagePath || !upload.sha256) redirect(`/activities/${activityId}/intake?fileError=1`);
+  const supabase = await createServerSupabaseClient();
+  const { error } = await supabase.rpc('register_activity_evidence_command', {
     p_organization_id: upload.context.organizationId,
     p_role_context: upload.context.activeRole,
     p_activity_id: activityId,
@@ -91,7 +96,7 @@ export async function uploadEvidenceAction(formData: FormData): Promise<void> {
     p_notes: notes || null,
   });
   if (error) {
-    await upload.supabase.storage.from('cpd-documents').remove([upload.storagePath]);
+    await removePrivateDocument(upload.context.organizationId, upload.storagePath).catch(() => undefined);
     redirect(`/activities/${activityId}/intake?fileError=1`);
   }
   redirect(`/activities/${activityId}/intake?evidenceUploaded=1`);
