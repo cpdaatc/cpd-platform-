@@ -29,6 +29,7 @@ if (orgError) throw orgError;
 const { data: roleRows, error: rolesError } = await admin.from('roles').select('id,code').in('code', [...new Set(users.flatMap((user) => user.roles))]);
 if (rolesError) throw rolesError;
 const roleIdByCode = new Map((roleRows ?? []).map((row) => [row.code, row.id]));
+const userIdByKey = new Map();
 
 for (const spec of users) {
   const { data: created, error: createError } = await admin.auth.admin.createUser({
@@ -40,6 +41,7 @@ for (const spec of users) {
   if (createError || !created.user) throw createError ?? new Error(`Unable to create ${spec.key}`);
 
   const userId = created.user.id;
+  userIdByKey.set(spec.key, userId);
   const { error: profileError } = await admin.from('users').update({ display_name: spec.fullName }).eq('id', userId);
   if (profileError) throw profileError;
 
@@ -59,4 +61,73 @@ for (const spec of users) {
   if (grantError) throw grantError;
 }
 
-console.log(JSON.stringify({ organizationId, password, users: users.map(({ key, email, fullName, roles }) => ({ key, email, fullName, roles })) }));
+const reportActivityId = 'e2000000-0000-0000-0000-000000000101';
+const methodologyId = 'e2000000-0000-0000-0000-000000000102';
+const impactReportId = 'e2000000-0000-0000-0000-000000000103';
+const adminUserId = userIdByKey.get('multi');
+const officerUserId = userIdByKey.get('officer');
+const managementUserId = userIdByKey.get('management');
+
+const { error: activityError } = await admin.from('activities').insert({
+  id: reportActivityId,
+  organization_id: organizationId,
+  activity_code: 'E2E-IMPACT-001',
+  title_ar: 'نشاط اصطناعي لاختبار تقرير الأثر',
+  title_en: 'Synthetic Impact Report Activity',
+  activity_type: 'COURSE',
+  planned_start_date: '2026-06-01',
+  planned_end_date: '2026-06-01',
+  reporting_year: 2026,
+  internal_state: 'FINAL_IMPACT_REPORT',
+  created_by: adminUserId,
+});
+if (activityError) throw activityError;
+
+const { error: methodologyError } = await admin.from('impact_methodology_versions').insert({
+  id: methodologyId,
+  organization_id: organizationId,
+  name: 'HTVI',
+  version_label: 'E2E-1',
+  status: 'ACTIVE',
+  weights: { L1: 15, L2: 20, L3: 25, L4: 40 },
+  rating_thresholds: { excellent: 85, very_good: 75, good: 65 },
+  configured_by: adminUserId,
+  approved_by: managementUserId,
+  approved_at: new Date().toISOString(),
+});
+if (methodologyError) throw methodologyError;
+
+const snapshot = {
+  level_scores: { L1: 88.667, L2: 100, L3: 100, L4: 95.907 },
+  impact_domains: { PATIENT_IMPACT: 95.9, PRACTITIONER_IMPACT: 98.9, QUALITY_SAFETY: 97.8, SERVICE_EFFICIENCY: 91.5 },
+  objectives: [
+    { objective_text: 'تحسين التطبيق السريري', impact_domain: 'PRACTITIONER_IMPACT', achievement: 98.9 },
+    { objective_text: 'تحسين سلامة المرضى', impact_domain: 'PATIENT_IMPACT', achievement: 95.9 },
+    { objective_text: 'رفع جودة الخدمة', impact_domain: 'QUALITY_SAFETY', achievement: 97.8 },
+  ],
+};
+const { error: reportError } = await admin.from('impact_reports').insert({
+  id: impactReportId,
+  organization_id: organizationId,
+  activity_id: reportActivityId,
+  kind: 'FINAL',
+  version_no: 1,
+  status: 'FINAL',
+  methodology_version_id: methodologyId,
+  htvi_status: 'FINAL',
+  htvi_score: 96.663,
+  overall_rating: 'EXCELLENT',
+  snapshot_json: snapshot,
+  snapshot_sha256: 'a'.repeat(64),
+  generated_by: officerUserId,
+  finalized_at: new Date().toISOString(),
+});
+if (reportError) throw reportError;
+
+console.log(JSON.stringify({
+  organizationId,
+  password,
+  reportActivityId,
+  impactReportId,
+  users: users.map(({ key, email, fullName, roles }) => ({ key, email, fullName, roles })),
+}));
