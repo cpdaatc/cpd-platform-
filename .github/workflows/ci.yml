@@ -34,8 +34,8 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with: { node-version: 22 }
-      - name: Install dependencies
-        run: npm install
+      - name: Install locked dependencies
+        run: npm ci
       - name: Production dependency audit
         run: npm audit --omit=dev --audit-level=high
       - name: Unit tests
@@ -79,8 +79,8 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with: { node-version: 22 }
-      - name: Install dependencies
-        run: npm install
+      - name: Install locked dependencies
+        run: npm ci
       - name: Start complete local Supabase stack
         run: npx supabase start
       - name: Export ephemeral local Supabase credentials

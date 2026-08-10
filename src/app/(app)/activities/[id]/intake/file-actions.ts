@@ -18,11 +18,19 @@ function safeFilename(name: string): string {
   return cleaned.slice(-120) || 'document.bin';
 }
 
-async function uploadPrivateFile(activityId: string, prefix: string, file: File) {
+async function uploadPrivateFile(activityId: string, prefix: string, file: File, activitySpeakerId?: string) {
   const context = await requireServerAuthContext('activity.fill_submit');
   if (!allowedMimeTypes.has(file.type) || file.size <= 0 || file.size > 20 * 1024 * 1024) {
     return { context, error: 'INVALID_FILE' as const };
   }
+  const supabase = await createServerSupabaseClient();
+  const { error: authorizationError } = await supabase.rpc('authorize_activity_upload_command', {
+    p_organization_id: context.organizationId,
+    p_role_context: context.activeRole,
+    p_activity_id: activityId,
+    p_activity_speaker_id: activitySpeakerId ?? null,
+  });
+  if (authorizationError) return { context, error: 'UNAUTHORIZED_RESOURCE' as const };
   const bytes = new Uint8Array(await file.arrayBuffer());
   const sha256 = createHash('sha256').update(bytes).digest('hex');
   const storagePath = `${context.organizationId}/${activityId}/${prefix}/${Date.now()}-${safeFilename(file.name)}`;
@@ -58,7 +66,7 @@ export async function uploadSpeakerCvAction(formData: FormData): Promise<void> {
   const file = formData.get('file');
   if (!activityId || !activitySpeakerId || !(file instanceof File)) redirect(`/activities/${activityId}/intake?fileError=1`);
 
-  const upload = await uploadPrivateFile(activityId, 'speaker-cv', file as File);
+  const upload = await uploadPrivateFile(activityId, 'speaker-cv', file as File, activitySpeakerId);
   if (upload.error || !upload.storagePath || !upload.sha256) redirect(`/activities/${activityId}/intake?fileError=1`);
   const supabase = await createServerSupabaseClient();
   const { error } = await supabase.rpc('register_activity_speaker_document_command', {
@@ -70,7 +78,12 @@ export async function uploadSpeakerCvAction(formData: FormData): Promise<void> {
     p_sha256: upload.sha256,
   });
   if (error) {
-    await removePrivateDocument(upload.context.organizationId, upload.storagePath).catch(() => undefined);
+    await removePrivateDocument(upload.context.organizationId, upload.storagePath).catch((cleanupError: unknown) => {
+      console.error('Private document cleanup failed after speaker document registration error.', {
+        storagePath: upload.storagePath,
+        cleanupError,
+      });
+    });
     redirect(`/activities/${activityId}/intake?fileError=1`);
   }
   redirect(`/activities/${activityId}/intake?cvUploaded=1`);
@@ -96,7 +109,12 @@ export async function uploadEvidenceAction(formData: FormData): Promise<void> {
     p_notes: notes || null,
   });
   if (error) {
-    await removePrivateDocument(upload.context.organizationId, upload.storagePath).catch(() => undefined);
+    await removePrivateDocument(upload.context.organizationId, upload.storagePath).catch((cleanupError: unknown) => {
+      console.error('Private document cleanup failed after evidence registration error.', {
+        storagePath: upload.storagePath,
+        cleanupError,
+      });
+    });
     redirect(`/activities/${activityId}/intake?fileError=1`);
   }
   redirect(`/activities/${activityId}/intake?evidenceUploaded=1`);

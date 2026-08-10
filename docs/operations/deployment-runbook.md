@@ -10,7 +10,8 @@ Production deployment requires values held by the hosting/Supabase secret stores
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` / approved public client key
-- `SUPABASE_SERVICE_ROLE_KEY` — server-only
+- `SUPABASE_SECRET_KEY` (preferred) or `SUPABASE_SERVICE_ROLE_KEY` — server-only
+- `PRODUCTION_BASE_URL` — canonical deployed HTTPS origin used by smoke validation
 - production domain/origin configuration
 - approved AI provider settings only if the privacy gate has been approved
 
@@ -52,6 +53,15 @@ Before production promotion:
 10. Verify document Storage remains private and no authenticated direct bucket policy has reappeared.
 11. Verify audit-chain health.
 12. Record release result and operator.
+
+The repository provides two fail-closed operator checks:
+
+```bash
+npm run production:env-check
+npm run production:smoke
+```
+
+The manual **Production Environment Validation** GitHub workflow runs both checks from `main` using the selected protected GitHub Environment. It never prints credential values and does not mutate the target database.
 
 ## Post-Deployment Smoke
 

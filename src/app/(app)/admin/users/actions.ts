@@ -9,7 +9,13 @@ export async function inviteOrganizationUserAction(formData:FormData):Promise<vo
   const c=await requireServerAuthContext('organization.users.manage'); const email=String(formData.get('email')??'').trim().toLowerCase(); const fullName=String(formData.get('fullName')??'').trim();
   if(!email||!email.includes('@'))throw new Error('Valid email is required.');
   const admin=createSupabaseAdminClient(); const {data,error}=await admin.auth.admin.inviteUserByEmail(email,{data:fullName?{full_name:fullName}:undefined}); if(error)throw new Error(error.message); if(!data.user?.id)throw new Error('Invitation did not return a user identifier.');
-  const s=await createServerSupabaseClient(); const {error:membershipError}=await s.rpc('ensure_organization_membership_command',{p_organization_id:c.organizationId,p_role_context:c.activeRole,p_user_id:data.user.id}); if(membershipError)throw new Error(membershipError.message); revalidatePath('/admin/users');
+  const s=await createServerSupabaseClient(); const {error:membershipError}=await s.rpc('ensure_organization_membership_command',{p_organization_id:c.organizationId,p_role_context:c.activeRole,p_user_id:data.user.id});
+  if(membershipError){
+    const {error:compensationError}=await admin.auth.admin.deleteUser(data.user.id);
+    if(compensationError)throw new Error(`Membership failed and invitation compensation also failed: ${compensationError.message}`);
+    throw new Error(membershipError.message);
+  }
+  revalidatePath('/admin/users');
 }
 
 export async function setOrganizationUserRolesAction(formData:FormData):Promise<void>{
