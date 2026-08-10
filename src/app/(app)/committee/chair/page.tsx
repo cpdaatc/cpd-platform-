@@ -1,0 +1,13 @@
+import Link from 'next/link';
+import { requireServerAuthContext } from '@/lib/auth/server-context';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
+
+export default async function CommitteeChairPage(){
+  const c=await requireServerAuthContext('activity.final_decision'); const s=await createServerSupabaseClient();
+  const {data,error}=await s.from('committee_reviews').select('id,status,recorded_at,activity:activities!committee_reviews_activity_id_fkey(id,activity_code,title_ar,title_en,internal_state),revision:activity_revisions!committee_reviews_revision_id_fkey(revision_no,status)').eq('organization_id',c.organizationId).in('status',['RECORDED','DECIDED']).order('recorded_at',{ascending:false});
+  if(error)throw new Error('تعذر تحميل قائمة قرارات رئيس اللجنة.');
+  const awaiting=(data??[]).filter(r=>r.status==='RECORDED');
+  return <section className="space-y-6"><header className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><p className="text-xs font-black uppercase tracking-[.18em] text-teal-700">Committee Chair</p><h1 className="mt-2 text-3xl font-black">قرارات رئيس اللجنة</h1><p className="mt-3 max-w-4xl text-sm leading-7 text-slate-600">المراجعات التي أكمل السكرتير توثيق نتيجتها الجماعية تظهر هنا للقرار النهائي الداخلي. لا يستطيع مسؤول النظام أو السكرتير تنفيذ هذا القرار.</p><div className="mt-5 inline-flex rounded-2xl bg-teal-50 px-5 py-4"><div><span className="text-xs text-teal-700">بانتظار القرار</span><strong className="block text-3xl text-teal-950">{awaiting.length}</strong></div></div></header>
+    <div className="grid gap-3">{(data??[]).length===0?<div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">لا توجد مراجعات في قائمة الرئيس.</div>:(data??[]).map(r=>{const a=r.activity as unknown as Record<string,unknown>|null;const rev=r.revision as unknown as Record<string,unknown>|null;return <Link key={String(r.id)} href={`/committee/reviews/${String(r.id)}`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-teal-500"><div className="flex flex-wrap items-start justify-between gap-4"><div><div className="font-mono text-xs font-bold text-slate-500" dir="ltr">{String(a?.activity_code??'—')}</div><h2 className="mt-1 text-lg font-black">{String(a?.title_ar??'Activity')}</h2><p className="mt-1 text-xs text-slate-500">Revision #{String(rev?.revision_no??'—')}</p></div><span className={`rounded-full px-3 py-1.5 text-xs font-black ${r.status==='RECORDED'?'bg-amber-100 text-amber-900':'bg-emerald-100 text-emerald-900'}`}>{r.status==='RECORDED'?'بانتظار قرار الرئيس':'تم اتخاذ القرار'}</span></div></Link>})}</div>
+  </section>;
+}
