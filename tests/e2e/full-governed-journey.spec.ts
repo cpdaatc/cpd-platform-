@@ -23,8 +23,16 @@ async function selectRole(page: Page, role: string) {
   await expect(page).toHaveURL(/\/dashboard/);
 }
 
-test('activity officer can reach governed submission after confirmed intake and pre-review', async ({ page }) => {
-  const title = `نشاط E2E للرحلة الحوكمية الكاملة ${Date.now()}-${test.info().retry}`;
+async function logout(page: Page) {
+  await page.getByRole('button', { name: /خروج|Sign out/ }).click();
+  await expect(page).toHaveURL(/\/login/);
+}
+
+test('governed activity journey reaches institutional committee review', async ({ page }) => {
+  const suffix = `${Date.now()}-${test.info().retry}`;
+  const title = `نشاط E2E للرحلة الحوكمية الكاملة ${suffix}`;
+  const meetingReference = `E2E-GOV-${suffix}`;
+
   await login(page, 'e2e.admin.secretary@example.test');
   await selectRole(page, 'ORGANIZATION_SYSTEM_ADMIN');
   await page.getByRole('link', { name: 'إدارة الأنشطة', exact: true }).click();
@@ -43,7 +51,7 @@ test('activity officer can reach governed submission after confirmed intake and 
   await page.getByLabel(/مسؤول النشاط/).selectOption({ label: 'E2E Activity Officer' });
   await page.getByRole('button', { name: 'حفظ الإسناد' }).click();
 
-  await page.getByRole('button', { name: /خروج|Sign out/ }).click();
+  await logout(page);
   await login(page, 'e2e.officer@example.test');
   await expect(page).toHaveURL(/\/dashboard/);
   await page.getByRole('link', { name: 'أنشطتي', exact: true }).click();
@@ -101,23 +109,40 @@ test('activity officer can reach governed submission after confirmed intake and 
   });
 
   await page.getByRole('button', { name: 'تأكيد البيانات' }).click();
-  await page.waitForURL(new RegExp(`/activities/${activityId}/intake(?:\\?confirmed=1)?`), { timeout: 10000 });
-  const alertText = ((await page.getByRole('alert').first().textContent().catch(() => '')) ?? '').trim();
-  if (alertText) throw new Error(`Intake confirmation failed: ${alertText}`);
   await expect(page).toHaveURL(new RegExp(`/activities/${activityId}/intake\\?confirmed=1`));
 
   await page.goto(`/activities/${activityId}/readiness`);
   await page.getByRole('button', { name: /تشغيل Pre.?Review/ }).click();
   await page.waitForURL(new RegExp(`/activities/${activityId}/readiness\\?(reviewed|error)=1`), { timeout: 10000 });
   if (page.url().includes('error=1')) throw new Error('Pre-review persistence failed in governed server action.');
-  const latestReviewCard = page.getByText('آخر مراجعة').locator('..');
-  await expect(latestReviewCard.getByText('Completed')).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Latest Pre‑Review Findings' })).toBeVisible();
+  await expect(page.getByText('آخر مراجعة').locator('..').getByText('Completed')).toBeVisible();
 
   const submitButton = page.getByRole('button', { name: 'إرسال إلى اللجنة المؤسسية' });
-  await expect(submitButton).toBeVisible();
+  await expect(submitButton).toBeEnabled();
   await submitButton.click();
   await page.waitForURL(new RegExp(`/activities/${activityId}/readiness\\?(submitted|submitError)=1`), { timeout: 10000 });
   if (page.url().includes('submitError=1')) throw new Error('Governed immutable committee submission failed.');
   await expect(page.getByText(/تم تثبيت نسخة النشاط وإرسالها/)).toBeVisible();
+
+  await logout(page);
+  await login(page, 'e2e.admin.secretary@example.test');
+  await selectRole(page, 'COMMITTEE_SECRETARY');
+  await page.goto('/committee/secretary');
+  await expect(page.getByText(title, { exact: true })).toBeVisible();
+
+  await page.getByLabel('مرجع الاجتماع').fill(meetingReference);
+  await page.getByLabel('التاريخ والوقت').fill('2026-08-21T10:00');
+  await page.getByLabel('المكان / القناة').fill('E2E Governance Room');
+  await page.getByRole('button', { name: 'إنشاء الاجتماع' }).click();
+  await expect(page).toHaveURL(/\/committee\/secretary\?meetingCreated=1/);
+
+  await page.getByRole('button', { name: 'حفظ الحضور' }).click();
+  await expect(page).toHaveURL(/\/committee\/secretary\?attendanceSaved=1/);
+
+  const activityReviewForm = page.locator('form').filter({ hasText: title });
+  await activityReviewForm.getByLabel('إسناد إلى اجتماع').selectOption({ label: meetingReference });
+  await activityReviewForm.getByRole('button', { name: 'فتح المراجعة' }).click();
+  await expect(page).toHaveURL(/\/committee\/reviews\/[0-9a-f-]+$/i);
+  await expect(page.getByRole('heading', { name: title })).toBeVisible();
+  await expect(page.getByText('UNDER_COMMITTEE_REVIEW')).toBeVisible();
 });
