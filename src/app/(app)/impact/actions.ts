@@ -19,8 +19,11 @@ async function rpc(name:string,args:Record<string,unknown>) {
 
 export async function configureFollowupPolicyAction(formData:FormData):Promise<void>{
   const c=await requireServerAuthContext('methodology.configure');
+  const effectiveFrom=String(formData.get('effectiveFrom')??'').trim();
+  const effectiveTo=String(formData.get('effectiveTo')??'').trim();
+  if(!effectiveFrom) throw new Error('Policy effective-from date is required');
   const levels=['L1','L2','L3','L4'].map(level=>({level,dueOffsetDays:num(formData,`${level}Due`),gracePeriodDays:num(formData,`${level}Grace`),required:true}));
-  await rpc('configure_impact_followup_policy_command',{p_organization_id:c.organizationId,p_role_context:c.activeRole,p_name:String(formData.get('name')??'Impact Follow-up'),p_version:String(formData.get('version')??''),p_levels:levels});
+  await rpc('configure_impact_followup_policy_version_command',{p_organization_id:c.organizationId,p_role_context:c.activeRole,p_name:String(formData.get('name')??'Impact Follow-up'),p_version:String(formData.get('version')??''),p_effective_from:effectiveFrom,p_effective_to:effectiveTo||null,p_levels:levels});
   revalidatePath('/impact');
 }
 export async function approveFollowupPolicyAction(formData:FormData):Promise<void>{
