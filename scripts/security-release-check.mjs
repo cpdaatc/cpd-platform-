@@ -31,6 +31,12 @@ requirePattern(adminClient, /import ['"]server-only['"]/, 'Supabase admin client
 requirePattern(adminClient, /SUPABASE_SERVICE_ROLE_KEY/, 'Server admin client must read the server-only service role key.');
 forbidPattern(adminClient, /NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY/, 'Service role key must never be public-prefixed.');
 
+const privateStorage = await text('src/lib/storage/private-documents.ts');
+requirePattern(privateStorage, /import ['"]server-only['"]/, 'Private document helper must be server-only.');
+requirePattern(privateStorage, /createSupabaseAdminClient/, 'Private document helper must use the server admin client.');
+requirePattern(privateStorage, /startsWith\(prefix\)/, 'Private document helper must enforce organization path boundaries.');
+requirePattern(privateStorage, /Math\.min\(Math\.max/, 'Private signed URLs must have bounded lifetimes.');
+
 const envExample = await text('.env.example');
 forbidPattern(envExample, /SUPABASE_SERVICE_ROLE_KEY\s*=\s*(?!server-only|replace|$)[^\n]+/i, 'Example environment file must not contain a real service-role secret.');
 
@@ -38,7 +44,7 @@ const sourceFiles = (await walk('src')).filter((path) => /\.(ts|tsx|js|jsx)$/.te
 for (const path of sourceFiles) {
   const source = await text(path);
   if (source.includes("'use client'") || source.includes('"use client"')) {
-    forbidPattern(source, /SUPABASE_SERVICE_ROLE_KEY|createSupabaseAdminClient/, `Client module ${relative(root, join(root, path))} references server-admin credentials.`);
+    forbidPattern(source, /SUPABASE_SERVICE_ROLE_KEY|createSupabaseAdminClient|private-documents/, `Client module ${relative(root, join(root, path))} references server-admin storage credentials.`);
   }
 }
 
@@ -53,7 +59,8 @@ for (const path of [
   'src/app/(app)/admin/templates/actions.ts',
 ]) {
   const source = await text(path);
-  requirePattern(source, /createSupabaseAdminClient/, `${path} must use a server-only storage client for sensitive document bytes.`);
+  requirePattern(source, /uploadPrivateDocument/, `${path} must use the server-only document helper for sensitive bytes.`);
+  forbidPattern(source, /\.storage\.from\(['"]cpd-documents['"]\)/, `${path} must not access sensitive Storage bytes through the session client.`);
 }
 
 const aiGovernance = await text('supabase/migrations/0018_ai_settings_governance.sql');
