@@ -1,14 +1,5 @@
-function required(name: 'NEXT_PUBLIC_SUPABASE_URL' | 'NEXT_PUBLIC_SUPABASE_ANON_KEY'): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-  return value;
-}
+import { readPublicRuntimeEnv } from '@/lib/config/runtime-env';
 
 export function getPublicSupabaseEnv() {
-  return {
-    url: required('NEXT_PUBLIC_SUPABASE_URL'),
-    anonKey: required('NEXT_PUBLIC_SUPABASE_ANON_KEY'),
-  } as const;
+  return readPublicRuntimeEnv();
 }

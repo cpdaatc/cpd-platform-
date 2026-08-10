@@ -113,6 +113,8 @@ export async function getActivityIntakeWorkspace(activityId: string): Promise<In
     return { ...row, speaker_keys: speakerKeys } as GenericRow;
   });
 
+  const committeeMembers = (committeeMembersResult.data ?? []) as GenericRow[];
+
   return {
     activity: {
       id: String(activity.id),
@@ -127,7 +129,7 @@ export async function getActivityIntakeWorkspace(activityId: string): Promise<In
     profile: (profileResult.data as GenericRow | null) ?? null,
     needsAssessmentTools: (needsResult.data ?? []) as GenericRow[],
     objectives: (objectivesResult.data ?? []) as GenericRow[],
-    committeeMembers: (committeeMembersResult.data ?? []) as GenericRow[],
+    committeeMembers: committeeMembers.length > 0 ? committeeMembers : [{ sort_order: 1 }, { sort_order: 2 }],
     speakers: (speakersResult.data ?? []) as GenericRow[],
     speakerDocuments: (speakerDocumentsResult.data ?? []) as GenericRow[],
     sessions,

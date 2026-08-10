@@ -6,6 +6,14 @@ const activityId = 'e2000000-0000-0000-0000-000000000101';
 const reportId = 'e2000000-0000-0000-0000-000000000103';
 
 test('final impact report is a two-page A4 print surface backed by structured data', async ({ page }) => {
+  const layoutWarnings: string[] = [];
+  page.on('console', (message) => {
+    const text = message.text();
+    if (message.type() === 'warning' && /height value of 0|width value of 0|api\/brand\/logo/i.test(text)) {
+      layoutWarnings.push(text);
+    }
+  });
+
   await page.goto('/login');
   await page.getByLabel(/البريد الإلكتروني|Email address/).fill('e2e.officer@example.test');
   await page.getByLabel(/كلمة المرور|Password/).fill(password);
@@ -28,4 +36,5 @@ test('final impact report is a two-page A4 print surface backed by structured da
   const bytes = await page.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true });
   const document = await pdfjs.getDocument({ data: new Uint8Array(bytes) }).promise;
   expect(document.numPages).toBe(2);
+  expect(layoutWarnings).toEqual([]);
 });

@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { getReadinessWorkspace } from '@/features/ai-review/queries';
 import { reviewObjective } from '@/features/ai-review/rules-engine';
+import { roleHasPermission } from '@/lib/auth/permissions';
 import { requireServerAuthContext } from '@/lib/auth/server-context';
 import { runPreReviewAction } from './actions';
+import { submitToCommitteeAction } from './committee-actions';
 
 function statusClass(status: string): string {
   if (status === 'ALIGNED') return 'bg-emerald-50 text-emerald-800 border-emerald-200';
@@ -10,10 +12,19 @@ function statusClass(status: string): string {
   return 'bg-red-50 text-red-800 border-red-200';
 }
 
-export default async function ReadinessPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ReadinessPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { id } = await params;
+  const query = await searchParams;
   const context = await requireServerAuthContext('ai.run_prereview');
   const workspace = await getReadinessWorkspace(id, context.organizationId);
+  const canSubmitToCommittee = roleHasPermission(context.activeRole, 'activity.submit_committee');
+  const hasCompletedPreReview = Boolean(workspace.latestReview);
 
   return (
     <section className="space-y-7">
@@ -22,6 +33,17 @@ export default async function ReadinessPage({ params }: { params: Promise<{ id: 
         <span className="text-slate-400">/</span>
         <span className="text-slate-500">Accreditation Readiness Review</span>
       </div>
+
+      {query.submitted === '1' ? (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-bold text-emerald-900">
+          تم تثبيت نسخة النشاط وإرسالها إلى مسار اللجنة العلمية المؤسسية للمراجعة الداخلية. هذه الخطوة لا تعني اعتماد الهيئة للنشاط أو الساعات.
+        </div>
+      ) : null}
+      {query.submitError === '1' ? (
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-900">
+          تعذر إرسال النشاط إلى اللجنة. راجع اكتمال السجل المؤكد، اللجنة العلمية الخاصة بالنشاط، الأهداف، ونتيجة Pre‑Review ثم أعد المحاولة.
+        </div>
+      ) : null}
 
       <header className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <p className="text-xs font-bold uppercase tracking-wide text-teal-800">SCFHS Accreditation Readiness Review</p>
@@ -87,6 +109,31 @@ export default async function ReadinessPage({ params }: { params: Promise<{ id: 
           })}
         </div>
       </section>
+
+      {canSubmitToCommittee ? (
+        <section className="rounded-2xl border border-teal-200 bg-teal-50/60 p-6 shadow-sm">
+          <div className="max-w-3xl">
+            <h2 className="text-xl font-black text-teal-950">الإرسال إلى اللجنة العلمية المؤسسية</h2>
+            <p className="mt-2 text-sm leading-7 text-teal-900">
+              عند الإرسال تُثبت نسخة غير قابلة للتعديل من سجل النشاط مع نتيجة Pre‑Review الحالية وتنتقل إلى المراجعة المؤسسية. موافقة اللجنة لاحقًا تعني الجاهزية الداخلية للرفع فقط ولا تمثل اعتماد الهيئة.
+            </p>
+          </div>
+          <form action={submitToCommitteeAction} className="mt-5 flex flex-wrap items-end gap-3">
+            <input type="hidden" name="activityId" value={id}/>
+            <label className="min-w-[260px] flex-1 text-xs font-bold text-teal-950">
+              ملخص التغييرات — مطلوب فقط عند إعادة الإرسال بعد الإرجاع
+              <input name="changeSummary" className="mt-2 w-full rounded-xl border border-teal-200 bg-white px-3 py-2.5 text-sm text-slate-800" placeholder="Describe corrections for a returned revision"/>
+            </label>
+            <button
+              disabled={!hasCompletedPreReview}
+              className="rounded-xl bg-teal-800 px-5 py-3 text-sm font-black text-white hover:bg-teal-900 disabled:cursor-not-allowed disabled:bg-slate-300"
+            >
+              إرسال إلى اللجنة المؤسسية
+            </button>
+          </form>
+          {!hasCompletedPreReview ? <p className="mt-3 text-xs font-bold text-amber-800">شغّل Pre‑Review الحالي قبل الإرسال.</p> : null}
+        </section>
+      ) : null}
     </section>
   );
 }

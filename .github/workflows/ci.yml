@@ -28,8 +28,8 @@ jobs:
           --health-retries 5
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/cpd_test
-      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
+      NEXT_PUBLIC_SUPABASE_URL: https://ci-build.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-public-anon-key-1234567890
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -95,8 +95,12 @@ jobs:
           echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY" >> "$GITHUB_ENV"
           echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY" >> "$GITHUB_ENV"
           echo "E2E_DB_URL=$DB_URL" >> "$GITHUB_ENV"
-      - name: Seed synthetic users and role contexts
-        run: node tests/e2e/seed-local.mjs
+      - name: Seed synthetic users, role contexts, and print fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/e2e/seed-local.mjs
+          node tests/e2e/seed-print-fixtures.mjs
       - name: Install Playwright Chromium
         run: npm run test:e2e:install
       - name: Auth and role-context browser UAT

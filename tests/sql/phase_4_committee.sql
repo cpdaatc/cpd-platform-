@@ -167,6 +167,7 @@ select public.draft_committee_minutes_command('90000000-0000-0000-0000-000000000
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000904',false);
 select public.finalize_committee_minutes_command('90000000-0000-0000-0000-000000000010','COMMITTEE_CHAIR',(select id from p4_minutes));
 select public._assert((select status='FINAL' and snapshot_sha256 is not null from public.committee_minutes where id=(select id from p4_minutes)),'Chair finalizes hashed minutes');
+select public._assert((select internal_state from public.activities where id=(select id from p4_activity))='READY_FOR_SCFHS_SUBMISSION','final Chair-approved minutes advance internal approval to SCFHS submission readiness');
 
 reset role;
 do $$
@@ -191,5 +192,6 @@ select public._assert((select status from public.committee_minutes where id=(sel
 select public._assert((select version_no from public.committee_minutes where id=(select id from p4_minutes_v2))=2,'approved correction creates a new minutes version');
 select public.finalize_committee_minutes_command('90000000-0000-0000-0000-000000000010','COMMITTEE_CHAIR',(select id from p4_minutes_v2));
 select public._assert((select status from public.committee_minutes where id=(select id from p4_minutes_v2))='FINAL','corrected minutes version can be finalized without deleting history');
+select public._assert((select internal_state from public.activities where id=(select id from p4_activity))='READY_FOR_SCFHS_SUBMISSION','corrected final minutes do not regress external submission readiness');
 
 reset role;
