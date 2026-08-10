@@ -15,7 +15,7 @@ Release candidate: `production-readiness`
 - [ ] Authenticated Role Context browser UAT passes.
 - [ ] Activity create/assign browser UAT passes.
 - [ ] Final Impact Report PDF is exactly two A4 pages.
-- [ ] All SQL acceptance suites Phase 1–10 pass from a clean database.
+- [ ] All SQL acceptance suites Phase 1–12 pass from a clean database, including migration `0040_security_governance_closure.sql`.
 - [ ] CodeQL JavaScript/TypeScript security-extended analysis completes without unresolved release-blocking finding.
 
 ## Security invariants
@@ -28,6 +28,10 @@ Release candidate: `production-readiness`
 - [ ] Sensitive document bytes use server-only Storage access after application authorization.
 - [ ] Service-role key is never public-prefixed or referenced by a client component.
 - [ ] External AI cannot be enabled without privacy approval.
+- [ ] Authenticated callers cannot emit arbitrary audit events or persist client-computed deterministic pre-review results.
+- [ ] Impact/annual/external/committee reads enforce their role permissions at RLS, not only in the page layer.
+- [ ] Activity Officer impact mutation/finalization remains assignment-scoped.
+- [ ] Hostile PDF extraction runs within page, output, memory, and wall-clock limits.
 
 ## Operational readiness
 
@@ -36,6 +40,7 @@ Release candidate: `production-readiness`
 - [x] Deployment runbook documented.
 - [x] Incident/rollback guide documented.
 - [x] Environment/secret matrix documented.
+- [x] Fail-closed production environment and deployed smoke scripts implemented.
 - [ ] Backup/restore drill completed against the approved staging/production target.
 - [ ] Monitoring/error platform selected and configured in the deployment environment.
 - [ ] Alert ownership/escalation confirmed for the real deployment.

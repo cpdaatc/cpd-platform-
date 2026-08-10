@@ -80,7 +80,7 @@ select public._assert(
 do $$
 begin
   begin
-    perform public.approve_external_ai_privacy_command('80000000-0000-0000-0000-000000000010','ORGANIZATION_SYSTEM_ADMIN',true);
+    perform public.approve_external_ai_command('80000000-0000-0000-0000-000000000010','ORGANIZATION_SYSTEM_ADMIN','PDPL-TEST-ADMIN',null);
     raise exception 'admin unexpectedly approved AI privacy';
   exception when others then
     if sqlerrm='admin unexpectedly approved AI privacy' then raise; end if;
@@ -89,15 +89,16 @@ begin
 end $$;
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000803',false);
-select public.approve_external_ai_privacy_command('80000000-0000-0000-0000-000000000010','MANAGEMENT_APPROVER',true);
+select public.approve_external_ai_command('80000000-0000-0000-0000-000000000010','MANAGEMENT_APPROVER','PDPL-TEST-APPROVAL',null);
 select public._assert(
   exists(select 1 from public.organization_ai_settings where organization_id='80000000-0000-0000-0000-000000000010' and external_ai_enabled=true and privacy_approved=true and approved_by='00000000-0000-0000-0000-000000000803'),
   'Management Approver explicitly controls privacy approval and enablement'
 );
 
-select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000802',false);
-select public.save_pre_review_command(
-  '80000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p3_activity),'ruleset-1.0','fingerprint-demo',
+reset role;
+select set_config('request.jwt.claim.sub','',false);
+select public.save_pre_review_server_command(
+  '80000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000802','ACTIVITY_OFFICER',(select id from p3_activity),'ruleset-1.0',repeat('a',64),
   jsonb_build_array(
     jsonb_build_object(
       'ruleCode','ACT-GOV-001','sourceCode','SCFHS_ACTIVITY_ACCREDITATION_STANDARDS','sourceVersion','2023',
@@ -120,7 +121,6 @@ select public._assert(
   'every deterministic finding is traceable to the versioned rule/source when a rule exists'
 );
 
-reset role;
 select public._assert(
   exists(select 1 from public.audit_logs where entity_id=(select id from p3_activity) and action='activity.pre_review_completed' and role_context='ACTIVITY_OFFICER'),
   'pre-review completion is audited with role context'

@@ -3,7 +3,8 @@
 import { createHash } from 'node:crypto';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { assessNativeExtractionQuality, extractNativePdfText, mapOfficialFormPages } from '@/features/intake/pdf-extractor';
+import { assessNativeExtractionQuality, mapOfficialFormPages } from '@/features/intake/pdf-extractor';
+import { extractNativePdfTextIsolated, MAX_PDF_UPLOAD_BYTES, validatePdfEnvelope } from '@/features/intake/pdf-extractor-isolated';
 import { validateIntakeDraft, type IntakeDraft } from '@/features/intake/service';
 import { requireServerAuthContext } from '@/lib/auth/server-context';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
@@ -34,13 +35,23 @@ export async function saveActivityIntakeAction(_previousState:IntakeActionState,
 
 export async function uploadCompletedPdfAction(_previousState:IntakeActionState,formData:FormData):Promise<IntakeActionState>{
   const context=await requireServerAuthContext('activity.fill_submit'); const activityId=String(formData.get('activityId')??''); const file=formData.get('file');
-  if(!activityId||!(file instanceof File))return{error:'اختر ملف PDF مكتمل.'}; if(file.type!=='application/pdf')return{error:'المسار يقبل PDF فقط.'}; if(file.size<=0||file.size>20*1024*1024)return{error:'حجم ملف PDF يجب ألا يتجاوز 20 MB.'};
-  const bytes=new Uint8Array(await file.arrayBuffer()); const sha256=createHash('sha256').update(bytes).digest('hex'); const storagePath=`${context.organizationId}/${activityId}/${Date.now()}-${safeFilename(file.name)}`; const supabase=await createServerSupabaseClient();
+  if(!activityId||!(file instanceof File))return{error:'اختر ملف PDF مكتمل.'}; if(file.type!=='application/pdf')return{error:'المسار يقبل PDF فقط.'}; if(file.size<=0||file.size>MAX_PDF_UPLOAD_BYTES)return{error:'حجم ملف PDF يجب ألا يتجاوز 10 MB.'};
+  const supabase=await createServerSupabaseClient();
+  const {error:authorizationError}=await supabase.rpc('authorize_activity_upload_command',{p_organization_id:context.organizationId,p_role_context:context.activeRole,p_activity_id:activityId,p_activity_speaker_id:null});
+  if(authorizationError)return{error:'غير مصرح برفع مستندات لهذا النشاط.'};
+  const bytes=new Uint8Array(await file.arrayBuffer());
+  try{validatePdfEnvelope(bytes);}catch{return{error:'الملف لا يحمل بنية PDF صحيحة.'};}
+  const sha256=createHash('sha256').update(bytes).digest('hex'); const storagePath=`${context.organizationId}/${activityId}/${Date.now()}-${safeFilename(file.name)}`;
   try{await uploadPrivateDocument({organizationId:context.organizationId,storagePath,bytes,contentType:'application/pdf'});}catch{return{error:'تعذر رفع الملف إلى التخزين الخاص.'};}
   const {data:documentId,error:registerError}=await supabase.rpc('register_intake_document_command',{p_organization_id:context.organizationId,p_role_context:context.activeRole,p_activity_id:activityId,p_document_role:'COMPLETED_ACTIVITY_FORM',p_original_filename:file.name,p_storage_path:storagePath,p_sha256:sha256,p_mime_type:file.type,p_file_size_bytes:file.size});
-  if(registerError||!documentId){await removePrivateDocument(context.organizationId,storagePath).catch(()=>undefined);return{error:'تم إلغاء الرفع لأن تسجيل نسخة الأصل لم يكتمل.'};}
+  if(registerError||!documentId){
+    await removePrivateDocument(context.organizationId,storagePath).catch((cleanupError:unknown)=>{
+      console.error('Private document cleanup failed after intake registration error.',{storagePath,cleanupError});
+    });
+    return{error:'تم إلغاء الرفع لأن تسجيل نسخة الأصل لم يكتمل.'};
+  }
   try{
-    const pages=await extractNativePdfText(bytes); const fields=mapOfficialFormPages(pages); const quality=assessNativeExtractionQuality(pages,fields);
+    const pages=await extractNativePdfTextIsolated(bytes); const fields=mapOfficialFormPages(pages); const quality=assessNativeExtractionQuality(pages,fields);
     const {data:runId,error:extractionError}=await supabase.rpc('complete_extraction_run_command',{p_organization_id:context.organizationId,p_role_context:context.activeRole,p_activity_id:activityId,p_document_id:documentId,p_engine:'NATIVE_PDF',p_fields:fields});
     if(extractionError||!runId)return{error:'حُفظ ملف PDF الأصلي، لكن تعذر تسجيل نتائج الاستخراج. أعد تشغيل الاستخراج لاحقًا.'};
     if(quality.requiresFallback){const {error:fallbackError}=await supabase.rpc('mark_extraction_fallback_required_command',{p_organization_id:context.organizationId,p_role_context:context.activeRole,p_extraction_run_id:runId,p_reason:quality.reason,p_suggested_engine:quality.suggestedEngine});if(fallbackError)return{error:'حُفظ الأصل ونتائج الاستخراج، لكن تعذر تسجيل حالة fallback. راجع الملف يدويًا.'};}

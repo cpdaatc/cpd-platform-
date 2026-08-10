@@ -71,10 +71,14 @@ select public.save_activity_intake_command(
     'disclosures',jsonb_build_array(jsonb_build_object('personName','Speaker P4','personRole','SPEAKER','declarationStatus','DECLARED_NO_CONFLICT'))
   )
 );
-select public.save_pre_review_command(
-  '90000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p4_activity),'ruleset-1.0','p4-v1',
+reset role;
+select set_config('request.jwt.claim.sub','',false);
+select public.save_pre_review_server_command(
+  '90000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000902','ACTIVITY_OFFICER',(select id from p4_activity),'ruleset-1.0',repeat('b',64),
   jsonb_build_array(jsonb_build_object('ruleCode','ACT-READINESS-SUMMARY','sourceCode','INTERNAL_READINESS_ENGINE','sourceVersion','1.0','evidenceLocation','activity_record','status','ALIGNED','severity','ADVISORY','rationale','Ready for human review','recommendation','Proceed to committee review','confidence',1))
 );
+set role authenticated;
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000902',false);
 create temporary table p4_rev1 as
 select public.submit_activity_revision_command('90000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p4_activity),null) as id;
 select public._assert((select internal_state from public.activities where id=(select id from p4_activity))='READY_FOR_COMMITTEE','submission advances to READY_FOR_COMMITTEE');
@@ -127,10 +131,14 @@ select public.save_activity_intake_command(
     'disclosures',jsonb_build_array(jsonb_build_object('personName','Speaker P4','personRole','SPEAKER','declarationStatus','DECLARED_NO_CONFLICT'))
   )
 );
-select public.save_pre_review_command(
-  '90000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p4_activity),'ruleset-1.0','p4-v2',
+reset role;
+select set_config('request.jwt.claim.sub','',false);
+select public.save_pre_review_server_command(
+  '90000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000902','ACTIVITY_OFFICER',(select id from p4_activity),'ruleset-1.0',repeat('c',64),
   jsonb_build_array(jsonb_build_object('ruleCode','ACT-READINESS-SUMMARY','sourceCode','INTERNAL_READINESS_ENGINE','sourceVersion','1.0','evidenceLocation','activity_record','status','ALIGNED','severity','ADVISORY','rationale','Corrected record ready','recommendation','Proceed to committee review','confidence',1))
 );
+set role authenticated;
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000902',false);
 create temporary table p4_rev2 as
 select public.submit_activity_revision_command('90000000-0000-0000-0000-000000000010','ACTIVITY_OFFICER',(select id from p4_activity),'Clarified the learning gap after committee return') as id;
 select public._assert((select revision_no from public.activity_revisions where id=(select id from p4_rev2))=2,'resubmission freezes Revision N+1');

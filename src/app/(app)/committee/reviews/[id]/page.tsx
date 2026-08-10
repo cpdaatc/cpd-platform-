@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { CollectiveReviewForm } from '@/features/committee/collective-review-form';
 import { getCommitteeReviewWorkspace } from '@/features/committee/queries';
-import { roleHasPermission } from '@/lib/auth/permissions';
+import { roleHasPermission, type Permission } from '@/lib/auth/permissions';
 import { requireServerAuthContext } from '@/lib/auth/server-context';
 import {
   addCommitteeCommentAction,
@@ -13,6 +13,13 @@ import {
 export default async function CommitteeReviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const context = await requireServerAuthContext();
+  const readPermissions: Permission[] = [
+    'committee.manage_structure','committee.prepare','committee.record_collective','committee.comment',
+    'activity.final_decision','minutes.draft','minutes.finalize','report.view','audit.view',
+  ];
+  if (!readPermissions.some((permission) => roleHasPermission(context.activeRole, permission))) {
+    throw new Error('غير مصرح بعرض سجل مراجعة اللجنة.');
+  }
   const workspace = await getCommitteeReviewWorkspace(id, context.organizationId);
   const canRecord = roleHasPermission(context.activeRole, 'committee.record_collective');
   const canComment = roleHasPermission(context.activeRole, 'committee.comment');

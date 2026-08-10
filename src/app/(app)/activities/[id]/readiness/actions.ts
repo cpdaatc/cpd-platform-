@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { getReadinessWorkspace } from '@/features/ai-review/queries';
 import { runDeterministicPreReview } from '@/features/ai-review/rules-engine';
 import { requireServerAuthContext } from '@/lib/auth/server-context';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export async function runPreReviewAction(formData: FormData): Promise<void> {
   const context = await requireServerAuthContext('ai.run_prereview');
@@ -18,9 +18,10 @@ export async function runPreReviewAction(formData: FormData): Promise<void> {
     .update(JSON.stringify(workspace.input))
     .digest('hex');
 
-  const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.rpc('save_pre_review_command', {
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase.rpc('save_pre_review_server_command', {
     p_organization_id: context.organizationId,
+    p_actor_user_id: context.userId,
     p_role_context: context.activeRole,
     p_activity_id: activityId,
     p_ruleset_version: 'ruleset-1.0',
