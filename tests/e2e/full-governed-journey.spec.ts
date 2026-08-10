@@ -41,10 +41,10 @@ async function selectRole(page: Page, role: string) {
   }
 
   if (role === 'COMMITTEE_SECRETARY') {
-    await expect(page.getByRole('link', { name: /مساحة سكرتير اللجنة|Committee Secretary/, exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'مساحة سكرتير اللجنة', exact: true })).toBeVisible();
   }
   if (role === 'ORGANIZATION_SYSTEM_ADMIN') {
-    await expect(page.getByRole('link', { name: /إدارة الأنشطة|Activity Administration/, exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'إدارة الأنشطة', exact: true }).first()).toBeVisible();
   }
 }
 
