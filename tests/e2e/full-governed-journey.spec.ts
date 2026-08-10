@@ -59,7 +59,7 @@ async function logout(page: Page) {
   await expect(page).toHaveURL(/\/login/);
 }
 
-test('governed activity journey reaches institutional committee review', async ({ page }) => {
+test('governed activity journey reaches final immutable institutional committee minutes', async ({ page }) => {
   const suffix = `${Date.now()}-${test.info().retry}`;
   const title = `نشاط E2E للرحلة الحوكمية الكاملة ${suffix}`;
   const meetingReference = `E2E-GOV-${suffix}`;
@@ -174,6 +174,38 @@ test('governed activity journey reaches institutional committee review', async (
   await activityReviewForm.getByLabel('إسناد إلى اجتماع').selectOption({ label: meetingReference });
   await activityReviewForm.getByRole('button', { name: 'فتح المراجعة' }).click();
   await expect(page).toHaveURL(/\/committee\/reviews\/[0-9a-f-]+$/i);
+  const reviewId = page.url().split('/').pop()!;
   await expect(page.getByRole('heading', { name: title })).toBeVisible();
   await expect(page.getByText('UNDER_COMMITTEE_REVIEW')).toBeVisible();
+
+  await page.getByRole('button', { name: 'حفظ التقييم الجماعي' }).click();
+  await expect(page).toHaveURL(new RegExp(`/committee/reviews/${reviewId}\\?assessmentSaved=1`));
+  await expect(page.getByText(/RECORDED/)).toBeVisible();
+
+  await logout(page);
+  await login(page, 'e2e.chair@example.test');
+  await expect(page).toHaveURL(/\/dashboard/);
+  await page.goto(`/committee/reviews/${reviewId}`);
+  await page.locator('select[name="decision"]').selectOption('APPROVED_FOR_SCFHS_SUBMISSION');
+  await page.getByPlaceholder('ملاحظات القرار').fill('E2E chair approval for external submission readiness.');
+  await page.getByRole('button', { name: 'تسجيل قرار رئيس اللجنة' }).click();
+  await expect(page).toHaveURL(new RegExp(`/committee/reviews/${reviewId}\\?decided=1`));
+  await expect(page.getByText('APPROVED_FOR_SCFHS_SUBMISSION')).toBeVisible();
+
+  await logout(page);
+  await login(page, 'e2e.admin.secretary@example.test');
+  await selectRole(page, 'COMMITTEE_SECRETARY');
+  await page.goto(`/committee/reviews/${reviewId}`);
+  await page.getByRole('button', { name: 'إعداد مسودة المحضر' }).click();
+  await expect(page).toHaveURL(new RegExp(`/committee/reviews/${reviewId}\\?minutesDrafted=1`));
+  await expect(page.getByText('DRAFT', { exact: true })).toBeVisible();
+
+  await logout(page);
+  await login(page, 'e2e.chair@example.test');
+  await expect(page).toHaveURL(/\/dashboard/);
+  await page.goto(`/committee/reviews/${reviewId}`);
+  await page.getByRole('button', { name: 'اعتماد المحضر النهائي' }).click();
+  await expect(page).toHaveURL(new RegExp(`/committee/reviews/${reviewId}\\?minutesFinal=1`));
+  await expect(page.getByText('FINAL', { exact: true })).toBeVisible();
+  await expect(page.getByText('READY_FOR_SCFHS_SUBMISSION')).toBeVisible();
 });
