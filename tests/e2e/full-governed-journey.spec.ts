@@ -29,7 +29,7 @@ async function selectRole(page: Page, role: string) {
   }
 
   if (/\/dashboard(?:\?|$|\/)/.test(page.url())) {
-    const select = page.locator('#shell-role');
+    const select = page.locator('select[name="role"]');
     if (await select.count()) {
       await select.selectOption(role);
       await page.getByRole('button', { name: /تبديل الدور|Switch role/ }).click();
