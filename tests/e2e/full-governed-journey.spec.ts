@@ -101,10 +101,9 @@ test('activity officer can reach governed submission after confirmed intake and 
   });
 
   await page.getByRole('button', { name: 'تأكيد البيانات' }).click();
-  const alert = page.getByRole('alert');
-  if (await alert.count()) {
-    throw new Error(`Intake confirmation failed: ${await alert.first().innerText()}`);
-  }
+  await page.waitForURL(new RegExp(`/activities/${activityId}/intake(?:\\?confirmed=1)?`), { timeout: 10000 });
+  const alertText = ((await page.getByRole('alert').first().textContent().catch(() => '')) ?? '').trim();
+  if (alertText) throw new Error(`Intake confirmation failed: ${alertText}`);
   await expect(page).toHaveURL(new RegExp(`/activities/${activityId}/intake\\?confirmed=1`));
 
   await page.goto(`/activities/${activityId}/readiness`);
