@@ -1,6 +1,6 @@
 \set ON_ERROR_STOP on
 
-insert into auth.users(id,email,raw_user_meta_data) values('00000000-0000-0000-0000-000000000907','new-user@example.test','{"full_name":"New User"}'::jsonb) on conflict(id) do nothing;
+insert into auth.users(id,email) values('00000000-0000-0000-0000-000000000907','new-user@example.test') on conflict(id) do nothing;
 
 set role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000901',false);
