@@ -12,7 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "test:e2e:smoke": "playwright test tests/e2e/login-smoke.spec.ts tests/e2e/responsive-accessibility.spec.ts",
+    "test:e2e:smoke": "playwright test tests/e2e/login-smoke.spec.ts tests/e2e/responsive-accessibility.spec.ts tests/e2e/security-headers.spec.ts",
     "test:e2e:auth": "playwright test tests/e2e/login-role-context.spec.ts tests/e2e/activity-lifecycle.spec.ts tests/e2e/reports-print.spec.ts tests/e2e/committee-minutes-print.spec.ts tests/e2e/annual-report-print.spec.ts tests/e2e/full-governed-journey.spec.ts",
     "test:e2e:install": "playwright install --with-deps chromium",
     "security:release": "node scripts/security-release-check.mjs",
