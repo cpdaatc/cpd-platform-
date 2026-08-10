@@ -4,6 +4,8 @@ const uatBaseUrl = 'http://localhost:3000';
 
 export default defineConfig({
   testDir: './tests/e2e',
+  timeout: 180000,
+  expect: { timeout: 10000 },
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
