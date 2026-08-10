@@ -114,5 +114,10 @@ test('activity officer can reach governed submission after confirmed intake and 
   await expect(latestReviewCard.getByText('Completed')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Latest Pre‑Review Findings' })).toBeVisible();
 
-  await expect(page.getByRole('button', { name: 'إرسال إلى اللجنة المؤسسية' })).toBeVisible();
+  const submitButton = page.getByRole('button', { name: 'إرسال إلى اللجنة المؤسسية' });
+  await expect(submitButton).toBeVisible();
+  await submitButton.click();
+  await page.waitForURL(new RegExp(`/activities/${activityId}/readiness\\?(submitted|submitError)=1`), { timeout: 10000 });
+  if (page.url().includes('submitError=1')) throw new Error('Governed immutable committee submission failed.');
+  await expect(page.getByText(/تم تثبيت نسخة النشاط وإرسالها/)).toBeVisible();
 });
