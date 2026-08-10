@@ -74,8 +74,32 @@ test('activity officer can reach governed submission after confirmed intake and 
   const sessions = page.getByRole('button', { name: 'حذف الجلسة' });
   if (await sessions.count()) await sessions.first().click();
 
+  const payloadInput = page.locator('input[name="payload"]');
+  await expect.poll(async () => {
+    const raw = await payloadInput.inputValue();
+    const payload = JSON.parse(raw);
+    return {
+      specialty: payload.profile?.specialty,
+      targetAudience: payload.profile?.targetAudience,
+      hasArabic: payload.profile?.activityLanguages?.includes('AR') ?? false,
+      learningGap: payload.profile?.learningGap,
+      objective: payload.objectives?.[0]?.objectiveText,
+      secondCommitteeMember: payload.committeeMembers?.[1]?.fullName,
+      speakers: payload.speakers?.length,
+      sessions: payload.sessions?.length,
+    };
+  }).toEqual({
+    specialty: 'Medical Education',
+    targetAudience: 'Healthcare professionals',
+    hasArabic: true,
+    learningGap: 'Documented learning gap requiring measurable improvement.',
+    objective: 'Apply the governed CPD workflow correctly by the end of the activity.',
+    secondCommitteeMember: 'Activity Committee Member Two',
+    speakers: 0,
+    sessions: 0,
+  });
+
   await page.getByRole('button', { name: 'تأكيد البيانات' }).click();
-  await page.waitForTimeout(800);
   const alert = page.getByRole('alert');
   if (await alert.count()) {
     throw new Error(`Intake confirmation failed: ${await alert.first().innerText()}`);
