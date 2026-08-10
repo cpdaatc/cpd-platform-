@@ -1,12 +1,13 @@
 -- Release completion: an internally approved activity becomes ready for external SCFHS submission
 -- only after the institutional committee minutes are finalized by the active Committee Chair.
 -- This keeps the Chair decision and the external submission readiness gate distinct.
+-- Keep pgcrypto resolution portable between Supabase (`extensions`) and standalone PostgreSQL (`public`).
 
 create or replace function public.finalize_committee_minutes_command(
   p_organization_id uuid,p_role_context text,p_minutes_id uuid
 )
 returns void
-language plpgsql security definer set search_path=''
+language plpgsql security definer set search_path = pg_catalog, extensions, public
 as $$
 declare
   v_actor uuid:=auth.uid();
