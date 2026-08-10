@@ -12,21 +12,25 @@ async function login(page: Page, email: string) {
 async function selectRole(page: Page, role: string) {
   await page.waitForURL(/\/(?:context|dashboard)(?:\?|$|\/)/, { timeout: 10000 });
 
-  for (let step = 0; step < 3 && /\/context(?:\?|$|\/)/.test(page.url()); step += 1) {
-    const roleForm = page.locator('form').filter({ has: page.locator(`input[name="role"][value="${role}"]`) }).first();
-    if (await roleForm.count()) {
-      await roleForm.getByRole('button').click();
-      await page.waitForURL(/\/dashboard(?:\?|$|\/)/, { timeout: 10000 });
-      break;
+  if (/\/context(?:\?|$|\/)/.test(page.url())) {
+    const requestedRoleInput = page.locator(`input[name="role"][value="${role}"]`);
+    if (!(await requestedRoleInput.count())) {
+      const organizationForm = page.locator('form').filter({ has: page.locator('input[name="organizationId"]') }).first();
+      if (await organizationForm.count()) {
+        await organizationForm.getByRole('button').click();
+        await expect(requestedRoleInput).toBeAttached({ timeout: 10000 });
+      }
     }
 
-    const organizationForm = page.locator('form').filter({ has: page.locator('input[name="organizationId"]') }).first();
-    if (await organizationForm.count()) {
-      await organizationForm.getByRole('button').click();
-      await page.waitForURL(/\/(?:context|dashboard)(?:\?|$|\/)/, { timeout: 10000 });
-      continue;
+    if (await requestedRoleInput.count()) {
+      await requestedRoleInput.locator('xpath=ancestor::form[1]').getByRole('button').click();
+      await page.waitForURL(/\/dashboard(?:\?|$|\/)/, { timeout: 10000 });
+    } else {
+      const anyRoleInput = page.locator('input[name="role"]').first();
+      if (!(await anyRoleInput.count())) throw new Error(`Unable to resolve organization/role context for ${role}.`);
+      await anyRoleInput.locator('xpath=ancestor::form[1]').getByRole('button').click();
+      await page.waitForURL(/\/dashboard(?:\?|$|\/)/, { timeout: 10000 });
     }
-    throw new Error(`Unable to resolve organization/role context for ${role}.`);
   }
 
   await expect(page).toHaveURL(/\/dashboard/);
