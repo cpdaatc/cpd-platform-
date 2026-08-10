@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: ['phase-*', 'recovery-*']
+    branches: ['phase-*', 'recovery-*', 'production-readiness']
   pull_request:
     branches: [main]
 
@@ -48,6 +48,8 @@ jobs:
         run: npm run lint
       - name: Build
         run: npm run build
+      - name: Browser acceptance smoke
+        run: npm run test:e2e
       - name: Prepare local Supabase compatibility
         run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f tests/sql/00_supabase_stub.sql
       - name: Apply all database migrations in order
