@@ -63,9 +63,9 @@ test('activity officer can reach governed submission after confirmed intake and 
   await objective.locator('..').locator('select').selectOption('SKILL');
 
   const committeeSection = page.getByRole('heading', { name: '4. اللجنة العلمية الخاصة بالنشاط' }).locator('xpath=ancestor::section[1]');
+  await expect(committeeSection.getByPlaceholder('Full name *')).toHaveCount(2);
   await committeeSection.getByPlaceholder('Full name *').first().fill('Activity Committee Member One');
   await committeeSection.getByPlaceholder('Classification number').first().fill('SCFHS-E2E-001');
-  await committeeSection.getByRole('button', { name: '+ عضو' }).click();
   await committeeSection.getByPlaceholder('Full name *').nth(1).fill('Activity Committee Member Two');
   await committeeSection.getByPlaceholder('Classification number').nth(1).fill('SCFHS-E2E-002');
 
