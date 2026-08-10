@@ -13,9 +13,9 @@ async function selectRole(page: Page, role: string) {
   await page.waitForURL(/\/(?:context|dashboard)(?:\?|$|\/)/, { timeout: 10000 });
 
   for (let step = 0; step < 3 && /\/context(?:\?|$|\/)/.test(page.url()); step += 1) {
-    const roleButton = page.getByRole('button', { name: new RegExp(role) });
-    if (await roleButton.count()) {
-      await roleButton.first().click();
+    const roleForm = page.locator('form').filter({ has: page.locator(`input[name="role"][value="${role}"]`) }).first();
+    if (await roleForm.count()) {
+      await roleForm.getByRole('button').click();
       await page.waitForURL(/\/dashboard(?:\?|$|\/)/, { timeout: 10000 });
       break;
     }
