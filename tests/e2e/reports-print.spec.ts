@@ -14,7 +14,7 @@ test('final impact report is a two-page A4 print surface backed by structured da
 
   await page.goto(`/impact/${activityId}/report/${reportId}`);
   await expect(page.getByRole('heading', { name: 'تقرير قياس الأثر التدريبي' })).toBeVisible();
-  await expect(page.getByText('96.7')).toBeVisible();
+  await expect(page.getByText('96.7', { exact: true })).toBeVisible();
   await expect(page.locator('.report-page')).toHaveCount(2);
 
   await page.emulateMedia({ media: 'print' });
