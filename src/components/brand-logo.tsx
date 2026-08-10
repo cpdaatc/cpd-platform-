@@ -6,8 +6,9 @@ export function BrandLogo({className='',alt='شعار منصة التطوير ا
   const [src,setSrc]=useState<string|null>(null);
   useEffect(()=>{
     let alive=true;
-    Promise.all([1,2,3,4].map(n=>fetch(`/brand/cpd-logo-${n}.txt`,{cache:'force-cache'}).then(r=>{if(!r.ok)throw new Error('logo');return r.text();})))
-      .then(parts=>{if(alive)setSrc(`data:image/jpeg;base64,${parts.join('').trim()}`);})
+    fetch('/brand/cpd-logo.txt',{cache:'force-cache'})
+      .then(response=>{if(!response.ok)throw new Error('logo');return response.text();})
+      .then(base64=>{if(alive)setSrc(`data:image/jpeg;base64,${base64.trim()}`);})
       .catch(()=>{if(alive)setSrc(null);});
     return()=>{alive=false};
   },[]);
