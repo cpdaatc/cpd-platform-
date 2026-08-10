@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 
 const password = 'E2E-Only-Strong-Password-2026!';
-const title = 'نشاط E2E لجاهزية الإنتاج';
 
 async function login(page: import('@playwright/test').Page, email: string) {
   await page.goto('/login');
@@ -11,6 +10,9 @@ async function login(page: import('@playwright/test').Page, email: string) {
 }
 
 test('admin creates and assigns an activity, then the assigned officer sees it in My Activities', async ({ page }) => {
+  const uniqueSuffix = `${Date.now()}-${test.info().retry}`;
+  const title = `نشاط E2E لجاهزية الإنتاج ${uniqueSuffix}`;
+
   await login(page, 'e2e.admin.secretary@example.test');
   await expect(page).toHaveURL(/\/context/);
   await page.getByRole('button', { name: /ORGANIZATION_SYSTEM_ADMIN/ }).click();
@@ -30,12 +32,14 @@ test('admin creates and assigns an activity, then the assigned officer sees it i
   await page.getByLabel(/مسؤول النشاط/).selectOption({ label: 'E2E Activity Officer' });
   await page.getByRole('button', { name: 'حفظ الإسناد' }).click();
   await expect(page).toHaveURL(/\/admin\?assigned=1/);
-  await expect(page.getByText(title)).toBeVisible();
+  await expect(page.getByText(title, { exact: true })).toBeVisible();
 
   await page.getByRole('button', { name: /خروج|Sign out/ }).click();
   await login(page, 'e2e.officer@example.test');
   await expect(page).toHaveURL(/\/dashboard/);
   await page.getByRole('link', { name: 'أنشطتي', exact: true }).click();
-  await expect(page.getByText(title)).toBeVisible();
-  await expect(page.getByRole('link', { name: /فتح ملف النشاط/ })).toBeVisible();
+
+  const assignedActivity = page.locator('article').filter({ hasText: title });
+  await expect(assignedActivity).toBeVisible();
+  await expect(assignedActivity.getByRole('link', { name: 'ملف النشاط', exact: true })).toBeVisible();
 });
