@@ -38,7 +38,7 @@ export async function scanSecurityBoundary(root = process.cwd()) {
     return out;
   }
 
-  if (!(await exists(join(root, 'SECURITY.md')))
+  if (!(await exists(join(root, 'SECURITY.md'))))
     failures.push('SECURITY.md must document credential, disclosure, and production-release boundaries.');
 
   const adminClient = await text('src/lib/supabase/admin.ts');
