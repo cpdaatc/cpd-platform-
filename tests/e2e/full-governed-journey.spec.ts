@@ -110,7 +110,9 @@ test('activity officer can reach governed submission after confirmed intake and 
   await page.getByRole('button', { name: /تشغيل Pre.?Review/ }).click();
   await page.waitForURL(new RegExp(`/activities/${activityId}/readiness\\?(reviewed|error)=1`), { timeout: 10000 });
   if (page.url().includes('error=1')) throw new Error('Pre-review persistence failed in governed server action.');
-  await expect(page.getByText(/آخر نتيجة Pre.?Review/)).toBeVisible();
+  const latestReviewCard = page.getByText('آخر مراجعة').locator('..');
+  await expect(latestReviewCard.getByText('Completed')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Latest Pre‑Review Findings' })).toBeVisible();
 
   await expect(page.getByRole('button', { name: 'إرسال إلى اللجنة المؤسسية' })).toBeVisible();
 });
