@@ -10,7 +10,8 @@ async function login(page: Page, email: string) {
 }
 
 async function selectRole(page: Page, role: string) {
-  if (/\/context/.test(page.url())) {
+  await page.waitForURL(/\/(?:context|dashboard)(?:\?|$|\/)/, { timeout: 10000 });
+  if (/\/context(?:\?|$|\/)/.test(page.url())) {
     await page.getByRole('button', { name: new RegExp(role) }).click();
   } else {
     const select = page.locator('#shell-role');
