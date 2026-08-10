@@ -1,6 +1,6 @@
 import { access, readFile, readdir } from 'node:fs/promises';
 import { constants } from 'node:fs';
-import { dirname, join, relative } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 async function exists(path) {
@@ -111,5 +111,5 @@ async function main() {
 }
 
 const currentFile = fileURLToPath(import.meta.url);
-const invokedFile = process.argv[1] ? join(process.cwd(), process.argv[1]) : '';
+const invokedFile = process.argv[1] ? resolve(process.argv[1]) : '';
 if (invokedFile && currentFile === invokedFile) await main();
