@@ -70,6 +70,8 @@ jobs:
             echo "Testing $file"
             psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$file"
           done
+      - name: Backup and restore drill
+        run: bash scripts/local-backup-restore-drill.sh
 
   authenticated-browser-uat:
     runs-on: ubuntu-latest
