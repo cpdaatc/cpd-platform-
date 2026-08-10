@@ -43,8 +43,14 @@ export async function scanSecurityBoundary(root = process.cwd()) {
 
   const adminClient = await text('src/lib/supabase/admin.ts');
   requirePattern(adminClient, /import ['"]server-only['"]/, 'Supabase admin client must be server-only.');
-  requirePattern(adminClient, /SUPABASE_SERVICE_ROLE_KEY/, 'Server admin client must read the server-only service role key.');
+  requirePattern(adminClient, /readServerRuntimeEnv/, 'Supabase admin client must use the centralized server runtime boundary.');
   forbidPattern(adminClient, /NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY/, 'Service role key must never be public-prefixed.');
+
+  const runtimeEnv = await text('src/lib/config/runtime-env.ts').catch(() => '');
+  requirePattern(runtimeEnv, /SUPABASE_SECRET_KEY.*SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SERVICE_ROLE_KEY.*SUPABASE_SECRET_KEY/s, 'Runtime boundary must resolve a server-only Supabase secret.');
+  requirePattern(runtimeEnv, /NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY/, 'Runtime boundary must explicitly reject public-prefixed service-role credentials.');
+  requirePattern(runtimeEnv, /protocol\s*!==\s*['"]https:['"]/, 'Production runtime boundary must require HTTPS.');
+  requirePattern(runtimeEnv, /localhost/, 'Production runtime boundary must reject localhost endpoints.');
 
   const privateStorage = await text('src/lib/storage/private-documents.ts');
   requirePattern(privateStorage, /import ['"]server-only['"]/, 'Private document helper must be server-only.');
@@ -59,7 +65,7 @@ export async function scanSecurityBoundary(root = process.cwd()) {
   for (const path of sourceFiles) {
     const source = await text(path);
     if (source.includes("'use client'") || source.includes('"use client"')) {
-      forbidPattern(source, /SUPABASE_SERVICE_ROLE_KEY|createSupabaseAdminClient|private-documents/, `Client module ${relative(root, join(root, path))} references server-admin storage credentials.`);
+      forbidPattern(source, /SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SECRET_KEY|createSupabaseAdminClient|private-documents/, `Client module ${relative(root, join(root, path))} references server-admin storage credentials.`);
     }
   }
 
@@ -80,6 +86,23 @@ export async function scanSecurityBoundary(root = process.cwd()) {
 
   const aiGovernance = await text('supabase/migrations/0018_ai_settings_governance.sql');
   requirePattern(aiGovernance, /external_ai_enabled\s*=\s*false/i, 'External AI must remain disabled by default until privacy approval.');
+
+  const workflow = await text('.github/workflows/ci.yml').catch(() => '');
+  for (const [pattern, message] of [
+    [/npm ci/, 'CI must install the locked dependency graph with npm ci.'],
+    [/npm run security:release/, 'CI must run the security release boundary checker.'],
+    [/npm run test:e2e:smoke/, 'CI must run public browser smoke/security tests.'],
+    [/Run all SQL acceptance suites|phase_\*\.sql/, 'CI must run all SQL acceptance suites.'],
+    [/local-backup-restore-drill\.sh/, 'CI must run the backup/restore drill.'],
+    [/seed-print-fixtures\.mjs/, 'Authenticated UAT must seed immutable official-document print fixtures.'],
+    [/npm run test:e2e:auth/, 'CI must run the authenticated governed lifecycle UAT.'],
+  ]) requirePattern(workflow, pattern, message);
+
+  const packageJson = await text('package.json');
+  requirePattern(packageJson, /security-headers\.spec\.ts/, 'Public browser smoke must include the HTTP security header gate.');
+  requirePattern(packageJson, /committee-minutes-print\.spec\.ts/, 'Authenticated UAT must include committee-minutes print QA.');
+  requirePattern(packageJson, /annual-report-print\.spec\.ts/, 'Authenticated UAT must include annual-report print QA.');
+  requirePattern(packageJson, /full-governed-journey\.spec\.ts/, 'Authenticated UAT must include the full governed lifecycle journey.');
 
   const scanFiles = [
     ...(await walk('src')),
