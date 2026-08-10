@@ -22,7 +22,7 @@ const users = [
   { key: 'management', membershipId: 'e2100000-0000-0000-0000-000000000005', email: 'e2e.management@example.test', fullName: 'E2E Management Approver', roles: ['MANAGEMENT_APPROVER'] },
 ];
 
-const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function sqlLiteral(value) {
   return `'${String(value).replaceAll("'", "''")}'`;
 }
