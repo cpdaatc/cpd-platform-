@@ -45,8 +45,10 @@ for (const spec of users) {
 
 const adminUserId = userIdByKey.get('multi');
 const officerUserId = userIdByKey.get('officer');
+const chairUserId = userIdByKey.get('chair');
+const memberUserId = userIdByKey.get('member');
 const managementUserId = userIdByKey.get('management');
-if (!adminUserId || !officerUserId || !managementUserId) throw new Error('Synthetic role users were not created.');
+if (!adminUserId || !officerUserId || !chairUserId || !memberUserId || !managementUserId) throw new Error('Synthetic role users were not created.');
 
 const officerMembershipId = users.find((user) => user.key === 'officer')?.membershipId;
 if (!officerMembershipId) throw new Error('Synthetic Activity Officer membership is missing.');
@@ -54,6 +56,10 @@ if (!officerMembershipId) throw new Error('Synthetic Activity Officer membership
 const reportActivityId = 'e2000000-0000-0000-0000-000000000101';
 const methodologyId = 'e2000000-0000-0000-0000-000000000102';
 const impactReportId = 'e2000000-0000-0000-0000-000000000103';
+const committeeId = 'e2000000-0000-0000-0000-000000000201';
+const chairCommitteeMemberId = 'e2000000-0000-0000-0000-000000000202';
+const secretaryCommitteeMemberId = 'e2000000-0000-0000-0000-000000000203';
+const memberCommitteeMemberId = 'e2000000-0000-0000-0000-000000000204';
 const snapshot = {
   level_scores: { L1: 88.667, L2: 100, L3: 100, L4: 95.907 },
   impact_domains: { PATIENT_IMPACT: 95.9, PRACTITIONER_IMPACT: 98.9, QUALITY_SAFETY: 97.8, SERVICE_EFFICIENCY: 91.5 },
@@ -83,6 +89,10 @@ for (const spec of users) {
 }
 
 statements.push(
+  `insert into public.institutional_committees(id,organization_id,committee_name,appointment_reference,appointment_date,appointed_by,effective_from,effective_to,status,created_by) values (${sqlUuid(committeeId)},${sqlUuid(organizationId)},${sqlLiteral('E2E Institutional Scientific Committee')},${sqlLiteral('E2E-APPOINTMENT-2026')},'2026-01-01',${sqlLiteral('Synthetic Management Decision')},'2026-01-01',null,'ACTIVE',${sqlUuid(adminUserId)});`,
+  `insert into public.institutional_committee_members(id,organization_id,committee_id,user_id,full_name_snapshot,committee_role,appointment_from,status) values (${sqlUuid(chairCommitteeMemberId)},${sqlUuid(organizationId)},${sqlUuid(committeeId)},${sqlUuid(chairUserId)},${sqlLiteral('E2E Committee Chair')},'CHAIR','2026-01-01','ACTIVE');`,
+  `insert into public.institutional_committee_members(id,organization_id,committee_id,user_id,full_name_snapshot,committee_role,appointment_from,status) values (${sqlUuid(secretaryCommitteeMemberId)},${sqlUuid(organizationId)},${sqlUuid(committeeId)},${sqlUuid(adminUserId)},${sqlLiteral('E2E Admin Secretary')},'SECRETARY','2026-01-01','ACTIVE');`,
+  `insert into public.institutional_committee_members(id,organization_id,committee_id,user_id,full_name_snapshot,committee_role,appointment_from,status) values (${sqlUuid(memberCommitteeMemberId)},${sqlUuid(organizationId)},${sqlUuid(committeeId)},${sqlUuid(memberUserId)},${sqlLiteral('E2E Committee Member')},'MEMBER','2026-01-01','ACTIVE');`,
   `insert into public.activities(id,organization_id,activity_code,title_ar,title_en,activity_type,planned_start_date,planned_end_date,reporting_year,internal_state,created_by) values (${sqlUuid(reportActivityId)},${sqlUuid(organizationId)},'E2E-IMPACT-001',${sqlLiteral('نشاط اصطناعي لاختبار تقرير الأثر')},'Synthetic Impact Report Activity','COURSE','2026-06-01','2026-06-01',2026,'FINAL_IMPACT_REPORT',${sqlUuid(adminUserId)});`,
   `insert into public.activity_assignments(organization_id,activity_id,membership_id,assignment_role,is_active,assigned_by) values (${sqlUuid(organizationId)},${sqlUuid(reportActivityId)},${sqlUuid(officerMembershipId)},'ACTIVITY_OFFICER',true,${sqlUuid(adminUserId)});`,
   `insert into public.impact_methodology_versions(id,organization_id,name,version_label,status,weights,rating_thresholds,configured_by,approved_by,approved_at) values (${sqlUuid(methodologyId)},${sqlUuid(organizationId)},'HTVI','E2E-1','ACTIVE','{"L1":15,"L2":20,"L3":25,"L4":40}'::jsonb,'{"excellent":85,"very_good":75,"good":65}'::jsonb,${sqlUuid(adminUserId)},${sqlUuid(managementUserId)},now());`,
@@ -95,4 +105,4 @@ execFileSync('psql', [dbUrl, '-v', 'ON_ERROR_STOP=1'], {
   stdio: ['pipe', 'inherit', 'inherit'],
 });
 
-console.log(`Seeded ${users.length} synthetic Auth users and governed public UAT fixtures.`);
+console.log(`Seeded ${users.length} synthetic Auth users, active institutional committee, and governed public UAT fixtures.`);
