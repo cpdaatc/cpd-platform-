@@ -190,7 +190,7 @@ test('governed activity journey reaches final immutable institutional committee 
   await page.getByPlaceholder('ملاحظات القرار').fill('E2E chair approval for external submission readiness.');
   await page.getByRole('button', { name: 'تسجيل قرار رئيس اللجنة' }).click();
   await expect(page).toHaveURL(new RegExp(`/committee/reviews/${reviewId}\\?decided=1`));
-  await expect(page.getByText('APPROVED_FOR_SCFHS_SUBMISSION')).toBeVisible();
+  await expect(page.getByText('APPROVED_FOR_SCFHS_SUBMISSION').first()).toBeVisible();
 
   await logout(page);
   await login(page, 'e2e.admin.secretary@example.test');
@@ -198,7 +198,7 @@ test('governed activity journey reaches final immutable institutional committee 
   await page.goto(`/committee/reviews/${reviewId}`);
   await page.getByRole('button', { name: 'إعداد مسودة المحضر' }).click();
   await expect(page).toHaveURL(new RegExp(`/committee/reviews/${reviewId}\\?minutesDrafted=1`));
-  await expect(page.getByText('DRAFT', { exact: true })).toBeVisible();
+  await expect(page.getByText('DRAFT', { exact: true }).first()).toBeVisible();
 
   await logout(page);
   await login(page, 'e2e.chair@example.test');
@@ -206,6 +206,6 @@ test('governed activity journey reaches final immutable institutional committee 
   await page.goto(`/committee/reviews/${reviewId}`);
   await page.getByRole('button', { name: 'اعتماد المحضر النهائي' }).click();
   await expect(page).toHaveURL(new RegExp(`/committee/reviews/${reviewId}\\?minutesFinal=1`));
-  await expect(page.getByText('FINAL', { exact: true })).toBeVisible();
-  await expect(page.getByText('READY_FOR_SCFHS_SUBMISSION')).toBeVisible();
+  await expect(page.getByText('FINAL', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('READY_FOR_SCFHS_SUBMISSION').first()).toBeVisible();
 });
