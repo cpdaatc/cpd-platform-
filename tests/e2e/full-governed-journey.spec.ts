@@ -11,15 +11,31 @@ async function login(page: Page, email: string) {
 
 async function selectRole(page: Page, role: string) {
   await page.waitForURL(/\/(?:context|dashboard)(?:\?|$|\/)/, { timeout: 10000 });
-  if (/\/context(?:\?|$|\/)/.test(page.url())) {
-    await page.getByRole('button', { name: new RegExp(role) }).click();
-  } else {
+
+  for (let step = 0; step < 2 && /\/context(?:\?|$|\/)/.test(page.url()); step += 1) {
+    const roleButton = page.getByRole('button', { name: new RegExp(role) });
+    if (await roleButton.count()) {
+      await roleButton.click();
+      break;
+    }
+
+    const organizationForm = page.locator('form').filter({ has: page.locator('input[name="organizationId"]') }).first();
+    if (await organizationForm.count()) {
+      await organizationForm.getByRole('button').click();
+      await page.waitForURL(/\/context(?:\?|$|\/)/, { timeout: 10000 });
+      continue;
+    }
+    break;
+  }
+
+  if (/\/dashboard(?:\?|$|\/)/.test(page.url())) {
     const select = page.locator('#shell-role');
     if (await select.count()) {
       await select.selectOption(role);
       await page.getByRole('button', { name: /تبديل الدور|Switch role/ }).click();
     }
   }
+
   await expect(page).toHaveURL(/\/dashboard/);
 }
 
