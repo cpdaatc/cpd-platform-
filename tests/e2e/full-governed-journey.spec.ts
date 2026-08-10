@@ -75,6 +75,11 @@ test('activity officer can reach governed submission after confirmed intake and 
   if (await sessions.count()) await sessions.first().click();
 
   await page.getByRole('button', { name: 'تأكيد البيانات' }).click();
+  await page.waitForTimeout(800);
+  const alert = page.getByRole('alert');
+  if (await alert.count()) {
+    throw new Error(`Intake confirmation failed: ${await alert.first().innerText()}`);
+  }
   await expect(page).toHaveURL(new RegExp(`/activities/${activityId}/intake\\?confirmed=1`));
 
   await page.goto(`/activities/${activityId}/readiness`);
