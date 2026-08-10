@@ -2,9 +2,7 @@
   "name": "cpd-governance-platform",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-    "node": ">=22"
-  },
+  "engines": { "node": ">=22" },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "test:e2e:install": "playwright install --with-deps chromium"
+    "test:e2e:install": "playwright install --with-deps chromium",
+    "security:release": "node scripts/security-release-check.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",
@@ -42,8 +41,5 @@
     "typescript": "^5.8.2",
     "vitest": "^3.0.8"
   },
-  "overrides": {
-    "postcss": "8.5.23",
-    "sharp": "0.35.0"
-  }
+  "overrides": { "postcss": "8.5.23", "sharp": "0.35.0" }
 }
