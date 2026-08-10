@@ -28,5 +28,16 @@ as $$
   select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
 $$;
 
+create or replace function public._assert(condition boolean, message text)
+returns void
+language plpgsql
+as $$
+begin
+  if not condition then
+    raise exception 'ASSERTION FAILED: %', message;
+  end if;
+end;
+$$;
+
 grant usage on schema auth to authenticated, service_role;
 grant select on auth.users to authenticated, service_role;
