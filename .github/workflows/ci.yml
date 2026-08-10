@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: ['phase-*']
+    branches: ['phase-*', 'recovery-*']
   pull_request:
     branches: [main]
 
@@ -49,64 +49,20 @@ jobs:
       - name: Build
         run: npm run build
       - name: Prepare local Supabase compatibility
-        run: psql "$DATABASE_URL" -f tests/sql/00_supabase_stub.sql
-      - name: Apply foundation migration
-        run: psql "$DATABASE_URL" -f supabase/migrations/0001_foundation.sql
-      - name: Apply RBAC seed
-        run: psql "$DATABASE_URL" -f supabase/migrations/0002_seed_rbac.sql
-      - name: Apply audit migration
-        run: psql "$DATABASE_URL" -f supabase/migrations/0003_audit.sql
-      - name: Apply RLS migration
-        run: psql "$DATABASE_URL" -f supabase/migrations/0004_rls.sql
-      - name: Apply audit RPC hardening
-        run: psql "$DATABASE_URL" -f supabase/migrations/0005_audit_rpc_security.sql
-      - name: Apply auth profile bootstrap
-        run: psql "$DATABASE_URL" -f supabase/migrations/0006_auth_profile_bootstrap.sql
-      - name: Apply governed activity commands
-        run: psql "$DATABASE_URL" -f supabase/migrations/0007_activity_commands.sql
-      - name: Apply governed write boundary
-        run: psql "$DATABASE_URL" -f supabase/migrations/0008_governed_write_boundary.sql
-      - name: Apply single-active-officer invariant
-        run: psql "$DATABASE_URL" -f supabase/migrations/0009_single_active_activity_officer.sql
-      - name: Apply Phase 2 intake model
-        run: psql "$DATABASE_URL" -f supabase/migrations/0010_intake.sql
-      - name: Apply Phase 2 storage configuration
-        run: psql "$DATABASE_URL" -f supabase/migrations/0011_storage.sql
-      - name: Apply Phase 2 governed intake commands
-        run: psql "$DATABASE_URL" -f supabase/migrations/0012_intake_commands.sql
-      - name: Apply Phase 2 governed file commands
-        run: psql "$DATABASE_URL" -f supabase/migrations/0013_intake_files.sql
-      - name: Apply Phase 2 speaker contact snapshots
-        run: psql "$DATABASE_URL" -f supabase/migrations/0014_speaker_contact_snapshots.sql
-      - name: Apply Phase 2 offline evidence role-context hardening
-        run: psql "$DATABASE_URL" -f supabase/migrations/0015_offline_evidence_role_context.sql
-      - name: Apply Phase 2 session speaker key fix
-        run: psql "$DATABASE_URL" -f supabase/migrations/0016_fix_session_speaker_keys.sql
-      - name: Apply Phase 3 rules and AI review model
-        run: psql "$DATABASE_URL" -f supabase/migrations/0017_ai_rules.sql
-      - name: Apply Phase 3 AI privacy governance
-        run: psql "$DATABASE_URL" -f supabase/migrations/0018_ai_settings_governance.sql
-      - name: Apply Phase 3 command hardening
-        run: psql "$DATABASE_URL" -f supabase/migrations/0019_ai_command_hardening.sql
-      - name: Apply Phase 3 alignment rule
-        run: psql "$DATABASE_URL" -f supabase/migrations/0020_alignment_rule.sql
-      - name: Foundation schema acceptance
-        run: psql "$DATABASE_URL" -f tests/sql/phase_1_foundation.sql
-      - name: RBAC acceptance
-        run: psql "$DATABASE_URL" -f tests/sql/phase_1_rbac.sql
-      - name: Audit acceptance
-        run: psql "$DATABASE_URL" -f tests/sql/phase_1_audit.sql
-      - name: RLS acceptance
-        run: psql "$DATABASE_URL" -f tests/sql/phase_1_rls.sql
-      - name: Auth profile bootstrap acceptance
-        run: psql "$DATABASE_URL" -f tests/sql/phase_1_auth.sql
-      - name: Governed activity command acceptance
-        run: psql "$DATABASE_URL" -f tests/sql/phase_1_activity_commands.sql
-      - name: Single active Activity Officer invariant
-        run: psql "$DATABASE_URL" -f tests/sql/phase_1_assignment_invariant.sql
-      - name: Phase 2 intake acceptance
-        run: psql "$DATABASE_URL" -f tests/sql/phase_2_intake.sql
-      - name: Phase 2 governed command acceptance
-        run: psql "$DATABASE_URL" -f tests/sql/phase_2_commands.sql
-      - name: Phase 3 AI/rules acceptance
-        run: psql "$DATABASE_URL" -f tests/sql/phase_3_ai.sql
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f tests/sql/00_supabase_stub.sql
+      - name: Apply all database migrations in order
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in $(find supabase/migrations -maxdepth 1 -type f -name '*.sql' | sort); do
+            echo "Applying $file"
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$file"
+          done
+      - name: Run all SQL acceptance suites in order
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in $(find tests/sql -maxdepth 1 -type f -name 'phase_*.sql' | sort); do
+            echo "Testing $file"
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$file"
+          done
