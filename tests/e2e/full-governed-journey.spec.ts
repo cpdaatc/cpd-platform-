@@ -14,14 +14,19 @@ async function selectRole(page: Page, role: string) {
 
   if (/\/context(?:\?|$|\/)/.test(page.url())) {
     await expect(page.getByRole('heading', { name: 'حدد المؤسسة والدور' })).toBeVisible();
-    const requested = page.getByRole('button', { name: new RegExp(role) });
-    if (await requested.count()) {
-      await requested.first().click();
-    } else {
-      const admin = page.getByRole('button', { name: /ORGANIZATION_SYSTEM_ADMIN/ });
-      await expect(admin).toBeVisible();
-      await admin.click();
+    const requestedRoleInput = page.locator(`input[name="role"][value="${role}"]`);
+    const organizationInput = page.locator('input[name="organizationId"]').first();
+
+    await expect.poll(async () => (await requestedRoleInput.count()) + (await organizationInput.count()), { timeout: 10000 }).toBeGreaterThan(0);
+
+    if (!(await requestedRoleInput.count()) && await organizationInput.count()) {
+      await organizationInput.locator('xpath=ancestor::form[1]').getByRole('button').click();
+      await expect(page.getByRole('heading', { name: 'حدد المؤسسة والدور' })).toBeVisible();
+      await expect(requestedRoleInput).toBeAttached({ timeout: 10000 });
     }
+
+    await expect(requestedRoleInput).toBeAttached({ timeout: 10000 });
+    await requestedRoleInput.locator('xpath=ancestor::form[1]').getByRole('button').click();
     await page.waitForURL(/\/dashboard(?:\?|$|\/)/, { timeout: 10000 });
   }
 
@@ -32,8 +37,8 @@ async function selectRole(page: Page, role: string) {
     await roleSelect.selectOption(role);
     await page.getByRole('button', { name: /تبديل الدور|Switch role/ }).click();
     await expect(page).toHaveURL(/\/dashboard/);
-    await expect(roleSelect).toHaveValue(role);
   }
+  await expect(roleSelect).toHaveValue(role);
 
   if (role === 'COMMITTEE_SECRETARY') {
     await expect(page.getByRole('link', { name: 'مساحة سكرتير اللجنة', exact: true })).toBeVisible();
