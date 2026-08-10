@@ -5,10 +5,10 @@ export function BrandLogo({className='',alt='شعار منصة التطوير ا
     <Image
       src="/api/brand/logo"
       alt={alt}
-      fill
+      width={160}
+      height={160}
       unoptimized
-      sizes="160px"
-      className="object-contain"
+      className="h-full w-full object-contain"
     />
   </span>;
 }
