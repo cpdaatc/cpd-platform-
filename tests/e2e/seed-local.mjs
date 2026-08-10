@@ -1,8 +1,12 @@
+import { execFileSync } from 'node:child_process';
 import { createClient } from '@supabase/supabase-js';
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!url || !serviceRoleKey) throw new Error('Local Supabase URL and service role key are required for E2E seeding.');
+const dbUrl = process.env.E2E_DB_URL;
+if (!url || !serviceRoleKey || !dbUrl) {
+  throw new Error('Local Supabase API, service-role key, and database URL are required for E2E seeding.');
+}
 
 const admin = createClient(url, serviceRoleKey, {
   auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
@@ -11,26 +15,23 @@ const admin = createClient(url, serviceRoleKey, {
 const organizationId = 'e2000000-0000-0000-0000-000000000001';
 const password = 'E2E-Only-Strong-Password-2026!';
 const users = [
-  { key: 'multi', email: 'e2e.admin.secretary@example.test', fullName: 'E2E Admin Secretary', roles: ['ORGANIZATION_SYSTEM_ADMIN', 'COMMITTEE_SECRETARY'] },
-  { key: 'officer', email: 'e2e.officer@example.test', fullName: 'E2E Activity Officer', roles: ['ACTIVITY_OFFICER'] },
-  { key: 'chair', email: 'e2e.chair@example.test', fullName: 'E2E Committee Chair', roles: ['COMMITTEE_CHAIR'] },
-  { key: 'member', email: 'e2e.member@example.test', fullName: 'E2E Committee Member', roles: ['COMMITTEE_MEMBER'] },
-  { key: 'management', email: 'e2e.management@example.test', fullName: 'E2E Management Approver', roles: ['MANAGEMENT_APPROVER'] },
+  { key: 'multi', membershipId: 'e2100000-0000-0000-0000-000000000001', email: 'e2e.admin.secretary@example.test', fullName: 'E2E Admin Secretary', roles: ['ORGANIZATION_SYSTEM_ADMIN', 'COMMITTEE_SECRETARY'] },
+  { key: 'officer', membershipId: 'e2100000-0000-0000-0000-000000000002', email: 'e2e.officer@example.test', fullName: 'E2E Activity Officer', roles: ['ACTIVITY_OFFICER'] },
+  { key: 'chair', membershipId: 'e2100000-0000-0000-0000-000000000003', email: 'e2e.chair@example.test', fullName: 'E2E Committee Chair', roles: ['COMMITTEE_CHAIR'] },
+  { key: 'member', membershipId: 'e2100000-0000-0000-0000-000000000004', email: 'e2e.member@example.test', fullName: 'E2E Committee Member', roles: ['COMMITTEE_MEMBER'] },
+  { key: 'management', membershipId: 'e2100000-0000-0000-0000-000000000005', email: 'e2e.management@example.test', fullName: 'E2E Management Approver', roles: ['MANAGEMENT_APPROVER'] },
 ];
 
-const { error: orgError } = await admin.from('organizations').upsert({
-  id: organizationId,
-  name: 'E2E Synthetic Healthcare Organization',
-  slug: 'e2e-synthetic-healthcare',
-  status: 'ACTIVE',
-}, { onConflict: 'id' });
-if (orgError) throw orgError;
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+function sqlLiteral(value) {
+  return `'${String(value).replaceAll("'", "''")}'`;
+}
+function sqlUuid(value) {
+  if (!uuidPattern.test(value)) throw new Error(`Invalid UUID returned while seeding: ${value}`);
+  return `${sqlLiteral(value)}::uuid`;
+}
 
-const { data: roleRows, error: rolesError } = await admin.from('roles').select('id,code').in('code', [...new Set(users.flatMap((user) => user.roles))]);
-if (rolesError) throw rolesError;
-const roleIdByCode = new Map((roleRows ?? []).map((row) => [row.code, row.id]));
 const userIdByKey = new Map();
-
 for (const spec of users) {
   const { data: created, error: createError } = await admin.auth.admin.createUser({
     email: spec.email,
@@ -39,64 +40,17 @@ for (const spec of users) {
     user_metadata: { full_name: spec.fullName },
   });
   if (createError || !created.user) throw createError ?? new Error(`Unable to create ${spec.key}`);
-
-  const userId = created.user.id;
-  userIdByKey.set(spec.key, userId);
-  const { error: profileError } = await admin.from('users').update({ display_name: spec.fullName }).eq('id', userId);
-  if (profileError) throw profileError;
-
-  const { data: membership, error: membershipError } = await admin.from('organization_memberships').insert({
-    organization_id: organizationId,
-    user_id: userId,
-    status: 'ACTIVE',
-  }).select('id').single();
-  if (membershipError || !membership) throw membershipError ?? new Error(`Unable to create membership for ${spec.key}`);
-
-  const grants = spec.roles.map((code) => {
-    const roleId = roleIdByCode.get(code);
-    if (!roleId) throw new Error(`Seed role is missing: ${code}`);
-    return { organization_id: organizationId, membership_id: membership.id, role_id: roleId, assigned_by: userId };
-  });
-  const { error: grantError } = await admin.from('user_roles').insert(grants);
-  if (grantError) throw grantError;
+  userIdByKey.set(spec.key, created.user.id);
 }
+
+const adminUserId = userIdByKey.get('multi');
+const officerUserId = userIdByKey.get('officer');
+const managementUserId = userIdByKey.get('management');
+if (!adminUserId || !officerUserId || !managementUserId) throw new Error('Synthetic role users were not created.');
 
 const reportActivityId = 'e2000000-0000-0000-0000-000000000101';
 const methodologyId = 'e2000000-0000-0000-0000-000000000102';
 const impactReportId = 'e2000000-0000-0000-0000-000000000103';
-const adminUserId = userIdByKey.get('multi');
-const officerUserId = userIdByKey.get('officer');
-const managementUserId = userIdByKey.get('management');
-
-const { error: activityError } = await admin.from('activities').insert({
-  id: reportActivityId,
-  organization_id: organizationId,
-  activity_code: 'E2E-IMPACT-001',
-  title_ar: 'نشاط اصطناعي لاختبار تقرير الأثر',
-  title_en: 'Synthetic Impact Report Activity',
-  activity_type: 'COURSE',
-  planned_start_date: '2026-06-01',
-  planned_end_date: '2026-06-01',
-  reporting_year: 2026,
-  internal_state: 'FINAL_IMPACT_REPORT',
-  created_by: adminUserId,
-});
-if (activityError) throw activityError;
-
-const { error: methodologyError } = await admin.from('impact_methodology_versions').insert({
-  id: methodologyId,
-  organization_id: organizationId,
-  name: 'HTVI',
-  version_label: 'E2E-1',
-  status: 'ACTIVE',
-  weights: { L1: 15, L2: 20, L3: 25, L4: 40 },
-  rating_thresholds: { excellent: 85, very_good: 75, good: 65 },
-  configured_by: adminUserId,
-  approved_by: managementUserId,
-  approved_at: new Date().toISOString(),
-});
-if (methodologyError) throw methodologyError;
-
 const snapshot = {
   level_scores: { L1: 88.667, L2: 100, L3: 100, L4: 95.907 },
   impact_domains: { PATIENT_IMPACT: 95.9, PRACTITIONER_IMPACT: 98.9, QUALITY_SAFETY: 97.8, SERVICE_EFFICIENCY: 91.5 },
@@ -106,28 +60,35 @@ const snapshot = {
     { objective_text: 'رفع جودة الخدمة', impact_domain: 'QUALITY_SAFETY', achievement: 97.8 },
   ],
 };
-const { error: reportError } = await admin.from('impact_reports').insert({
-  id: impactReportId,
-  organization_id: organizationId,
-  activity_id: reportActivityId,
-  kind: 'FINAL',
-  version_no: 1,
-  status: 'FINAL',
-  methodology_version_id: methodologyId,
-  htvi_status: 'FINAL',
-  htvi_score: 96.663,
-  overall_rating: 'EXCELLENT',
-  snapshot_json: snapshot,
-  snapshot_sha256: 'a'.repeat(64),
-  generated_by: officerUserId,
-  finalized_at: new Date().toISOString(),
-});
-if (reportError) throw reportError;
 
-console.log(JSON.stringify({
-  organizationId,
-  password,
-  reportActivityId,
-  impactReportId,
-  users: users.map(({ key, email, fullName, roles }) => ({ key, email, fullName, roles })),
-}));
+const statements = [
+  '\\set ON_ERROR_STOP on',
+  'begin;',
+  `insert into public.organizations(id,name,slug,status) values (${sqlUuid(organizationId)},${sqlLiteral('E2E Synthetic Healthcare Organization')},${sqlLiteral('e2e-synthetic-healthcare')},'ACTIVE') on conflict(id) do update set name=excluded.name,status='ACTIVE';`,
+];
+
+for (const spec of users) {
+  const userId = userIdByKey.get(spec.key);
+  if (!userId) throw new Error(`Missing Auth UUID for ${spec.key}`);
+  statements.push(
+    `update public.users set display_name=${sqlLiteral(spec.fullName)} where id=${sqlUuid(userId)};`,
+    `insert into public.organization_memberships(id,organization_id,user_id,status) values (${sqlUuid(spec.membershipId)},${sqlUuid(organizationId)},${sqlUuid(userId)},'ACTIVE') on conflict(organization_id,user_id) do update set status='ACTIVE';`,
+  );
+  for (const role of spec.roles) {
+    statements.push(`insert into public.user_roles(organization_id,membership_id,role_id,assigned_by) select ${sqlUuid(organizationId)},${sqlUuid(spec.membershipId)},r.id,${sqlUuid(adminUserId)} from public.roles r where r.code=${sqlLiteral(role)} on conflict(membership_id,role_id) do nothing;`);
+  }
+}
+
+statements.push(
+  `insert into public.activities(id,organization_id,activity_code,title_ar,title_en,activity_type,planned_start_date,planned_end_date,reporting_year,internal_state,created_by) values (${sqlUuid(reportActivityId)},${sqlUuid(organizationId)},'E2E-IMPACT-001',${sqlLiteral('نشاط اصطناعي لاختبار تقرير الأثر')},'Synthetic Impact Report Activity','COURSE','2026-06-01','2026-06-01',2026,'FINAL_IMPACT_REPORT',${sqlUuid(adminUserId)});`,
+  `insert into public.impact_methodology_versions(id,organization_id,name,version_label,status,weights,rating_thresholds,configured_by,approved_by,approved_at) values (${sqlUuid(methodologyId)},${sqlUuid(organizationId)},'HTVI','E2E-1','ACTIVE','{"L1":15,"L2":20,"L3":25,"L4":40}'::jsonb,'{"excellent":85,"very_good":75,"good":65}'::jsonb,${sqlUuid(adminUserId)},${sqlUuid(managementUserId)},now());`,
+  `insert into public.impact_reports(id,organization_id,activity_id,kind,version_no,status,methodology_version_id,htvi_status,htvi_score,overall_rating,snapshot_json,snapshot_sha256,generated_by,finalized_at) values (${sqlUuid(impactReportId)},${sqlUuid(organizationId)},${sqlUuid(reportActivityId)},'FINAL',1,'FINAL',${sqlUuid(methodologyId)},'FINAL',96.663,'EXCELLENT',${sqlLiteral(JSON.stringify(snapshot))}::jsonb,${sqlLiteral('a'.repeat(64))},${sqlUuid(officerUserId)},now());`,
+  'commit;',
+);
+
+execFileSync('psql', [dbUrl, '-v', 'ON_ERROR_STOP=1'], {
+  input: `${statements.join('\n')}\n`,
+  stdio: ['pipe', 'inherit', 'inherit'],
+});
+
+console.log(`Seeded ${users.length} synthetic Auth users and governed public UAT fixtures.`);
