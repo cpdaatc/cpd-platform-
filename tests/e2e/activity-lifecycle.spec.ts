@@ -16,7 +16,7 @@ test('admin creates and assigns an activity, then the assigned officer sees it i
   await page.getByRole('button', { name: /ORGANIZATION_SYSTEM_ADMIN/ }).click();
   await expect(page).toHaveURL(/\/dashboard/);
 
-  await page.getByRole('link', { name: /إدارة الأنشطة|Activity Administration/ }).click();
+  await page.getByRole('link', { name: 'إدارة الأنشطة', exact: true }).click();
   await page.getByRole('link', { name: 'إنشاء نشاط جديد' }).click();
   await page.getByLabel(/اسم النشاط بالعربية/).fill(title);
   await page.getByLabel(/اسم النشاط بالإنجليزية/).fill('Production Readiness E2E Activity');
@@ -35,7 +35,7 @@ test('admin creates and assigns an activity, then the assigned officer sees it i
   await page.getByRole('button', { name: /خروج|Sign out/ }).click();
   await login(page, 'e2e.officer@example.test');
   await expect(page).toHaveURL(/\/dashboard/);
-  await page.getByRole('link', { name: /أنشطتي|My Activities/ }).click();
+  await page.getByRole('link', { name: 'أنشطتي', exact: true }).click();
   await expect(page.getByText(title)).toBeVisible();
   await expect(page.getByRole('link', { name: /فتح ملف النشاط/ })).toBeVisible();
 });
