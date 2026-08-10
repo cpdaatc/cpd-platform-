@@ -1,7 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 
 const password = 'E2E-Only-Strong-Password-2026!';
-const title = 'نشاط E2E للرحلة الحوكمية الكاملة';
 
 async function login(page: Page, email: string) {
   await page.goto('/login');
@@ -24,6 +23,7 @@ async function selectRole(page: Page, role: string) {
 }
 
 test('activity officer can reach governed submission after confirmed intake and pre-review', async ({ page }) => {
+  const title = `نشاط E2E للرحلة الحوكمية الكاملة ${Date.now()}-${test.info().retry}`;
   await login(page, 'e2e.admin.secretary@example.test');
   await selectRole(page, 'ORGANIZATION_SYSTEM_ADMIN');
   await page.getByRole('link', { name: 'إدارة الأنشطة', exact: true }).click();
@@ -36,6 +36,9 @@ test('activity officer can reach governed submission after confirmed intake and 
   await page.getByLabel(/تاريخ النهاية المخطط/).fill('2026-08-20');
   await page.getByRole('button', { name: /إنشاء النشاط والمتابعة للإسناد/ }).click();
   await expect(page).toHaveURL(/\/admin\/activities\/.+\/assign/);
+  const assignMatch = page.url().match(/\/admin\/activities\/([^/]+)\/assign/);
+  expect(assignMatch).not.toBeNull();
+  const activityId = assignMatch![1];
   await page.getByLabel(/مسؤول النشاط/).selectOption({ label: 'E2E Activity Officer' });
   await page.getByRole('button', { name: 'حفظ الإسناد' }).click();
 
@@ -43,11 +46,8 @@ test('activity officer can reach governed submission after confirmed intake and 
   await login(page, 'e2e.officer@example.test');
   await expect(page).toHaveURL(/\/dashboard/);
   await page.getByRole('link', { name: 'أنشطتي', exact: true }).click();
-  const card = page.locator('article').filter({ hasText: title });
-  await card.getByRole('link', { name: 'ملف النشاط' }).click();
-  const match = page.url().match(/\/activities\/([^/]+)\/intake/);
-  expect(match).not.toBeNull();
-  const activityId = match![1];
+  await expect(page.getByText(title, { exact: true })).toBeVisible();
+  await page.goto(`/activities/${activityId}/intake`);
 
   await page.getByLabel(/التخصص/).fill('Medical Education');
   await page.getByLabel('العربية').check();
@@ -58,10 +58,11 @@ test('activity officer can reach governed submission after confirmed intake and 
   await page.getByLabel(/Participant \/ Activity Evaluation Method/).fill('Post-test and structured participant evaluation.');
   await page.getByLabel('Surveys').check();
 
-  await page.getByPlaceholder('Objective 1').fill('Apply the governed CPD workflow correctly by the end of the activity.');
-  await page.locator('section').filter({ hasText: 'SMART Learning Objectives' }).getByRole('combobox').selectOption('SKILL');
+  const objective = page.getByPlaceholder('Objective 1');
+  await objective.fill('Apply the governed CPD workflow correctly by the end of the activity.');
+  await objective.locator('..').locator('select').selectOption('SKILL');
 
-  const committeeSection = page.locator('section').filter({ hasText: 'اللجنة العلمية الخاصة بالنشاط' });
+  const committeeSection = page.getByRole('heading', { name: '4. اللجنة العلمية الخاصة بالنشاط' }).locator('xpath=ancestor::section[1]');
   await committeeSection.getByPlaceholder('Full name *').first().fill('Activity Committee Member One');
   await committeeSection.getByPlaceholder('Classification number').first().fill('SCFHS-E2E-001');
   await committeeSection.getByRole('button', { name: '+ عضو' }).click();
@@ -74,7 +75,7 @@ test('activity officer can reach governed submission after confirmed intake and 
   if (await sessions.count()) await sessions.first().click();
 
   await page.getByRole('button', { name: 'تأكيد البيانات' }).click();
-  await expect(page.getByText(/CONFIRMED|تم تأكيد|مؤكد/i).first()).toBeVisible({ timeout: 10000 }).catch(() => undefined);
+  await expect(page).toHaveURL(new RegExp(`/activities/${activityId}/intake\\?confirmed=1`));
 
   await page.goto(`/activities/${activityId}/readiness`);
   await page.getByRole('button', { name: /تشغيل Pre.?Review/ }).click();
