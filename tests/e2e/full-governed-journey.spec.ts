@@ -207,5 +207,13 @@ test('governed activity journey reaches final immutable institutional committee 
   await page.getByRole('button', { name: 'اعتماد المحضر النهائي' }).click();
   await expect(page).toHaveURL(new RegExp(`/committee/reviews/${reviewId}\\?minutesFinal=1`));
   await expect(page.getByText('FINAL', { exact: true }).first()).toBeVisible();
-  await expect(page.getByText('READY_FOR_SCFHS_SUBMISSION').first()).toBeVisible();
+
+  await logout(page);
+  await login(page, 'e2e.admin.secretary@example.test');
+  await selectRole(page, 'ORGANIZATION_SYSTEM_ADMIN');
+  await page.goto('/external');
+  const trackedActivity = page.locator('article').filter({ hasText: title });
+  await expect(trackedActivity).toBeVisible();
+  await expect(trackedActivity.getByText('Internal: READY_FOR_SCFHS_SUBMISSION', { exact: true })).toBeVisible();
+  await expect(trackedActivity.getByText('NOT_SUBMITTED', { exact: true })).toBeVisible();
 });
