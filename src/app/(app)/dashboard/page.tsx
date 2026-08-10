@@ -17,8 +17,9 @@ export default async function DashboardPage(){
     const {data}=await s.from('committee_reviews').select('id,status').eq('organization_id',context.organizationId); awaitingChair=(data??[]).filter(x=>x.status==='RECORDED').length;
   }
   if(can('impact.view')){
-    const {data}=await s.from('activity_impact_schedules').select('status,due_at,grace_until').eq('organization_id',context.organizationId); const now=Date.now();
-    for(const row of data??[]){if(['COMPLETED','NOT_APPLICABLE'].includes(String(row.status)))continue;const due=Date.parse(String(row.due_at)),grace=Date.parse(String(row.grace_until));if(now>grace)impactOverdue+=1;else if(now>=due)impactDue+=1;}
+    const {data}=await s.from('activity_impact_schedules').select('status').eq('organization_id',context.organizationId);
+    impactDue=(data??[]).filter(row=>row.status==='DUE').length;
+    impactOverdue=(data??[]).filter(row=>row.status==='OVERDUE').length;
     const {data:reports}=await s.from('impact_reports').select('id,kind,status').eq('organization_id',context.organizationId).eq('kind','FINAL').eq('status','FINAL'); finalReports=reports?.length??0;
   }
   if(can('notification.view')){const {data}=await s.from('notifications').select('id,is_read').eq('organization_id',context.organizationId).eq('recipient_user_id',context.userId).eq('is_read',false);unread=data?.length??0;}
@@ -34,6 +35,7 @@ export default async function DashboardPage(){
     {href:'/external',icon:'external',ar:'التتبع الخارجي',en:'External Tracking',descAr:'تسجيل حالة الطلب الخارجي ودليل القرار.',descEn:'Record external submission status and decision evidence.',permission:'external.view'},
     {href:'/impact',icon:'impact',ar:'قياس الأثر وHTVI',en:'Impact & HTVI',descAr:'L1–L4، الاستحقاقات والتقرير النهائي.',descEn:'L1–L4, follow-up due dates and final report.',permission:'impact.view'},
     {href:'/annual-reports',icon:'annual',ar:'التقرير السنوي',en:'Annual Committee Report',descAr:'مؤشرات اللجنة والمساهمة واعتماد الرئيس وإقرار الإدارة.',descEn:'Committee metrics, contributions, Chair approval and management acknowledgement.',permission:'annual.view'},
+    {href:'/reports',icon:'reports',ar:'التقارير والطباعة',en:'Reports & Printing',descAr:'تقارير الأثر والمحاضر والتقرير السنوي من البيانات التشغيلية.',descEn:'Impact reports, minutes and annual outputs from operational data.',permission:'report.view'},
     {href:'/evidence',icon:'evidence',ar:'جاهزية الأدلة',en:'Evidence Readiness',descAr:'اكتمال الأدلة والفجوات دون تحويلها لدرجة امتثال.',descEn:'Evidence completeness and gaps without a compliance score.',permission:'evidence.readiness.view'},
     {href:'/notifications',icon:'notifications',ar:'الإشعارات',en:'Notifications',descAr:'المواعيد المستحقة والمتأخرة والتنبيهات الحوكمية.',descEn:'Due, overdue and governance alerts.',permission:'notification.view'},
     {href:'/admin/templates',icon:'templates',ar:'القوالب والإصدارات',en:'Templates & Versions',descAr:'القوالب الرسمية والداخلية وMapping وQA والتفعيل.',descEn:'Official/internal templates, mapping, QA and activation.',role:'TEMPLATE'},
