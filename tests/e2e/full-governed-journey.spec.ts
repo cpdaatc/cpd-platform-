@@ -12,31 +12,40 @@ async function login(page: Page, email: string) {
 async function selectRole(page: Page, role: string) {
   await page.waitForURL(/\/(?:context|dashboard)(?:\?|$|\/)/, { timeout: 10000 });
 
-  for (let step = 0; step < 2 && /\/context(?:\?|$|\/)/.test(page.url()); step += 1) {
+  for (let step = 0; step < 3 && /\/context(?:\?|$|\/)/.test(page.url()); step += 1) {
     const roleButton = page.getByRole('button', { name: new RegExp(role) });
     if (await roleButton.count()) {
-      await roleButton.click();
+      await roleButton.first().click();
+      await page.waitForURL(/\/dashboard(?:\?|$|\/)/, { timeout: 10000 });
       break;
     }
 
     const organizationForm = page.locator('form').filter({ has: page.locator('input[name="organizationId"]') }).first();
     if (await organizationForm.count()) {
       await organizationForm.getByRole('button').click();
-      await page.waitForURL(/\/context(?:\?|$|\/)/, { timeout: 10000 });
+      await page.waitForURL(/\/(?:context|dashboard)(?:\?|$|\/)/, { timeout: 10000 });
       continue;
     }
-    break;
-  }
-
-  if (/\/dashboard(?:\?|$|\/)/.test(page.url())) {
-    const select = page.locator('select[name="role"]');
-    if (await select.count()) {
-      await select.selectOption(role);
-      await page.getByRole('button', { name: /تبديل الدور|Switch role/ }).click();
-    }
+    throw new Error(`Unable to resolve organization/role context for ${role}.`);
   }
 
   await expect(page).toHaveURL(/\/dashboard/);
+  const select = page.locator('#shell-role, select[name="role"]').first();
+  if (await select.count()) {
+    if ((await select.inputValue()) !== role) {
+      await select.selectOption(role);
+      await page.getByRole('button', { name: /تبديل الدور|Switch role/ }).click();
+      await page.waitForURL(/\/dashboard(?:\?|$|\/)/, { timeout: 10000 });
+    }
+    await expect(select).toHaveValue(role);
+  }
+
+  if (role === 'COMMITTEE_SECRETARY') {
+    await expect(page.getByRole('link', { name: /مساحة سكرتير اللجنة|Committee Secretary/, exact: true })).toBeVisible();
+  }
+  if (role === 'ORGANIZATION_SYSTEM_ADMIN') {
+    await expect(page.getByRole('link', { name: /إدارة الأنشطة|Activity Administration/, exact: true })).toBeVisible();
+  }
 }
 
 async function logout(page: Page) {
