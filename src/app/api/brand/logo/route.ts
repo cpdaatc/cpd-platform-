@@ -4,13 +4,12 @@ import { join } from 'node:path';
 export const runtime = 'nodejs';
 
 export async function GET() {
-  const source = await readFile(join(process.cwd(), 'public', 'brand', 'cpd-logo.txt'), 'utf8');
-  const bytes = Buffer.from(source.trim(), 'base64');
+  const bytes = await readFile(join(process.cwd(), 'public', 'brand', 'cpd-logo.png'));
 
   return new Response(bytes, {
     status: 200,
     headers: {
-      'Content-Type': 'image/jpeg',
+      'Content-Type': 'image/png',
       'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
       'X-Content-Type-Options': 'nosniff',
     },
