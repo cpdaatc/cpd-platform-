@@ -25,5 +25,11 @@ describe('GitHub Pages full-platform demo', () => {
     expect(pageIds).toHaveLength(13);
     expect(new Set(navPages)).toEqual(new Set(pageIds));
     expect(document.querySelectorAll('.dyn-logo').length).toBeGreaterThanOrEqual(4);
+
+    const annual = document.querySelector('#annual')?.textContent ?? '';
+    expect(annual).toContain('إجمالي الأنشطة');
+    expect(annual).toContain('التقارير النهائية');
+    expect(annual).toContain('33.3% COVERAGE');
+    expect(annual).not.toContain('الأنشطة المكتملة');
   });
 });
