@@ -13,6 +13,7 @@ Release candidate: `production-readiness`
 - [ ] Public login/mobile/keyboard Playwright smoke passes.
 - [ ] Complete local Supabase starts from repository configuration and applies all migrations.
 - [ ] Authenticated Role Context browser UAT passes.
+- [ ] All nine canonical roles pass role-specific navigation, clarity, and authority-boundary browser UAT.
 - [ ] Activity create/assign browser UAT passes.
 - [ ] Final Impact Report PDF is exactly two A4 pages.
 - [ ] All SQL acceptance suites Phase 1–12 pass from a clean database, including migration `0040_security_governance_closure.sql`.
