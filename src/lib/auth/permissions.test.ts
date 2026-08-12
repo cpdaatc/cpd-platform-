@@ -22,6 +22,20 @@ describe('foundation RBAC defaults', () => {
     expect(roleHasPermission('ORGANIZATION_SYSTEM_ADMIN', 'methodology.approve')).toBe(false);
   });
 
+  it('keeps external AI configuration separate from privacy approval', () => {
+    expect(roleHasPermission('ORGANIZATION_SYSTEM_ADMIN', 'ai.settings.configure')).toBe(true);
+    expect(roleHasPermission('ORGANIZATION_SYSTEM_ADMIN', 'ai.settings.approve')).toBe(false);
+    expect(roleHasPermission('MANAGEMENT_APPROVER', 'ai.settings.configure')).toBe(false);
+    expect(roleHasPermission('MANAGEMENT_APPROVER', 'ai.settings.approve')).toBe(true);
+  });
+
+  it('keeps impact correction requests separate from approval', () => {
+    expect(roleHasPermission('ACTIVITY_OFFICER', 'impact.correction.request')).toBe(true);
+    expect(roleHasPermission('ORGANIZATION_SYSTEM_ADMIN', 'impact.correction.request')).toBe(true);
+    expect(roleHasPermission('MANAGEMENT_APPROVER', 'impact.correction.approve')).toBe(true);
+    expect(roleHasPermission('ACTIVITY_OFFICER', 'impact.correction.approve')).toBe(false);
+  });
+
   it('does not allow an activity officer to create activities', () => {
     expect(roleHasPermission('ACTIVITY_OFFICER', 'activity.create')).toBe(false);
     expect(roleHasPermission('ORGANIZATION_SYSTEM_ADMIN', 'activity.create')).toBe(true);

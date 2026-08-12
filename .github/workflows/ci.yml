@@ -99,8 +99,8 @@ jobs:
         run: node tests/e2e/seed-local.mjs
       - name: Install Playwright Chromium
         run: npm run test:e2e:install
-      - name: Auth and role-context browser UAT
-        run: npm run test:e2e:auth
+      - name: Full role and workflow browser UAT
+        run: npm run test:e2e:uat
       - name: Stop local Supabase stack
         if: always()
         run: npx supabase stop --no-backup

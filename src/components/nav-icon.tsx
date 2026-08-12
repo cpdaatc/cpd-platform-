@@ -1,4 +1,4 @@
-export type NavIconName='dashboard'|'activities'|'committee'|'external'|'impact'|'annual'|'reports'|'evidence'|'notifications'|'admin'|'templates'|'users'|'references';
+export type NavIconName='dashboard'|'activities'|'committee'|'external'|'impact'|'annual'|'reports'|'evidence'|'notifications'|'admin'|'templates'|'users'|'references'|'audit'|'platform'|'ai';
 
 export function NavIcon({name}:{name:NavIconName}){
   const common={width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.8,strokeLinecap:'round' as const,strokeLinejoin:'round' as const,'aria-hidden':true};
@@ -14,5 +14,8 @@ export function NavIcon({name}:{name:NavIconName}){
   if(name==='templates')return <svg {...common}><path d="M5 3h14v18H5z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>;
   if(name==='users')return <svg {...common}><circle cx="9" cy="8" r="3"/><path d="M3 20c.5-4 2.5-6 6-6s5.5 2 6 6"/><circle cx="18" cy="9" r="2"/><path d="M15.5 14.5c3.2-.8 5.2.8 5.5 4.5"/></svg>;
   if(name==='references')return <svg {...common}><path d="M4 4h6a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4z"/><path d="M20 4h-4a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h4z"/></svg>;
+  if(name==='audit')return <svg {...common}><path d="M12 3 4 6v5c0 5 3.3 8.5 8 10 4.7-1.5 8-5 8-10V6z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg>;
+  if(name==='platform')return <svg {...common}><path d="M4 5h16v14H4z"/><path d="M4 9h16M8 5v14M12 13h4M12 16h3"/></svg>;
+  if(name==='ai')return <svg {...common}><rect x="5" y="5" width="14" height="14" rx="3"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M19 9h3M2 15h3M19 15h3"/><circle cx="10" cy="11" r="1"/><circle cx="14" cy="11" r="1"/><path d="M9.5 15h5"/></svg>;
   return <svg {...common}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21h-4v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H3v-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6V3h4v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.1v4H21a1.7 1.7 0 0 0-1.6 1z"/></svg>;
 }

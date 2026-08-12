@@ -14,6 +14,8 @@
     "test:e2e": "playwright test",
     "test:e2e:smoke": "playwright test tests/e2e/login-smoke.spec.ts tests/e2e/responsive-accessibility.spec.ts",
     "test:e2e:auth": "playwright test tests/e2e/login-role-context.spec.ts tests/e2e/activity-lifecycle.spec.ts tests/e2e/reports-print.spec.ts",
+    "test:e2e:roles": "playwright test tests/e2e/all-roles-clarity.spec.ts",
+    "test:e2e:uat": "playwright test tests/e2e/login-role-context.spec.ts tests/e2e/activity-lifecycle.spec.ts tests/e2e/all-roles-clarity.spec.ts tests/e2e/reports-print.spec.ts",
     "test:e2e:install": "playwright install --with-deps chromium",
     "security:release": "node scripts/security-release-check.mjs",
     "production:env-check": "node scripts/production-env-check.mjs",

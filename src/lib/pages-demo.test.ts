@@ -11,8 +11,12 @@ describe('GitHub Pages full-platform demo', () => {
       readFile(join(root, 'demo', 'logo.png')),
     ]);
 
-    expect(index).toContain('./v3.html?release=20260811');
-    expect(html).toContain("img.src='./logo.png?v=20260811'");
+    expect(index).toContain('./v3.html?release=20260812');
+    expect(html).toContain("img.src='./logo.png?v=20260812'");
+    for (const role of ['PLATFORM_SUPER_ADMIN','ORGANIZATION_SYSTEM_ADMIN','ACTIVITY_OFFICER','COMMITTEE_SECRETARY','COMMITTEE_CHAIR','COMMITTEE_MEMBER','MANAGEMENT_VIEWER','MANAGEMENT_APPROVER','AUDITOR']) {
+      expect(html).toContain(`${role}:{`);
+    }
+    expect(html).toContain("button.hidden=!r.pages.includes(button.dataset.page)");
     expect([...logo.subarray(0, 8)]).toEqual([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 
     const document = new DOMParser().parseFromString(html, 'text/html');

@@ -12,9 +12,11 @@ This UAT uses synthetic data only. It does not certify SCFHS accreditation, lega
 | Mobile/RTL/keyboard | `tests/e2e/responsive-accessibility.spec.ts` | narrow viewport + keyboard focus |
 | Multi-role Role Context | `tests/e2e/login-role-context.spec.ts` | Admin and Secretary remain separated |
 | Activity creation + assignment | `tests/e2e/activity-lifecycle.spec.ts` | Admin creates/assigns; Officer sees only assigned activity path |
+| All nine role workspaces | `tests/e2e/all-roles-clarity.spec.ts` | role mission, authorized navigation, active section, separation-of-duties boundaries |
+| Platform and audit surfaces | `tests/e2e/all-roles-clarity.spec.ts` | Platform Super Admin has no implicit tenant operations; Auditor sees immutable events without mutation workspaces |
 | Final impact print | `tests/e2e/reports-print.spec.ts` | structured final report + exact 2-page PDF |
 
-The authenticated tests run against a complete disposable local Supabase stack (Auth, Postgres, RLS, Storage) with synthetic users seeded by `tests/e2e/seed-local.mjs`.
+The authenticated tests run against a complete disposable local Supabase stack (Auth, Postgres, RLS, Storage) with all nine canonical roles seeded by `tests/e2e/seed-local.mjs`.
 
 ## Backend Workflow Evidence
 
@@ -32,6 +34,7 @@ The browser UAT is supplemented by SQL acceptance suites that execute governed s
 - Phase 10 — production security invariants.
 - Phase 11 — recovery and tenant-isolation regression coverage;
 - Phase 12 — audit/RLS/assignment/privacy/security-governance closure.
+- Phase 13 — role-workspace contract repairs validated by full-role browser UAT.
 
 ## Manual Pilot UAT — required before real users
 
