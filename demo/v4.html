@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="description" content="نسخة تشغيلية تفاعلية لمنصة حوكمة التطوير المهني المستمر">
+  <title>منصة التطوير المهني المستمر | العرض التشغيلي</title>
+  <link rel="stylesheet" href="./operational.css?v=20260812-1">
+</head>
+<body>
+  <section id="login" aria-labelledby="loginTitle">
+    <div class="login-story">
+      <div class="logo"><img class="logo-img" src="./logo.png?v=20260812-1" alt="شعار منصة التطوير المهني المستمر"></div>
+      <span class="eyebrow">CPD GOVERNANCE &amp; IMPACT INTELLIGENCE</span>
+      <h1>منصة التطوير المهني المستمر</h1>
+      <p>مساحة مؤسسية موحدة لإنشاء النشاط، استكمال ملفه، مراجعته علميًا، تتبع قرار الهيئة، وقياس أثره من المستوى الأول إلى الرابع.</p>
+      <div class="scope-strip" aria-label="نطاق المنصة">
+        <div>ملف نشاط قابل للتعبئة</div>
+        <div>حوكمة القرار والأدلة</div>
+        <div>تقارير A4 قابلة للحفظ PDF</div>
+      </div>
+      <div class="demo-notice">هذه بيئة عرض تفاعلية ببيانات مصطنعة محفوظة داخل المتصفح. قرار اللجنة يعني الجاهزية الداخلية للرفع ولا يمثل اعتمادًا صادرًا عن الهيئة السعودية للتخصصات الصحية.</div>
+    </div>
+    <div class="login-area">
+      <form class="login-card" id="loginForm">
+        <div class="login-head">
+          <div>
+            <span class="eyebrow">SECURE ROLE CONTEXT</span>
+            <h2 id="loginTitle">تسجيل الدخول</h2>
+          </div>
+          <div class="logo"><img class="logo-img" src="./logo.png?v=20260812-1" alt="شعار المنصة"></div>
+        </div>
+        <div class="sub">اختر الدور لتجربة المساحة والعمليات المسموح بها لذلك الدور.</div>
+        <div class="field">
+          <label for="username">البريد أو اسم المستخدم</label>
+          <input id="username" autocomplete="username" value="admin@hospital.med" required>
+        </div>
+        <div class="field">
+          <label for="password">كلمة المرور</label>
+          <input id="password" type="password" autocomplete="current-password" value="demo1234" required>
+        </div>
+        <div class="field">
+          <label for="role">الدخول بدور</label>
+          <select id="role" required>
+            <option value="PLATFORM_SUPER_ADMIN">مسؤول المنصة العام</option>
+            <option value="ORGANIZATION_SYSTEM_ADMIN" selected>مسؤول النظام المؤسسي</option>
+            <option value="ACTIVITY_OFFICER">مسؤول النشاط</option>
+            <option value="COMMITTEE_SECRETARY">سكرتير اللجنة</option>
+            <option value="COMMITTEE_CHAIR">رئيس اللجنة</option>
+            <option value="COMMITTEE_MEMBER">عضو اللجنة</option>
+            <option value="MANAGEMENT_VIEWER">مستخدم إداري للعرض</option>
+            <option value="MANAGEMENT_APPROVER">المخول الإداري</option>
+            <option value="AUDITOR">المدقق</option>
+          </select>
+        </div>
+        <button class="btn primary" type="submit">دخول مساحة العمل</button>
+      </form>
+    </div>
+  </section>
+
+  <div id="app" class="hidden">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo"><img class="logo-img" src="./logo.png?v=20260812-1" alt="شعار المنصة"></div>
+        <div><b>منصة التطوير المهني المستمر</b><small>الجاهزية · الحوكمة · ذكاء الأثر</small></div>
+      </div>
+      <nav class="nav" aria-label="التنقل الرئيسي">
+        <button class="active" data-page="dash" data-title="لوحة القيادة">لوحة القيادة</button>
+        <button data-page="admin" data-title="إدارة الأنشطة">إدارة الأنشطة</button>
+        <button data-page="activities" data-title="الأنشطة ومساحة العمل">الأنشطة ومساحة العمل</button>
+        <button data-page="planning" data-title="التخطيط والمراجعة المسبقة">التخطيط والمراجعة المسبقة</button>
+        <button data-page="committee" data-title="اللجنة والقرارات">اللجنة والقرارات</button>
+        <button data-page="external" data-title="التتبع الخارجي">التتبع الخارجي</button>
+        <button data-page="impact" data-title="قياس الأثر وHTVI">قياس الأثر وHTVI</button>
+        <button data-page="annual" data-title="التقرير السنوي">التقرير السنوي</button>
+        <button data-page="reports" data-title="التقارير والطباعة">التقارير والطباعة</button>
+        <button data-page="evidence" data-title="جاهزية الأدلة">جاهزية الأدلة</button>
+        <button data-page="notifications" data-title="الإشعارات">الإشعارات</button>
+        <button data-page="templates" data-title="القوالب والمراجع">القوالب والمراجع</button>
+        <button data-page="audit" data-title="التدقيق والحوكمة">التدقيق والحوكمة</button>
+      </nav>
+      <div class="sidebar-note">الموافقة الداخلية تعني جاهزية الرفع فقط، وليست اعتمادًا خارجيًا للنشاط أو الساعات.</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div><h1 id="pageTitle">لوحة القيادة</h1><small id="roleText">مسؤول النظام المؤسسي</small></div>
+        <div class="top-actions">
+          <span class="demo-chip">بيانات عرض مصطنعة</span>
+          <button class="btn small" id="resetDemo" type="button">إعادة بيانات العرض</button>
+          <button class="btn small" id="logout" type="button">تسجيل الخروج</button>
+        </div>
+      </header>
+
+      <section class="page active" id="dash" aria-labelledby="dashHeading">
+        <div class="role-guide">
+          <div class="card"><span class="eyebrow">مهمتي في هذا الدور</span><h2 id="roleGuideTitle">مسؤول النظام المؤسسي</h2><p id="roleMission"></p></div>
+          <div class="card authority"><b>حدود الصلاحية</b><p id="roleBoundary"></p></div>
+        </div>
+        <div class="page-heading"><div><h2 id="dashHeading">المشهد التشغيلي اليوم</h2><p>مؤشرات مرتبطة بسجلات فعلية، وليست أرقامًا معزولة عن سير العمل.</p></div><button class="btn secondary" type="button" data-goto="activities">فتح سجل الأنشطة</button></div>
+        <div class="kpis">
+          <div class="card kpi"><span>إجمالي الأنشطة</span><strong id="activityCount">3</strong><small>نشاط واحد مكتمل الأثر</small></div>
+          <div class="card kpi"><span>نواقص الأدلة</span><strong>1</strong><small>إفصاح متحدث مطلوب</small></div>
+          <div class="card kpi"><span>متوسط HTVI النهائي</span><strong class="liveHtvi">96.7</strong><small>للتقارير النهائية فقط</small></div>
+          <div class="card kpi"><span>قرارات مستحقة</span><strong>2</strong><small>لجنة 1 · أثر 1</small></div>
+        </div>
+        <div class="card panel">
+          <div class="panel-header"><div><h3>قائمة عملي اليوم</h3><p>المهام مرتبة حسب الاستحقاق والدور النشط.</p></div><span class="badge warning">3 إجراءات</span></div>
+          <div class="table-wrap">
+            <table class="data-table compact" id="workQueueTable">
+              <thead><tr><th>النشاط</th><th>المهمة</th><th>المسؤول</th><th>الاستحقاق</th><th>الحالة</th><th>الإجراء</th></tr></thead>
+              <tbody>
+                <tr><td>HT-2026-003</td><td>رفع إفصاح المتحدث</td><td>مسؤول النشاط</td><td>اليوم</td><td><span class="badge danger">متأخر</span></td><td><button class="btn small" data-goto="evidence">استكمال</button></td></tr>
+                <tr><td>HT-2026-002</td><td>تسجيل نتيجة اللجنة</td><td>سكرتير اللجنة</td><td>13 أغسطس</td><td><span class="badge warning">بانتظار</span></td><td><button class="btn small" data-goto="committee">مراجعة</button></td></tr>
+                <tr><td>HT-2026-001</td><td>إغلاق تقرير الأثر</td><td>رئيس اللجنة</td><td>15 أغسطس</td><td><span class="badge">جاهز</span></td><td><button class="btn small" data-goto="impact">فتح</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card panel">
+          <h3>رحلة النشاط HT-2026-001</h3>
+          <div class="flow" aria-label="مراحل النشاط">
+            <div class="step done">التخطيط ✓</div><div class="step done">المراجعة المسبقة ✓</div><div class="step done">اللجنة ✓</div><div class="step done">قرار الرئيس ✓</div><div class="step done">الاعتماد الخارجي ✓</div><div class="step current">قياس الأثر</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="admin" aria-labelledby="adminHeading">
+        <div class="page-heading"><div><h2 id="adminHeading">إدارة الأنشطة والتعيينات</h2><p>إنشاء سجل نشاط، إسناد مسؤول واضح، ومراجعة عضوية المستخدمين من شاشة واحدة.</p></div><button class="btn primary" id="openActivityDialog" type="button" data-roles="ORGANIZATION_SYSTEM_ADMIN">إنشاء نشاط جديد</button></div>
+        <div class="card panel">
+          <div class="filters">
+            <div class="field search"><label for="adminSearch">بحث بالرقم أو العنوان</label><input id="adminSearch" data-filter-table="activityAdminTable" placeholder="مثال: HT-2026-001"></div>
+            <div class="field"><label for="adminStatus">الحالة</label><select id="adminStatus"><option>جميع الحالات</option><option>مسودة</option><option>تحت المراجعة</option><option>جاهز للرفع</option></select></div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="activityAdminTable">
+              <thead><tr><th>الرقم</th><th>عنوان النشاط</th><th>النوع</th><th>تاريخ البدء</th><th>مسؤول النشاط</th><th>الجاهزية</th><th>الحالة</th><th>إجراء</th></tr></thead>
+              <tbody>
+                <tr><td>HT-2026-001</td><td>دورة تطوير مهارات التواصل</td><td>دورة</td><td>20/05/2026</td><td><select aria-label="مسؤول HT-2026-001" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN"><option>د. سارة العتيبي</option><option>أ. خالد الشهري</option></select></td><td>9 / 9</td><td><span class="badge purple">قياس الأثر</span></td><td><button class="btn small" data-goto="activities">فتح الملف</button></td></tr>
+                <tr><td>HT-2026-002</td><td>سلامة المرضى</td><td>ورشة</td><td>08/09/2026</td><td><select aria-label="مسؤول HT-2026-002" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN"><option>أ. خالد الشهري</option><option>د. سارة العتيبي</option></select></td><td>9 / 9</td><td><span class="badge warning">اللجنة</span></td><td><button class="btn small" data-goto="committee">فتح المراجعة</button></td></tr>
+                <tr><td>HT-2026-003</td><td>جودة الخدمات الصحية</td><td>ندوة</td><td>18/10/2026</td><td><select aria-label="مسؤول HT-2026-003" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN"><option>د. نورة القحطاني</option><option>أ. خالد الشهري</option></select></td><td>8 / 9</td><td><span class="badge danger">إعادة استكمال</span></td><td><button class="btn small" data-goto="evidence">عرض النقص</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card panel">
+          <div class="panel-header"><div><h3>المستخدمون وسياقات الأدوار</h3><p>الدور النشط منفصل عن عضوية المستخدم الأساسية.</p></div><button class="btn small secondary" type="button" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN">دعوة مستخدم</button></div>
+          <div class="table-wrap"><table class="data-table compact"><thead><tr><th>المستخدم</th><th>البريد</th><th>السياق الوظيفي</th><th>آخر دخول</th><th>الحالة</th></tr></thead><tbody><tr><td>د. سارة العتيبي</td><td>s.alotaibi@hospital.med</td><td>مسؤول نشاط</td><td>12/08/2026 09:24</td><td><span class="badge">نشط</span></td></tr><tr><td>د. محمد الحربي</td><td>m.alharbi@hospital.med</td><td>رئيس اللجنة</td><td>11/08/2026 14:10</td><td><span class="badge">نشط</span></td></tr><tr><td>أ. ليان الغامدي</td><td>l.alghamdi@hospital.med</td><td>سكرتير اللجنة</td><td>12/08/2026 08:03</td><td><span class="badge">نشط</span></td></tr></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="page" id="activities" aria-labelledby="activitiesHeading">
+        <div class="page-heading"><div><h2 id="activitiesHeading">ملف النشاط القابل للتعبئة</h2><p>حرر البيانات، ارفع نموذج PDF، احفظ المسودة، ثم شغّل فحص الجاهزية قبل الإرسال للمراجعة.</p></div><div class="actions"><button class="btn secondary" id="saveActivityDraft" type="button" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN ACTIVITY_OFFICER">حفظ المسودة</button><button class="btn primary" id="checkReadiness" type="button" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN ACTIVITY_OFFICER">فحص الجاهزية</button><button class="btn" id="printActivity" type="button">طباعة / حفظ PDF</button></div></div>
+        <form id="activityIntakeForm" class="grid-2" autocomplete="off">
+          <div class="card panel">
+            <div class="panel-header"><div><h3>بيانات النشاط الأساسية</h3><p>HT-2026-001 · آخر حفظ 12/08/2026 10:32</p></div><span class="badge neutral">مسودة محفوظة</span></div>
+            <div class="form-grid">
+              <div class="field"><label for="activityCode">رقم النشاط</label><input id="activityCode" name="activityCode" value="HT-2026-001" readonly></div>
+              <div class="field"><label for="activityType">نوع النشاط</label><select id="activityType" name="activityType" required><option value="course">دورة تدريبية</option><option value="workshop">ورشة عمل</option><option value="symposium">ندوة علمية</option><option value="conference">مؤتمر</option></select></div>
+              <div class="field wide"><label for="activityTitle">عنوان النشاط بالعربية</label><input id="activityTitle" name="activityTitle" value="دورة تطوير مهارات التواصل لدى الممارسين الصحيين" required></div>
+              <div class="field wide"><label for="activityTitleEn">العنوان بالإنجليزية</label><input class="ltr" id="activityTitleEn" name="activityTitleEn" value="Communication Skills Development for Healthcare Practitioners" required></div>
+              <div class="field"><label for="activityStart">تاريخ البدء</label><input id="activityStart" name="activityStart" type="date" value="2026-05-20" required></div>
+              <div class="field"><label for="activityEnd">تاريخ الانتهاء</label><input id="activityEnd" name="activityEnd" type="date" value="2026-05-21" required></div>
+              <div class="field"><label for="cpdHours">الساعات المقترحة</label><input id="cpdHours" name="cpdHours" type="number" min="1" max="50" value="8" required></div>
+              <div class="field"><label for="capacity">الطاقة الاستيعابية</label><input id="capacity" name="capacity" type="number" min="1" value="40" required></div>
+              <div class="field"><label for="deliveryMethod">طريقة التنفيذ</label><select id="deliveryMethod" name="deliveryMethod" required><option>حضوري</option><option>افتراضي مباشر</option><option>مدمج</option></select></div>
+              <div class="field"><label for="targetAudience">الفئة المستهدفة</label><input id="targetAudience" name="targetAudience" value="الأطباء والتمريض والصيادلة" required></div>
+              <div class="field wide"><label for="gapStatement">الفجوة المهنية المبنية على البيانات</label><textarea id="gapStatement" name="gapStatement" required>أظهر تدقيق تجربة المريض انخفاضًا في وضوح التواصل عند الانتقال بين الوحدات بنسبة 18% مقارنة بالمستهدف المؤسسي.</textarea></div>
+              <div class="field wide"><label for="learningObjectives">الأهداف التعليمية</label><textarea id="learningObjectives" name="learningObjectives" required>بنهاية النشاط يطبق المشارك نموذج SBAR في محاكاة سريرية محققا 80% على الأقل في قائمة التحقق.</textarea></div>
+            </div>
+          </div>
+          <div>
+            <div class="card panel">
+              <h3>رفع النموذج الرسمي PDF</h3>
+              <label class="upload-box" for="activityPdf"><span><b>اختر ملف PDF المكتمل</b><small>PDF فقط · حد العرض التجريبي 10 MB</small><input id="activityPdf" name="activityPdf" type="file" accept="application/pdf" data-file-status="activityPdfStatus"><span class="file-status" id="activityPdfStatus">لم يتم اختيار ملف في هذه الجلسة</span></span></label>
+            </div>
+            <div class="card panel">
+              <div class="readiness"><div class="readiness-score" id="readinessScore">8 / 9</div><div><b>اكتمال ملف النشاط</b><div class="progress"><span id="readinessBar" style="width:88.9%"></span></div><div class="readiness-message" id="readinessMessage">المطلوب: إرفاق نسخة PDF الحالية ثم إعادة الفحص.</div></div></div>
+            </div>
+            <div class="card panel">
+              <h3>قائمة الجاهزية</h3>
+              <div class="table-wrap"><table class="data-table compact" id="readinessTable"><thead><tr><th>المتطلب</th><th>المصدر</th><th>الحالة</th></tr></thead><tbody><tr><td>البيانات الأساسية</td><td>ملف النشاط</td><td data-check="core"><span class="badge">مكتمل</span></td></tr><tr><td>الفجوة المهنية</td><td>التحليل</td><td data-check="gap"><span class="badge">مكتمل</span></td></tr><tr><td>الأهداف التعليمية</td><td>التخطيط</td><td data-check="objectives"><span class="badge">مكتمل</span></td></tr><tr><td>الفئة المستهدفة</td><td>ملف النشاط</td><td data-check="audience"><span class="badge">مكتمل</span></td></tr><tr><td>الساعات والمدة</td><td>الجدول</td><td data-check="schedule"><span class="badge">مكتمل</span></td></tr><tr><td>منهجية التقييم</td><td>التخطيط</td><td><span class="badge">مكتمل</span></td></tr><tr><td>إفصاحات المتحدثين</td><td>الأدلة</td><td><span class="badge">مكتمل</span></td></tr><tr><td>تعارض المصالح</td><td>الحوكمة</td><td><span class="badge">مكتمل</span></td></tr><tr><td>النموذج الرسمي PDF</td><td>المرفقات</td><td data-check="pdf"><span class="badge danger">مطلوب</span></td></tr></tbody></table></div>
+            </div>
+          </div>
+        </form>
+        <div class="card panel">
+          <div class="panel-header"><div><h3>المرفقات وإصداراتها</h3><p>كل رفع ينشئ إصدارًا جديدًا ويحفظ الإصدار السابق.</p></div><span class="badge purple">3 ملفات</span></div>
+          <div class="table-wrap"><table class="data-table compact" id="attachmentsTable"><thead><tr><th>المستند</th><th>الإصدار</th><th>الحجم</th><th>رفع بواسطة</th><th>التاريخ</th><th>الحالة</th></tr></thead><tbody><tr><td>نموذج طلب اعتماد النشاط.pdf</td><td>v2</td><td>1.8 MB</td><td>د. سارة العتيبي</td><td>11/08/2026</td><td><span class="badge warning">استبدال مطلوب</span></td></tr><tr><td>تحليل الفجوة.pdf</td><td>v1</td><td>640 KB</td><td>د. سارة العتيبي</td><td>08/08/2026</td><td><span class="badge">متحقق</span></td></tr><tr><td>إفصاحات المتحدثين.pdf</td><td>v1</td><td>920 KB</td><td>أ. خالد الشهري</td><td>09/08/2026</td><td><span class="badge">متحقق</span></td></tr></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="page" id="planning" aria-labelledby="planningHeading">
+        <div class="page-heading"><div><h2 id="planningHeading">التخطيط والمراجعة المسبقة</h2><p>يفحص النظام صياغة الأهداف ومواءمتها، بينما تبقى النتيجة العلمية للمراجع البشري.</p></div><button class="btn primary" id="runPlanningCheck" type="button" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN ACTIVITY_OFFICER COMMITTEE_SECRETARY COMMITTEE_MEMBER COMMITTEE_CHAIR">تشغيل الفحص</button></div>
+        <div class="card panel">
+          <div class="panel-header"><div><h3>الأهداف التعليمية وSMART / Bloom</h3><p>يمكن تعديل النص ثم إعادة التحليل.</p></div><span class="badge" id="planningSummary">2 مستوفٍ · 1 يحتاج مراجعة</span></div>
+          <div class="table-wrap"><table class="data-table" id="objectivesTable"><thead><tr><th>#</th><th>الهدف التعليمي</th><th>الفعل</th><th>قابل للقياس</th><th>مواءمة التقييم</th><th>النتيجة</th></tr></thead><tbody><tr><td>1</td><td><input class="comment-input" value="يطبق نموذج SBAR في محاكاة سريرية"></td><td>يطبق</td><td><select><option selected>نعم</option><option>جزئي</option><option>لا</option></select></td><td>قائمة تحقق عملية</td><td><span class="badge">MEET</span></td></tr><tr><td>2</td><td><input class="comment-input" value="يميز عناصر التواصل عالي الخطورة"></td><td>يميز</td><td><select><option selected>نعم</option><option>جزئي</option><option>لا</option></select></td><td>اختبار قبلي/بعدي</td><td><span class="badge">MEET</span></td></tr><tr><td>3</td><td><input class="comment-input" value="يفهم أهمية الاستماع الفعال"></td><td>يفهم</td><td><select><option>نعم</option><option selected>جزئي</option><option>لا</option></select></td><td>غير محدد</td><td><span class="badge warning">PARTIAL</span></td></tr></tbody></table></div>
+        </div>
+        <div class="grid-2">
+          <div class="card panel">
+            <h3>منهجية التقييم</h3>
+            <form id="assessmentPlanForm" class="form-grid"><div class="field"><label for="assessmentMethod">الأداة</label><select id="assessmentMethod"><option>اختبار قبلي وبعدي</option><option>OSCE</option><option>قائمة تحقق</option></select></div><div class="field"><label for="passThreshold">حد الاجتياز %</label><input id="passThreshold" type="number" value="80" min="1" max="100"></div><div class="field wide"><label for="assessmentNotes">وصف التطبيق</label><textarea id="assessmentNotes">اختبار من 10 أسئلة وقائمة تحقق من 12 عنصرًا في المحاكاة.</textarea></div></form>
+          </div>
+          <div class="card panel">
+            <h3>نتائج المراجعة المسبقة</h3>
+            <div class="table-wrap"><table class="data-table compact" id="preReviewTable"><thead><tr><th>القاعدة</th><th>الملاحظة</th><th>الشدة</th><th>الإجراء</th></tr></thead><tbody><tr><td>SMART-04</td><td>الهدف الثالث لا يحدد سلوكًا قابلًا للرصد</td><td><span class="badge warning">متوسط</span></td><td><button class="btn small" type="button">تطبيق اقتراح</button></td></tr><tr><td>BLOOM-02</td><td>أداة القياس متوافقة مع مستوى التطبيق</td><td><span class="badge">سليم</span></td><td>—</td></tr><tr><td>EVID-07</td><td>الأدلة المرجعية حديثة وموثقة</td><td><span class="badge">سليم</span></td><td>—</td></tr></tbody></table></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="committee" aria-labelledby="committeeHeading">
+        <div class="page-heading"><div><h2 id="committeeHeading">مساحة عمل اللجنة والقرارات</h2><p>جدول أعمال، تقييم معيار-بمعيار، نتيجة جماعية، ثم قرار مستقل لرئيس اللجنة.</p></div><span class="badge warning">اجتماع 14/08/2026 · 10:00</span></div>
+        <div class="card panel">
+          <h3>جدول أعمال الاجتماع رقم SCM-2026-08</h3>
+          <div class="table-wrap"><table class="data-table" id="committeeAgendaTable"><thead><tr><th>#</th><th>النشاط</th><th>المراجع القائد</th><th>الجاهزية</th><th>الإفصاحات</th><th>توصيات الأعضاء</th><th>الحالة</th></tr></thead><tbody><tr><td>1</td><td>HT-2026-002 · سلامة المرضى</td><td>د. ريم الزهراني</td><td>9 / 9</td><td>3 / 3</td><td>2 MEET · 1 PARTIAL</td><td><span class="badge warning">قيد المناقشة</span></td></tr><tr><td>2</td><td>HT-2026-003 · جودة الخدمات الصحية</td><td>د. فهد المالكي</td><td>8 / 9</td><td>2 / 3</td><td>لم تبدأ</td><td><span class="badge neutral">مؤجل</span></td></tr></tbody></table></div>
+        </div>
+        <form id="committeeReviewForm" class="card panel">
+          <div class="panel-header"><div><h3>نموذج المراجعة الجماعية — HT-2026-002</h3><p>اختر نتيجة كل معيار وسجل الحيثية.</p></div><span class="badge purple" id="committeeReviewStatus">مسودة</span></div>
+          <div class="table-wrap"><table class="data-table" id="criteriaTable"><thead><tr><th>المعيار</th><th>الدليل</th><th>النتيجة</th><th>ملاحظة اللجنة</th></tr></thead><tbody><tr><td>C1 · الحاجة المهنية موثقة</td><td>تحليل الفجوة v2</td><td><select class="criterion-result"><option>MEET</option><option>PARTIAL</option><option>NOT MEET</option></select></td><td><input class="comment-input" value="مؤشرات العدوى تدعم الحاجة"></td></tr><tr><td>C2 · الأهداف SMART</td><td>خطة التعلم v3</td><td><select class="criterion-result"><option>MEET</option><option>PARTIAL</option><option>NOT MEET</option></select></td><td><input class="comment-input" value="الأهداف قابلة للقياس"></td></tr><tr><td>C3 · المحتوى متوازن</td><td>الجدول العلمي</td><td><select class="criterion-result"><option>MEET</option><option selected>PARTIAL</option><option>NOT MEET</option></select></td><td><input class="comment-input" value="إضافة مرجع للمحور الثالث"></td></tr><tr><td>C4 · الإفصاحات مكتملة</td><td>3 إفصاحات</td><td><select class="criterion-result"><option>MEET</option><option>PARTIAL</option><option>NOT MEET</option></select></td><td><input class="comment-input" value="لا يوجد تعارض معلن"></td></tr><tr><td>C5 · التقييم موائم</td><td>خطة التقييم</td><td><select class="criterion-result"><option>MEET</option><option>PARTIAL</option><option>NOT MEET</option></select></td><td><input class="comment-input" value="الاختبار والمحاكاة مناسبان"></td></tr></tbody></table></div>
+          <div class="field"><label for="committeeNotes">ملخص مناقشة اللجنة</label><textarea id="committeeNotes">ناقشت اللجنة مواءمة المحتوى مع الفجوة المهنية، وطلبت إضافة مرجع حديث للمحور الثالث قبل إصدار القرار.</textarea></div>
+          <div class="actions" style="margin-top:12px"><button class="btn primary" id="recordCommitteeReview" type="submit" data-mutate data-roles="COMMITTEE_SECRETARY COMMITTEE_CHAIR">تسجيل النتيجة الجماعية</button><button class="btn" type="button" data-preview="minutesReport">معاينة محضر الاجتماع</button></div>
+        </form>
+        <form id="chairDecisionForm" class="card panel">
+          <div class="panel-header"><div><h3>قرار رئيس اللجنة</h3><p>يُتاح بعد تثبيت النتيجة الجماعية، ولا يمثل اعتمادًا خارجيًا.</p></div><span class="badge warning" id="chairDecisionStatus">بانتظار القرار</span></div>
+          <div class="form-grid"><div class="field"><label for="chairDecision">القرار</label><select id="chairDecision"><option>APPROVED FOR SCFHS SUBMISSION</option><option>RETURNED FOR CORRECTION</option><option>REJECTED INTERNALLY</option></select></div><div class="field"><label for="decisionDate">تاريخ القرار</label><input id="decisionDate" type="date" value="2026-08-14"></div><div class="field wide"><label for="chairRationale">حيثيات القرار</label><textarea id="chairRationale">استوفى النشاط متطلبات المراجعة الداخلية، ويصبح جاهزًا للرفع إلى الهيئة بعد إضافة المرجع المطلوب.</textarea></div></div>
+          <button class="btn primary" type="submit" data-mutate data-roles="COMMITTEE_CHAIR">اعتماد قرار الرئيس</button>
+        </form>
+      </section>
+
+      <section class="page" id="external" aria-labelledby="externalHeading">
+        <div class="page-heading"><div><h2 id="externalHeading">التتبع الخارجي للهيئة</h2><p>يسجل المستخدم ما حدث خارج المنصة مع الدليل؛ النظام لا يدعي صدور اعتماد قبل توثيقه.</p></div><span class="badge purple">HT-2026-001</span></div>
+        <div class="flow"><div class="step done">جاهز للرفع ✓</div><div class="step done">تم الرفع ✓</div><div class="step done">تحت المراجعة ✓</div><div class="step current">معتمد خارجيًا</div><div class="step">تنفيذ النشاط</div><div class="step">متابعة الأثر</div></div>
+        <div class="grid-2">
+          <form id="externalTrackingForm" class="card panel">
+            <h3>تسجيل تحديث خارجي</h3>
+            <div class="form-grid">
+              <div class="field"><label for="submissionReference">مرجع طلب الهيئة</label><input id="submissionReference" value="SCFHS-CPD-2026-18427" required></div>
+              <div class="field"><label for="submittedAt">تاريخ الرفع</label><input id="submittedAt" type="date" value="2026-04-12" required></div>
+              <div class="field"><label for="externalStatus">الحالة الخارجية</label><select id="externalStatus"><option>SUBMITTED</option><option>UNDER SCFHS REVIEW</option><option selected>APPROVED</option><option>RETURNED</option><option>REJECTED</option></select></div>
+              <div class="field"><label for="approvedHours">الساعات المعتمدة</label><input id="approvedHours" type="number" min="0" value="8"></div>
+              <div class="field"><label for="externalDecisionDate">تاريخ القرار</label><input id="externalDecisionDate" type="date" value="2026-04-28"></div>
+              <div class="field"><label for="externalExpiry">تاريخ انتهاء الاعتماد</label><input id="externalExpiry" type="date" value="2027-04-27"></div>
+              <div class="field wide"><label for="externalNotes">ملاحظات</label><textarea id="externalNotes">تم اعتماد النشاط بثماني ساعات تطوير مهني مستمر.</textarea></div>
+              <div class="field wide"><label class="upload-box" for="externalDecisionPdf"><span><b>رفع خطاب/شهادة قرار الهيئة PDF</b><input id="externalDecisionPdf" type="file" accept="application/pdf" data-file-status="externalPdfStatus"><span class="file-status" id="externalPdfStatus">القرار الحالي: scfhs-decision-18427.pdf</span></span></label></div>
+            </div>
+            <button class="btn primary" type="submit" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN ACTIVITY_OFFICER">حفظ التحديث الخارجي</button>
+          </form>
+          <div class="card panel">
+            <h3>سجل التغييرات الخارجية</h3>
+            <div class="table-wrap"><table class="data-table compact" id="externalHistoryTable"><thead><tr><th>التاريخ</th><th>الحالة</th><th>المرجع</th><th>الساعات</th><th>المسجل</th><th>الدليل</th></tr></thead><tbody><tr><td>28/04/2026</td><td><span class="badge">APPROVED</span></td><td>SCFHS-CPD-2026-18427</td><td>8</td><td>د. سارة العتيبي</td><td><button class="btn small">فتح PDF</button></td></tr><tr><td>15/04/2026</td><td><span class="badge warning">UNDER REVIEW</span></td><td>SCFHS-CPD-2026-18427</td><td>—</td><td>د. سارة العتيبي</td><td>إيصال الرفع</td></tr><tr><td>12/04/2026</td><td><span class="badge neutral">SUBMITTED</span></td><td>SCFHS-CPD-2026-18427</td><td>—</td><td>د. سارة العتيبي</td><td>إيصال الرفع</td></tr></tbody></table></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="impact" aria-labelledby="impactHeading">
+        <div class="page-heading"><div><h2 id="impactHeading">قياس الأثر ومؤشر HTVI</h2><p>أدخل نتائج المستويات L1–L4 واربط كل نتيجة بدليل؛ يُحسب المؤشر بالأوزان المعتمدة فورًا.</p></div><div class="actions"><button class="btn secondary" id="saveImpact" type="button" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN ACTIVITY_OFFICER">حفظ القياسات</button><button class="btn primary" id="finalizeImpact" type="button" data-mutate data-roles="COMMITTEE_CHAIR MANAGEMENT_APPROVER">اعتماد التقرير النهائي</button></div></div>
+        <div class="grid-2">
+          <form id="impactForm" class="card panel">
+            <div class="panel-header"><div><h3>نتائج المستويات</h3><p>تقبل القيم من 0 إلى 100.</p></div><span class="badge" id="impactState">بيانات مكتملة</span></div>
+            <div class="table-wrap"><table class="data-table compact" id="impactLevelsTable"><thead><tr><th>المستوى</th><th>المؤشر</th><th>النتيجة %</th><th>الوزن</th><th>المساهمة</th></tr></thead><tbody><tr><td>L1 · Reaction</td><td>رضا المشاركين</td><td><input class="metric-input impact-score" id="l1Score" type="number" min="0" max="100" step="0.1" value="88.7" data-weight="0.15"></td><td>15%</td><td id="l1Contribution">13.3</td></tr><tr><td>L2 · Learning</td><td>فرق الاختبار</td><td><input class="metric-input impact-score" id="l2Score" type="number" min="0" max="100" step="0.1" value="100" data-weight="0.20"></td><td>20%</td><td id="l2Contribution">20.0</td></tr><tr><td>L3 · Behavior</td><td>تطبيق المهارة</td><td><input class="metric-input impact-score" id="l3Score" type="number" min="0" max="100" step="0.1" value="100" data-weight="0.25"></td><td>25%</td><td id="l3Contribution">25.0</td></tr><tr><td>L4 · Results</td><td>نتائج الخدمة</td><td><input class="metric-input impact-score" id="l4Score" type="number" min="0" max="100" step="0.1" value="95.9" data-weight="0.40"></td><td>40%</td><td id="l4Contribution">38.4</td></tr></tbody></table></div>
+            <div class="field"><label for="impactNarrative">الاستنتاج المهني</label><textarea id="impactNarrative">تحسن الالتزام بنموذج SBAR وانخفضت الملاحظات المرتبطة بنقل المعلومات بين الوحدات.</textarea></div>
+            <div class="field"><label class="upload-box" for="impactEvidencePdf"><span><b>رفع حزمة أدلة الأثر PDF</b><input id="impactEvidencePdf" type="file" accept="application/pdf" data-file-status="impactPdfStatus"><span class="file-status" id="impactPdfStatus">impact-evidence-v3.pdf · متحقق</span></span></label></div>
+          </form>
+          <div>
+            <div class="htvi-box"><div><span class="eyebrow">HEALTHCARE TRAINING VALUE INDEX</span><h3>النتيجة الموزونة</h3><p>15% L1 + 20% L2 + 25% L3 + 40% L4</p></div><strong id="htviScore">96.7</strong></div>
+            <div class="card panel">
+              <h3>أدلة القياس</h3>
+              <div class="table-wrap"><table class="data-table compact"><thead><tr><th>المستوى</th><th>العينة</th><th>الأداة</th><th>تاريخ القياس</th><th>التحقق</th></tr></thead><tbody><tr><td>L1</td><td>38 / 40</td><td>استبانة رضا</td><td>21/05/2026</td><td><span class="badge">متحقق</span></td></tr><tr><td>L2</td><td>40 / 40</td><td>اختبار قبلي/بعدي</td><td>21/05/2026</td><td><span class="badge">متحقق</span></td></tr><tr><td>L3</td><td>34 / 40</td><td>قائمة تحقق المشرف</td><td>21/07/2026</td><td><span class="badge">متحقق</span></td></tr><tr><td>L4</td><td>12 وحدة</td><td>مؤشر جودة الخدمة</td><td>01/08/2026</td><td><span class="badge">متحقق</span></td></tr></tbody></table></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="annual" aria-labelledby="annualHeading">
+        <div class="page-heading"><div><h2 id="annualHeading">التقرير السنوي المجمع</h2><p>يعرض التغطية الفعلية ويفصل الأنشطة غير النهائية عن متوسط HTVI المعتمد.</p></div><div class="actions"><button class="btn" type="button" data-preview="annualReport">معاينة A4</button><button class="btn primary" type="button" data-print="annualReport">طباعة / PDF</button></div></div>
+        <form id="annualFilterForm" class="card panel filters">
+          <div class="field"><label for="annualYear">السنة</label><select id="annualYear"><option selected>2026</option><option>2025</option></select></div>
+          <div class="field"><label for="annualOrg">المؤسسة</label><select id="annualOrg"><option>مستشفى صحة المدينة</option></select></div>
+          <div class="field"><label for="annualState">نطاق الحالة</label><select id="annualState"><option>جميع الأنشطة</option><option>التقارير النهائية فقط</option></select></div>
+          <button class="btn secondary" type="submit">تطبيق</button>
+        </form>
+        <div class="kpis"><div class="card kpi"><span>إجمالي الأنشطة</span><strong>3</strong><small>خلال 2026</small></div><div class="card kpi"><span>تقارير الأثر النهائية</span><strong>1</strong><small>33.3% تغطية</small></div><div class="card kpi"><span>الساعات المعتمدة خارجيًا</span><strong>8</strong><small>نشاط واحد</small></div><div class="card kpi"><span>متوسط HTVI النهائي</span><strong class="liveHtvi">96.7</strong><small>لا يشمل المسودات</small></div></div>
+        <div class="card panel">
+          <h3>تفصيل الأنشطة الداخلة في التقرير</h3>
+          <div class="table-wrap"><table class="data-table" id="annualActivitiesTable"><thead><tr><th>الرقم</th><th>النشاط</th><th>الفترة</th><th>المشاركون</th><th>الساعات الخارجية</th><th>حالة الأثر</th><th>HTVI</th><th>دخوله في المتوسط</th></tr></thead><tbody><tr><td>HT-2026-001</td><td>دورة تطوير مهارات التواصل</td><td>مايو</td><td>40</td><td>8</td><td><span class="badge">FINAL</span></td><td class="liveHtvi">96.7</td><td>نعم</td></tr><tr><td>HT-2026-002</td><td>سلامة المرضى</td><td>سبتمبر</td><td>—</td><td>—</td><td><span class="badge warning">NOT DUE</span></td><td>—</td><td>لا</td></tr><tr><td>HT-2026-003</td><td>جودة الخدمات الصحية</td><td>أكتوبر</td><td>—</td><td>—</td><td><span class="badge neutral">NOT DUE</span></td><td>—</td><td>لا</td></tr></tbody></table></div>
+        </div>
+        <div class="card panel">
+          <div class="panel-header"><div><h3>سجل اعتماد التقرير السنوي</h3><p>يعتمد رئيس اللجنة المحتوى العلمي ثم المخول الإداري الإصدار المؤسسي.</p></div><button class="btn primary" type="button" data-mutate data-roles="COMMITTEE_CHAIR MANAGEMENT_APPROVER">اعتماد الإصدار</button></div>
+          <div class="table-wrap"><table class="data-table compact"><thead><tr><th>المرحلة</th><th>المخول</th><th>الحالة</th><th>التاريخ</th><th>الملاحظة</th></tr></thead><tbody><tr><td>إعداد المسودة</td><td>سكرتير اللجنة</td><td><span class="badge">مكتمل</span></td><td>10/08/2026</td><td>الإصدار 1.0</td></tr><tr><td>المراجعة العلمية</td><td>رئيس اللجنة</td><td><span class="badge warning">بانتظار</span></td><td>—</td><td>—</td></tr><tr><td>الاعتماد الإداري</td><td>المخول الإداري</td><td><span class="badge neutral">غير متاح</span></td><td>—</td><td>بعد المراجعة العلمية</td></tr></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="page" id="reports" aria-labelledby="reportsHeading">
+        <div class="page-heading"><div><h2 id="reportsHeading">سجل التقارير والطباعة</h2><p>تقارير مولدة من السجلات، مع إصدار وحالة وعدد صفحات واضح قبل حفظها PDF.</p></div></div>
+        <div class="card panel report-list">
+          <div class="table-wrap"><table class="data-table" id="reportsRegisterTable"><thead><tr><th>التقرير</th><th>المرجع</th><th>الإصدار</th><th>الحالة</th><th>الصفحات</th><th>آخر توليد</th><th>الإجراءات</th></tr></thead><tbody><tr><td>تقرير قياس الأثر التدريبي</td><td>HT-2026-001</td><td>v1.0</td><td><span class="badge">FINAL</span></td><td>2 A4</td><td>12/08/2026 10:44</td><td><div class="actions"><button class="btn small" type="button" data-preview="impactReport">معاينة</button><button class="btn small primary" type="button" data-print="impactReport">طباعة / PDF</button></div></td></tr><tr><td>التقرير السنوي المجمع</td><td>ANNUAL-2026</td><td>v0.9</td><td><span class="badge warning">DRAFT</span></td><td>1 A4</td><td>10/08/2026 16:20</td><td><div class="actions"><button class="btn small" type="button" data-preview="annualReport">معاينة</button><button class="btn small primary" type="button" data-print="annualReport">طباعة / PDF</button></div></td></tr><tr><td>محضر اجتماع اللجنة</td><td>SCM-2026-08</td><td>v1.0</td><td><span class="badge purple">READY</span></td><td>1 A4</td><td>09/08/2026 13:15</td><td><div class="actions"><button class="btn small" type="button" data-preview="minutesReport">معاينة</button><button class="btn small primary" type="button" data-print="minutesReport">طباعة / PDF</button></div></td></tr><tr><td>طلب اعتماد النشاط</td><td>HT-2026-001</td><td>live</td><td><span class="badge neutral">FORM</span></td><td>1 A4</td><td>حسب الحقول الحالية</td><td><div class="actions"><button class="btn small" type="button" data-preview="activityApplicationReport">معاينة</button><button class="btn small primary" type="button" data-print="activityApplicationReport">طباعة / PDF</button></div></td></tr></tbody></table></div>
+        </div>
+
+        <div class="sheet" id="impactReport" aria-label="تقرير قياس الأثر من صفحتين">
+          <article class="paper">
+            <div class="report-head"><div class="logo"><img class="logo-img" src="./logo.png?v=20260812-1" alt="شعار المنصة"></div><div><div class="report-title">تقرير قياس الأثر التدريبي</div><div class="report-subtitle">Training Impact Report · Final</div></div></div>
+            <div class="report-rule"></div>
+            <div class="report-meta"><div><b>رقم النشاط</b><span>HT-2026-001</span></div><div><b>عنوان النشاط</b><span>دورة تطوير مهارات التواصل</span></div><div><b>فترة التنفيذ</b><span>20–21/05/2026</span></div><div><b>عدد المشاركين</b><span>40</span></div><div><b>الساعات المعتمدة</b><span>8 ساعات</span></div><div><b>حالة التقرير</b><span>FINAL</span></div></div>
+            <div class="htvi-box" style="margin-top:22px"><div><span class="eyebrow">HTVI</span><h3>مؤشر قيمة التدريب الصحي</h3><p>نتيجة موزونة للمستويات الأربعة</p></div><strong class="liveHtvi">96.7</strong></div>
+            <div class="report-section">نتائج مستويات الأثر</div>
+            <table class="data-table compact"><thead><tr><th>المستوى</th><th>النتيجة</th><th>الوزن</th><th>المساهمة</th><th>الدليل</th></tr></thead><tbody><tr><td>L1 · Reaction</td><td>88.7%</td><td>15%</td><td>13.3</td><td>استبانة 38 مشاركًا</td></tr><tr><td>L2 · Learning</td><td>100%</td><td>20%</td><td>20.0</td><td>اختبار قبلي/بعدي</td></tr><tr><td>L3 · Behavior</td><td>100%</td><td>25%</td><td>25.0</td><td>قائمة تحقق المشرف</td></tr><tr><td>L4 · Results</td><td>95.9%</td><td>40%</td><td>38.4</td><td>مؤشرات الخدمة</td></tr></tbody></table>
+            <div class="report-section">ملخص تنفيذي</div><p style="font-size:11px;line-height:1.9">حقق النشاط تحسنًا واضحًا في تطبيق نموذج التواصل السريري، وارتبط ذلك بانخفاض الملاحظات المتعلقة بنقل المعلومات بين الوحدات. جميع القياسات مرتبطة بأدلة متحقق منها.</p>
+            <div class="report-footer">التقرير النهائي · الصفحة 1 من 2 · تم التوليد من سجل HT-2026-001</div>
+          </article>
+          <article class="paper">
+            <div class="report-head"><div class="logo"><img class="logo-img" src="./logo.png?v=20260812-1" alt="شعار المنصة"></div><div><div class="report-title">تفصيل مجالات الأثر</div><div class="report-subtitle">HT-2026-001 · Evidence-linked outcomes</div></div></div>
+            <div class="report-rule"></div>
+            <div class="report-section">مؤشرات النتائج المؤسسية</div>
+            <table class="data-table compact"><thead><tr><th>المجال</th><th>خط الأساس</th><th>بعد النشاط</th><th>التغير</th><th>مصدر البيانات</th></tr></thead><tbody><tr><td>اكتمال نموذج SBAR</td><td>71%</td><td>96%</td><td>+25 نقطة</td><td>تدقيق 120 ملفًا</td></tr><tr><td>وضوح تسليم الحالة</td><td>78%</td><td>95%</td><td>+17 نقطة</td><td>تدقيق جودة</td></tr><tr><td>ملاحظات نقل المعلومات</td><td>22 حالة</td><td>9 حالات</td><td>-59%</td><td>نظام البلاغات</td></tr><tr><td>رضا الممارسين</td><td>82%</td><td>94%</td><td>+12 نقطة</td><td>استبانة متابعة</td></tr></tbody></table>
+            <div class="report-section">التوصيات وخطة المتابعة</div>
+            <table class="data-table compact"><thead><tr><th>التوصية</th><th>المالك</th><th>الاستحقاق</th><th>مؤشر الإغلاق</th></tr></thead><tbody><tr><td>إدراج SBAR في تهيئة الموظفين الجدد</td><td>إدارة التعليم</td><td>30/09/2026</td><td>اعتماد المادة</td></tr><tr><td>إعادة تدقيق الملفات بعد ثلاثة أشهر</td><td>إدارة الجودة</td><td>01/11/2026</td><td>عينة 120 ملفًا</td></tr><tr><td>مشاركة النتائج مع رؤساء الوحدات</td><td>مسؤول النشاط</td><td>20/08/2026</td><td>محضر الاجتماع</td></tr></tbody></table>
+            <div class="report-note">حُسب HTVI من نتائج L1–L4 المثبتة في سجل النشاط. لا يغيّر هذا التقرير قرار الاعتماد الخارجي، ولا يستبدل متطلبات الهيئة أو الحكم المهني للمراجع.</div>
+            <div class="report-footer">التقرير النهائي · الصفحة 2 من 2 · سلسلة التحقق AUD-HT-001-9F2A</div>
+          </article>
+        </div>
+
+        <div class="sheet" id="annualReport">
+          <article class="paper"><div class="report-head"><div class="logo"><img class="logo-img" src="./logo.png?v=20260812-1" alt="شعار المنصة"></div><div><div class="report-title">التقرير السنوي المجمع 2026</div><div class="report-subtitle">مستشفى صحة المدينة · مسودة للمراجعة</div></div></div><div class="report-rule"></div><div class="report-section">ملخص المؤشرات</div><table class="data-table compact"><thead><tr><th>الأنشطة</th><th>التقارير النهائية</th><th>تغطية الأثر</th><th>متوسط HTVI النهائي</th></tr></thead><tbody><tr><td>3</td><td>1</td><td>33.3%</td><td class="liveHtvi">96.7</td></tr></tbody></table><div class="report-section">تفصيل الأنشطة</div><table class="data-table compact"><thead><tr><th>الرقم</th><th>النشاط</th><th>الحالة</th><th>HTVI</th></tr></thead><tbody><tr><td>HT-2026-001</td><td>تطوير مهارات التواصل</td><td>FINAL</td><td class="liveHtvi">96.7</td></tr><tr><td>HT-2026-002</td><td>سلامة المرضى</td><td>COMMITTEE REVIEW</td><td>—</td></tr><tr><td>HT-2026-003</td><td>جودة الخدمات الصحية</td><td>RETURNED</td><td>—</td></tr></tbody></table><div class="report-note">متوسط HTVI يضم التقارير النهائية فقط؛ لا تدخل المسودات والأنشطة غير المستحقة في المقام.</div><div class="report-footer">التقرير السنوي · صفحة 1 من 1</div></article>
+        </div>
+
+        <div class="sheet" id="minutesReport">
+          <article class="paper"><div class="report-head"><div class="logo"><img class="logo-img" src="./logo.png?v=20260812-1" alt="شعار المنصة"></div><div><div class="report-title">محضر اجتماع اللجنة العلمية</div><div class="report-subtitle">الاجتماع SCM-2026-08 · 14/08/2026</div></div></div><div class="report-rule"></div><div class="report-meta"><div><b>النشاط</b><span>HT-2026-002</span></div><div><b>العنوان</b><span>سلامة المرضى</span></div><div><b>الحضور</b><span>5 من 5</span></div><div><b>النتيجة</b><span>PARTIAL</span></div></div><div class="report-section">نتيجة المعايير</div><table class="data-table compact"><thead><tr><th>المعيار</th><th>النتيجة</th><th>الملاحظة</th></tr></thead><tbody><tr><td>الحاجة المهنية</td><td>MEET</td><td>موثقة بمؤشرات العدوى</td></tr><tr><td>الأهداف</td><td>MEET</td><td>قابلة للقياس</td></tr><tr><td>المحتوى</td><td>PARTIAL</td><td>إضافة مرجع للمحور الثالث</td></tr><tr><td>الإفصاحات</td><td>MEET</td><td>مكتملة</td></tr></tbody></table><div class="report-section">القرار الداخلي</div><p style="font-size:11px;line-height:1.9">يعاد لمسؤول النشاط لاستكمال المرجع ثم يرفع لرئيس اللجنة. القرار الداخلي عند صدوره يعني الجاهزية للرفع فقط.</p><div class="report-footer">محضر اللجنة · صفحة 1 من 1</div></article>
+        </div>
+
+        <div class="sheet" id="activityApplicationReport">
+          <article class="paper"><div class="report-head"><div class="logo"><img class="logo-img" src="./logo.png?v=20260812-1" alt="شعار المنصة"></div><div><div class="report-title">نموذج طلب نشاط تطوير مهني</div><div class="report-subtitle">نسخة قابلة للطباعة والحفظ PDF من الحقول الحالية</div></div></div><div class="report-rule"></div><div class="report-meta"><div><b>رقم النشاط</b><span id="printActivityCode">HT-2026-001</span></div><div><b>العنوان</b><span id="printActivityTitle">دورة تطوير مهارات التواصل</span></div><div><b>الفترة</b><span id="printActivityDates">20–21/05/2026</span></div><div><b>الساعات</b><span id="printActivityHours">8</span></div><div><b>الفئة المستهدفة</b><span id="printActivityAudience">الأطباء والتمريض والصيادلة</span></div><div><b>طريقة التنفيذ</b><span id="printDeliveryMethod">حضوري</span></div></div><div class="report-section">الفجوة المهنية</div><p id="printGap" style="font-size:11px;line-height:1.9"></p><div class="report-section">الأهداف التعليمية</div><p id="printObjectives" style="font-size:11px;line-height:1.9"></p><div class="report-section">الجاهزية</div><table class="data-table compact"><thead><tr><th>البيانات الأساسية</th><th>التحليل</th><th>الأهداف</th><th>PDF الرسمي</th></tr></thead><tbody><tr><td>مكتمل</td><td>مكتمل</td><td>مكتمل</td><td id="printPdfStatus">بانتظار الرفع</td></tr></tbody></table><div class="report-note">هذا النموذج نسخة عرض منشأة من الحقول المدخلة، ولا يمثل رفعًا فعليًا إلى الهيئة.</div><div class="report-footer">نموذج طلب النشاط · صفحة 1 من 1</div></article>
+        </div>
+      </section>
+
+      <section class="page" id="evidence" aria-labelledby="evidenceHeading">
+        <div class="page-heading"><div><h2 id="evidenceHeading">مصفوفة جاهزية الأدلة</h2><p>كل متطلب مرتبط بمستند وإصدار ومتحقق وتاريخ؛ الرفع يحدث على مستوى الصف نفسه.</p></div><span class="badge warning" id="evidenceSummary">8 / 9 مكتمل</span></div>
+        <div class="card panel">
+          <div class="filters"><div class="field search"><label for="evidenceSearch">بحث في الأدلة</label><input id="evidenceSearch" data-filter-table="evidenceTable" placeholder="اسم المتطلب أو المستند"></div><div class="field"><label for="evidenceState">الحالة</label><select id="evidenceState"><option>الكل</option><option>مكتمل</option><option>ناقص</option></select></div></div>
+          <div class="table-wrap"><table class="data-table" id="evidenceTable"><thead><tr><th>#</th><th>المتطلب</th><th>المستند الحالي</th><th>الإصدار</th><th>المتحقق</th><th>التاريخ</th><th>الحالة</th><th>رفع PDF</th></tr></thead><tbody><tr><td>1</td><td>النموذج الرسمي</td><td>activity-application.pdf</td><td>v2</td><td>أ. ليان الغامدي</td><td>11/08/2026</td><td><span class="badge">متحقق</span></td><td><input class="evidence-file" aria-label="رفع النموذج الرسمي" type="file" accept="application/pdf" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN ACTIVITY_OFFICER"></td></tr><tr><td>2</td><td>تحليل الفجوة</td><td>gap-analysis.pdf</td><td>v1</td><td>د. ريم الزهراني</td><td>08/08/2026</td><td><span class="badge">متحقق</span></td><td><input class="evidence-file" aria-label="رفع تحليل الفجوة" type="file" accept="application/pdf" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN ACTIVITY_OFFICER"></td></tr><tr><td>3</td><td>الجدول العلمي</td><td>scientific-agenda.pdf</td><td>v3</td><td>أ. ليان الغامدي</td><td>09/08/2026</td><td><span class="badge">متحقق</span></td><td><input class="evidence-file" aria-label="رفع الجدول العلمي" type="file" accept="application/pdf" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN ACTIVITY_OFFICER"></td></tr><tr><td>4</td><td>السير الذاتية</td><td>speaker-cvs.pdf</td><td>v1</td><td>أ. ليان الغامدي</td><td>09/08/2026</td><td><span class="badge">متحقق</span></td><td><input class="evidence-file" aria-label="رفع السير الذاتية" type="file" accept="application/pdf" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN ACTIVITY_OFFICER"></td></tr><tr><td>5</td><td>إفصاحات المتحدثين</td><td>2 من 3 إفصاحات</td><td>v1</td><td>—</td><td>—</td><td><span class="badge danger">ناقص</span></td><td><input class="evidence-file" aria-label="رفع إفصاحات المتحدثين" type="file" accept="application/pdf" data-missing-evidence data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN ACTIVITY_OFFICER"></td></tr><tr><td>6</td><td>خطة التقييم</td><td>assessment-plan.pdf</td><td>v2</td><td>د. ريم الزهراني</td><td>10/08/2026</td><td><span class="badge">متحقق</span></td><td><input class="evidence-file" aria-label="رفع خطة التقييم" type="file" accept="application/pdf" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN ACTIVITY_OFFICER"></td></tr><tr><td>7</td><td>إثبات الحضور</td><td>attendance.pdf</td><td>v1</td><td>أ. خالد الشهري</td><td>22/05/2026</td><td><span class="badge purple">مدقق</span></td><td><input class="evidence-file" aria-label="رفع إثبات الحضور" type="file" accept="application/pdf" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN ACTIVITY_OFFICER"></td></tr><tr><td>8</td><td>قرار الهيئة</td><td>scfhs-decision.pdf</td><td>v1</td><td>د. سارة العتيبي</td><td>28/04/2026</td><td><span class="badge purple">مصدر خارجي</span></td><td><input class="evidence-file" aria-label="رفع قرار الهيئة" type="file" accept="application/pdf" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN ACTIVITY_OFFICER"></td></tr><tr><td>9</td><td>حزمة أدلة الأثر</td><td>impact-evidence.pdf</td><td>v3</td><td>د. محمد الحربي</td><td>12/08/2026</td><td><span class="badge">متحقق</span></td><td><input class="evidence-file" aria-label="رفع أدلة الأثر" type="file" accept="application/pdf" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN ACTIVITY_OFFICER"></td></tr></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="page" id="notifications" aria-labelledby="notificationsHeading">
+        <div class="page-heading"><div><h2 id="notificationsHeading">مركز الإشعارات والإجراءات</h2><p>كل إشعار مرتبط بسجل ومستلم واستحقاق وإجراء مباشر.</p></div><button class="btn secondary" id="markAllRead" type="button" data-mutate>تحديد الكل كمقروء</button></div>
+        <div class="card panel">
+          <div class="filters"><div class="field"><label for="notificationFilter">عرض</label><select id="notificationFilter"><option value="all">الكل</option><option value="unread">غير المقروء</option><option value="due">المستحق</option></select></div></div>
+          <div class="table-wrap"><table class="data-table" id="notificationsTable"><thead><tr><th>الوقت</th><th>الحدث</th><th>السجل</th><th>المستلم</th><th>الاستحقاق</th><th>الحالة</th><th>الإجراء</th></tr></thead><tbody><tr data-unread="true"><td>منذ 12 دقيقة</td><td>نشاط جاهز لقرار رئيس اللجنة</td><td>HT-2026-002</td><td>رئيس اللجنة</td><td>14/08/2026</td><td><span class="badge warning notification-state">جديد</span></td><td><button class="btn small notification-open" data-goto="committee">فتح</button> <button class="btn small mark-read">مقروء</button></td></tr><tr data-unread="true" data-due="true"><td>منذ ساعتين</td><td>إفصاح متحدث ناقص</td><td>HT-2026-003</td><td>مسؤول النشاط</td><td>اليوم</td><td><span class="badge danger notification-state">مستحق</span></td><td><button class="btn small notification-open" data-goto="evidence">استكمال</button> <button class="btn small mark-read">مقروء</button></td></tr><tr data-unread="false"><td>أمس</td><td>تم توثيق قرار الهيئة</td><td>HT-2026-001</td><td>مسؤول النظام</td><td>—</td><td><span class="badge neutral notification-state">مقروء</span></td><td><button class="btn small notification-open" data-goto="external">عرض</button></td></tr></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="page" id="templates" aria-labelledby="templatesHeading">
+        <div class="page-heading"><div><h2 id="templatesHeading">القوالب الرسمية والمراجع</h2><p>إصدارات غير قابلة للاستبدال بأثر رجعي، مع فترة سريان ومصدر ومراجعة جودة.</p></div><button class="btn primary" id="openTemplateDialog" type="button" data-mutate data-roles="ORGANIZATION_SYSTEM_ADMIN MANAGEMENT_APPROVER">رفع إصدار قالب</button></div>
+        <div class="card panel">
+          <div class="table-wrap"><table class="data-table" id="templatesTable"><thead><tr><th>عائلة القالب</th><th>الإصدار</th><th>ساري من</th><th>ساري إلى</th><th>المصدر</th><th>فحص الجودة</th><th>الحالة</th><th>الإجراء</th></tr></thead><tbody><tr><td>طلب اعتماد نشاط</td><td>3.2</td><td>01/01/2026</td><td>31/12/2026</td><td>إدارة التعليم</td><td>14 / 14</td><td><span class="badge">ACTIVE</span></td><td><button class="btn small">تنزيل</button></td></tr><tr><td>إفصاح المتحدث</td><td>2.1</td><td>01/06/2025</td><td>31/12/2026</td><td>الحوكمة</td><td>8 / 8</td><td><span class="badge">ACTIVE</span></td><td><button class="btn small">تنزيل</button></td></tr><tr><td>تقرير قياس الأثر</td><td>1.4</td><td>01/03/2026</td><td>28/02/2027</td><td>اللجنة العلمية</td><td>11 / 11</td><td><span class="badge purple">ACTIVE</span></td><td><button class="btn small">تنزيل</button></td></tr><tr><td>طلب اعتماد نشاط</td><td>3.1</td><td>01/01/2025</td><td>31/12/2025</td><td>إدارة التعليم</td><td>14 / 14</td><td><span class="badge neutral">RETIRED</span></td><td><button class="btn small">تنزيل تاريخي</button></td></tr></tbody></table></div>
+        </div>
+        <div class="card panel">
+          <h3>مكتبة المراجع الموثقة</h3>
+          <div class="table-wrap"><table class="data-table compact" id="referencesTable"><thead><tr><th>المرجع</th><th>الجهة</th><th>النوع</th><th>الإصدار/التاريخ</th><th>الاستخدام</th><th>الحالة</th></tr></thead><tbody><tr><td>معايير اعتماد أنشطة CPD</td><td>الهيئة السعودية للتخصصات الصحية</td><td>متطلب خارجي</td><td>2026</td><td>قواعد الجاهزية</td><td><span class="badge">موثق</span></td></tr><tr><td>Kirkpatrick Evaluation Model</td><td>Kirkpatrick Partners</td><td>إطار قياس</td><td>مرجع مؤسسي</td><td>L1–L4</td><td><span class="badge">موثق</span></td></tr><tr><td>سياسة حوكمة التدريب</td><td>المؤسسة</td><td>سياسة داخلية</td><td>POL-EDU-14 v4</td><td>فصل الصلاحيات</td><td><span class="badge purple">ساري</span></td></tr></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="page" id="audit" aria-labelledby="auditHeading">
+        <div class="page-heading"><div><h2 id="auditHeading">سجل التدقيق والحوكمة</h2><p>سجل قراءة فقط يوضح المنفذ، الدور النشط، الكيان، والتجزئة المرتبطة بكل حدث جوهري.</p></div><button class="btn" id="exportAudit" type="button">تصدير CSV</button></div>
+        <div class="card panel">
+          <form id="auditFilterForm" class="filters"><div class="field search"><label for="auditSearch">بحث</label><input id="auditSearch" data-filter-table="auditTable" placeholder="الحدث، المستخدم، أو السجل"></div><div class="field"><label for="auditFrom">من</label><input id="auditFrom" type="date" value="2026-08-09"></div><div class="field"><label for="auditAction">العملية</label><select id="auditAction"><option>جميع العمليات</option><option>CREATE</option><option>UPDATE</option><option>DECISION</option><option>AUTH</option></select></div><button class="btn secondary" type="submit">تطبيق</button></form>
+          <div class="table-wrap"><table class="data-table" id="auditTable"><thead><tr><th>التسلسل</th><th>التاريخ والوقت</th><th>العملية</th><th>السجل</th><th>المنفذ</th><th>الدور النشط</th><th>القيمة السابقة ← الجديدة</th><th>Hash</th></tr></thead><tbody><tr><td>009184</td><td>12/08/2026 10:44:21</td><td>IMPACT_FINALIZED</td><td>HT-2026-001</td><td>د. محمد الحربي</td><td>COMMITTEE_CHAIR</td><td>DRAFT ← FINAL</td><td class="audit-hash" title="9f2a73b1c81d16e2">9f2a73b1c81d16e2…</td></tr><tr><td>009183</td><td>12/08/2026 10:32:09</td><td>EVIDENCE_VERIFIED</td><td>HT-2026-001</td><td>أ. ليان الغامدي</td><td>COMMITTEE_SECRETARY</td><td>PENDING ← VERIFIED</td><td class="audit-hash" title="3aa56bd95c51de89">3aa56bd95c51de89…</td></tr><tr><td>009182</td><td>12/08/2026 09:24:03</td><td>ROLE_CONTEXT_SET</td><td>SESSION-74C</td><td>د. سارة العتيبي</td><td>ACTIVITY_OFFICER</td><td>NONE ← ACTIVITY_OFFICER</td><td class="audit-hash" title="75d9c104b8530af2">75d9c104b8530af2…</td></tr><tr><td>009181</td><td>11/08/2026 16:18:51</td><td>ACTIVITY_RETURNED</td><td>HT-2026-003</td><td>د. محمد الحربي</td><td>COMMITTEE_CHAIR</td><td>REVIEW ← CORRECTION</td><td class="audit-hash" title="271ee5c6835c2f4a">271ee5c6835c2f4a…</td></tr><tr><td>009180</td><td>11/08/2026 15:42:17</td><td>DOCUMENT_UPLOADED</td><td>HT-2026-001</td><td>د. سارة العتيبي</td><td>ACTIVITY_OFFICER</td><td>v1 ← v2</td><td class="audit-hash" title="ba982b4f0ee9d115">ba982b4f0ee9d115…</td></tr></tbody></table></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="activityDialog" aria-labelledby="activityDialogTitle">
+    <form id="activityCreateForm" method="dialog">
+      <div class="dialog-head"><h2 id="activityDialogTitle">إنشاء نشاط جديد</h2><button class="btn small" type="button" data-close-dialog="activityDialog" aria-label="إغلاق">إغلاق</button></div>
+      <div class="dialog-body"><div class="form-grid">
+        <div class="field wide"><label for="newTitleAr">عنوان النشاط بالعربية</label><input id="newTitleAr" name="newTitleAr" required></div>
+        <div class="field wide"><label for="newTitleEn">العنوان بالإنجليزية</label><input class="ltr" id="newTitleEn" name="newTitleEn" required></div>
+        <div class="field"><label for="newType">نوع النشاط</label><select id="newType" name="newType"><option>دورة</option><option>ورشة</option><option>ندوة</option><option>مؤتمر</option></select></div>
+        <div class="field"><label for="newDelivery">طريقة التنفيذ</label><select id="newDelivery" name="newDelivery"><option>حضوري</option><option>افتراضي مباشر</option><option>مدمج</option></select></div>
+        <div class="field"><label for="newStart">تاريخ البدء</label><input id="newStart" name="newStart" type="date" value="2026-11-01" required></div>
+        <div class="field"><label for="newEnd">تاريخ الانتهاء</label><input id="newEnd" name="newEnd" type="date" value="2026-11-01" required></div>
+        <div class="field"><label for="newOfficer">مسؤول النشاط</label><select id="newOfficer" name="newOfficer"><option>د. سارة العتيبي</option><option>أ. خالد الشهري</option><option>د. نورة القحطاني</option></select></div>
+        <div class="field"><label for="newAudience">الفئة المستهدفة</label><input id="newAudience" name="newAudience" required></div>
+        <div class="field wide"><label for="newBriefPdf">نموذج/خطاب بدء النشاط PDF</label><input id="newBriefPdf" name="newBriefPdf" type="file" accept="application/pdf" data-file-status="newBriefStatus"><span class="file-status" id="newBriefStatus">اختياري عند إنشاء السجل</span></div>
+      </div></div>
+      <div class="dialog-actions"><button class="btn" type="button" data-close-dialog="activityDialog">إلغاء</button><button class="btn primary" type="submit">إنشاء وإسناد النشاط</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="templateDialog" aria-labelledby="templateDialogTitle">
+    <form id="templateUploadForm" method="dialog">
+      <div class="dialog-head"><h2 id="templateDialogTitle">رفع إصدار قالب رسمي</h2><button class="btn small" type="button" data-close-dialog="templateDialog">إغلاق</button></div>
+      <div class="dialog-body"><div class="form-grid"><div class="field"><label for="templateFamily">عائلة القالب</label><select id="templateFamily"><option>طلب اعتماد نشاط</option><option>إفصاح المتحدث</option><option>تقرير قياس الأثر</option></select></div><div class="field"><label for="templateVersion">رقم الإصدار</label><input id="templateVersion" value="3.3" required></div><div class="field"><label for="templateStart">ساري من</label><input id="templateStart" type="date" value="2027-01-01" required></div><div class="field"><label for="templateEnd">ساري إلى</label><input id="templateEnd" type="date" value="2027-12-31" required></div><div class="field wide"><label for="templateFile">ملف القالب PDF أو DOCX</label><input id="templateFile" type="file" accept="application/pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required data-file-status="templateFileStatus"><span class="file-status" id="templateFileStatus">لم يتم اختيار ملف</span></div><div class="field wide"><label for="templateSource">المصدر وسبب الإصدار</label><textarea id="templateSource" required>تحديث سنوي لمتطلبات الحقول والتحقق.</textarea></div></div></div>
+      <div class="dialog-actions"><button class="btn" type="button" data-close-dialog="templateDialog">إلغاء</button><button class="btn primary" type="submit">رفع للفحص والجودة</button></div>
+    </form>
+  </dialog>
+
+  <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
+  <script src="./operational.js?v=20260812-1"></script>
+</body>
+</html>
