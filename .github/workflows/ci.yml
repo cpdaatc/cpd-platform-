@@ -97,6 +97,8 @@ jobs:
           echo "E2E_DB_URL=$DB_URL" >> "$GITHUB_ENV"
       - name: Seed synthetic users and role contexts
         run: node tests/e2e/seed-local.mjs
+      - name: Seed institutional committee fixture
+        run: node tests/e2e/seed-committee-local.mjs
       - name: Install Playwright Chromium
         run: npm run test:e2e:install
       - name: Auth and role-context browser UAT
