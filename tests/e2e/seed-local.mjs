@@ -15,11 +15,14 @@ const admin = createClient(url, serviceRoleKey, {
 const organizationId = 'e2000000-0000-0000-0000-000000000001';
 const password = 'E2E-Only-Strong-Password-2026!';
 const users = [
+  { key: 'platform', membershipId: 'e2100000-0000-0000-0000-000000000006', email: 'e2e.platform@example.test', fullName: 'E2E Platform Super Admin', roles: ['PLATFORM_SUPER_ADMIN'] },
   { key: 'multi', membershipId: 'e2100000-0000-0000-0000-000000000001', email: 'e2e.admin.secretary@example.test', fullName: 'E2E Admin Secretary', roles: ['ORGANIZATION_SYSTEM_ADMIN', 'COMMITTEE_SECRETARY'] },
   { key: 'officer', membershipId: 'e2100000-0000-0000-0000-000000000002', email: 'e2e.officer@example.test', fullName: 'E2E Activity Officer', roles: ['ACTIVITY_OFFICER'] },
   { key: 'chair', membershipId: 'e2100000-0000-0000-0000-000000000003', email: 'e2e.chair@example.test', fullName: 'E2E Committee Chair', roles: ['COMMITTEE_CHAIR'] },
   { key: 'member', membershipId: 'e2100000-0000-0000-0000-000000000004', email: 'e2e.member@example.test', fullName: 'E2E Committee Member', roles: ['COMMITTEE_MEMBER'] },
   { key: 'management', membershipId: 'e2100000-0000-0000-0000-000000000005', email: 'e2e.management@example.test', fullName: 'E2E Management Approver', roles: ['MANAGEMENT_APPROVER'] },
+  { key: 'viewer', membershipId: 'e2100000-0000-0000-0000-000000000007', email: 'e2e.viewer@example.test', fullName: 'E2E Management Viewer', roles: ['MANAGEMENT_VIEWER'] },
+  { key: 'auditor', membershipId: 'e2100000-0000-0000-0000-000000000008', email: 'e2e.auditor@example.test', fullName: 'E2E Auditor', roles: ['AUDITOR'] },
 ];
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -87,6 +90,7 @@ statements.push(
   `insert into public.activity_assignments(organization_id,activity_id,membership_id,assignment_role,is_active,assigned_by) values (${sqlUuid(organizationId)},${sqlUuid(reportActivityId)},${sqlUuid(officerMembershipId)},'ACTIVITY_OFFICER',true,${sqlUuid(adminUserId)});`,
   `insert into public.impact_methodology_versions(id,organization_id,name,version_label,status,weights,rating_thresholds,configured_by,approved_by,approved_at) values (${sqlUuid(methodologyId)},${sqlUuid(organizationId)},'HTVI','E2E-1','ACTIVE','{"L1":15,"L2":20,"L3":25,"L4":40}'::jsonb,'{"excellent":85,"very_good":75,"good":65}'::jsonb,${sqlUuid(adminUserId)},${sqlUuid(managementUserId)},now());`,
   `insert into public.impact_reports(id,organization_id,activity_id,kind,version_no,status,methodology_version_id,htvi_status,htvi_score,overall_rating,snapshot_json,snapshot_sha256,generated_by,finalized_at) values (${sqlUuid(impactReportId)},${sqlUuid(organizationId)},${sqlUuid(reportActivityId)},'FINAL',1,'FINAL',${sqlUuid(methodologyId)},'FINAL',96.663,'EXCELLENT',${sqlLiteral(JSON.stringify(snapshot))}::jsonb,${sqlLiteral('a'.repeat(64))},${sqlUuid(officerUserId)},now());`,
+  `insert into public.audit_logs(organization_id,user_id,role_context,action,entity_type,entity_id,after_json,request_id) values (${sqlUuid(organizationId)},${sqlUuid(adminUserId)},'ORGANIZATION_SYSTEM_ADMIN','uat.fixture_created','activity',${sqlUuid(reportActivityId)},'{"synthetic":true}'::jsonb,'e2e-seed');`,
   'commit;',
 );
 
