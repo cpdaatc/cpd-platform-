@@ -128,6 +128,6 @@ for(const scenario of routeMatrix){
 test('direct navigation outside the active role is stopped with a clear recovery path',async({page})=>{
   await login(page,'e2e.officer@example.test');
   await page.goto('/admin/users');
-  await expect(page.getByRole('heading',{name:'تعذر فتح هذا القسم'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'هذا القسم غير متاح للدور الحالي'})).toBeVisible();
   await expect(page.getByRole('link',{name:'العودة إلى لوحة دوري'})).toBeVisible();
 });
