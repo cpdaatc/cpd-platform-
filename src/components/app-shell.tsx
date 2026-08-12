@@ -4,23 +4,49 @@ import { logoutAction } from '@/app/login/actions';
 import { resetContextAction, selectRoleAction } from '@/app/context/actions';
 import { BrandLogo } from '@/components/brand-logo';
 import { LanguageToggle } from '@/components/language-toggle';
-import { NavIcon, type NavIconName } from '@/components/nav-icon';
+import { RoleNavigation, type RoleNavigationGroup } from '@/components/role-navigation';
 import { ROLE_LABELS_AR, ROLE_LABELS_EN } from '@/lib/auth/labels';
 import { roleHasPermission } from '@/lib/auth/permissions';
+import { ROLE_GUIDANCE } from '@/lib/auth/role-guidance';
 import type { RequiredServerAuthContext } from '@/lib/auth/server-context';
 import type { UiLocale } from '@/lib/ui/locale';
-
-function NavItem({href,icon,label}:{href:string;icon:NavIconName;label:string}){
-  return <Link href={href} className="flex shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-teal-50 hover:text-teal-950 lg:w-full">
-    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-100 text-teal-800"><NavIcon name={icon}/></span><span>{label}</span>
-  </Link>;
-}
 
 export function AppShell({context,locale,children}:{context:RequiredServerAuthContext;locale:UiLocale;children:ReactNode}){
   const ar=locale==='ar'; const t=(a:string,e:string)=>ar?a:e;
   const organization=context.organizations.find(item=>item.id===context.organizationId);
   const can=(permission:Parameters<typeof roleHasPermission>[1])=>roleHasPermission(context.activeRole,permission);
   const roleLabel=ar?ROLE_LABELS_AR[context.activeRole]:ROLE_LABELS_EN[context.activeRole];
+  const guidance=ROLE_GUIDANCE[context.activeRole];
+  const item=(href: string, icon: RoleNavigationGroup['items'][number]['icon'], labelAr:string,labelEn:string,hintAr:string,hintEn:string,exact=false)=>({href,icon,label:t(labelAr,labelEn),hint:t(hintAr,hintEn),exact});
+  const navigationGroups:RoleNavigationGroup[]=[
+    {label:t('البدء','Start'),items:[
+      item('/dashboard','dashboard','لوحة دوري','My Role Dashboard','المهام والأولويات','Tasks and priorities',true),
+      ...(can('platform.manage')?[item('/platform','platform','حوكمة المنصة','Platform Governance','النطاق وعزل المؤسسات','Scope and tenant isolation')]:[]),
+    ]},
+    {label:t('دورة النشاط','Activity lifecycle'),items:[
+      ...(can('activity.create')?[item('/admin','admin','إدارة الأنشطة','Activity Administration','الإنشاء والإسناد والمتابعة','Create, assign and monitor',true)]:[]),
+      ...(can('activity.view.assigned')?[item('/activities','activities','أنشطتي','My Activities','الملف والجاهزية والتقديم','File, readiness and submission')]:[]),
+      ...(can('committee.prepare')?[item('/committee/secretary','committee','مساحة سكرتير اللجنة','Committee Secretary','الاجتماعات والتقييم الجماعي','Meetings and collective review')]:[]),
+      ...(can('activity.final_decision')?[item('/committee/chair','committee','قرارات رئيس اللجنة','Chair Decisions','القرار الداخلي والمحاضر','Internal decision and minutes')]:[]),
+      ...(context.activeRole==='COMMITTEE_MEMBER'?[item('/committee/member','committee','مراجعات عضو اللجنة','Member Reviews','الملاحظات العلمية','Scientific comments')]:[]),
+    ]},
+    {label:t('المتابعة والمخرجات','Monitoring & outputs'),items:[
+      ...(can('external.view')?[item('/external','external','التتبع الخارجي','External Tracking','حالة الرفع ودليل القرار','Submission status and evidence')]:[]),
+      ...(can('impact.view')?[item('/impact','impact','قياس الأثر وHTVI','Impact & HTVI','L1–L4 والتقرير النهائي','L1–L4 and final report')]:[]),
+      ...(can('annual.view')?[item('/annual-reports','annual','التقرير السنوي','Annual Report','أداء اللجنة والإقرار الإداري','Committee performance and acknowledgement')]:[]),
+      ...(can('report.view')?[item('/reports','reports','التقارير والطباعة','Reports & Printing','مخرجات نهائية قابلة للطباعة','Final printable outputs')]:[]),
+      ...(can('evidence.readiness.view')?[item('/evidence','evidence','جاهزية الأدلة','Evidence Readiness','الاكتمال والفجوات','Completeness and gaps')]:[]),
+      ...(can('notification.view')?[item('/notifications','notifications','الإشعارات','Notifications','المواعيد والتنبيهات','Due dates and alerts')]:[]),
+      ...(can('audit.view')?[item('/audit','audit','سجل التدقيق','Audit Trail','أثر غير قابل للتعديل','Immutable event trail')]:[]),
+    ]},
+    {label:t('إدارة المؤسسة','Organization administration'),items:[
+      ...(can('organization.users.manage')?[item('/admin/users','users','المستخدمون والأدوار','Users & Roles','العضويات وفصل الصلاحيات','Membership and role separation')]:[]),
+      ...(can('committee.manage_structure')?[item('/admin/committee','committee','تشكيل اللجنة','Committee Setup','القرار والعضويات','Appointment and memberships')]:[]),
+      ...(can('ai.manage_references')?[item('/admin/references','references','المراجع والقواعد','References & Rules','المصادر والإصدارات','Sources and versions')]:[]),
+      ...(can('ai.settings.configure')||can('ai.settings.approve')?[item('/admin/ai-settings','ai','خصوصية AI الخارجي','External AI Privacy','تكوين منفصل عن الاعتماد','Configuration separated from approval')]:[]),
+      ...(can('template.manage')||can('template.approve')?[item('/admin/templates','templates','القوالب والإصدارات','Templates & Versions','QA والتفعيل المحكوم','Governed QA and activation')]:[]),
+    ]},
+  ];
 
   return <div className="app-shell min-h-screen bg-[#f4f8f7]" dir={ar?'rtl':'ltr'}>
     <header className="app-shell-header no-print sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur">
@@ -40,23 +66,8 @@ export function AppShell({context,locale,children}:{context:RequiredServerAuthCo
 
     <div className="app-shell-content mx-auto grid w-full max-w-[1600px] gap-5 px-3 py-4 sm:px-5 lg:grid-cols-[270px_minmax(0,1fr)] lg:px-8 lg:py-6">
       <aside className="app-shell-nav no-print min-w-0 lg:sticky lg:top-24 lg:self-start">
-        <nav className="flex gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-sm lg:max-h-[calc(100vh-7rem)] lg:flex-col lg:overflow-y-auto" aria-label={t('التنقل الرئيسي','Main navigation')}>
-          <NavItem href="/dashboard" icon="dashboard" label={t('لوحة القيادة','Dashboard')}/>
-          {can('activity.create')?<NavItem href="/admin" icon="admin" label={t('إدارة الأنشطة','Activity Administration')}/>:null}
-          {can('activity.view.assigned')?<NavItem href="/activities" icon="activities" label={t('أنشطتي','My Activities')}/>:null}
-          {can('committee.manage_structure')?<NavItem href="/admin/committee" icon="committee" label={t('تشكيل اللجنة المؤسسية','Institutional Committee')}/>:null}
-          {can('committee.prepare')?<NavItem href="/committee/secretary" icon="committee" label={t('مساحة سكرتير اللجنة','Committee Secretary')}/>:null}
-          {can('activity.final_decision')?<NavItem href="/committee/chair" icon="committee" label={t('قرارات رئيس اللجنة','Chair Decisions')}/>:null}
-          {context.activeRole==='COMMITTEE_MEMBER'?<NavItem href="/committee/member" icon="committee" label={t('مراجعات اللجنة','Committee Reviews')}/>:null}
-          {can('external.view')?<NavItem href="/external" icon="external" label={t('التتبع الخارجي','External Tracking')}/>:null}
-          {can('impact.view')?<NavItem href="/impact" icon="impact" label={t('قياس الأثر وHTVI','Impact & HTVI')}/>:null}
-          {can('annual.view')?<NavItem href="/annual-reports" icon="annual" label={t('التقرير السنوي','Annual Report')}/>:null}
-          {can('report.view')?<NavItem href="/reports" icon="reports" label={t('التقارير والطباعة','Reports & Printing')}/>:null}
-          {can('evidence.readiness.view')?<NavItem href="/evidence" icon="evidence" label={t('جاهزية الأدلة','Evidence Readiness')}/>:null}
-          {can('notification.view')?<NavItem href="/notifications" icon="notifications" label={t('الإشعارات','Notifications')}/>:null}
-          {can('template.manage')||can('template.approve')?<NavItem href="/admin/templates" icon="templates" label={t('القوالب والإصدارات','Templates & Versions')}/>:null}
-        </nav>
-        <div className="mt-3 hidden rounded-2xl border border-slate-200 bg-white p-4 text-xs leading-6 text-slate-500 shadow-sm lg:block"><div>{t('السياق النشط','Active context')}</div><strong className="text-slate-800">{roleLabel}</strong><div className="mt-2 border-t border-slate-100 pt-2 text-[10px] leading-5">{t('الموافقة الداخلية تعني جاهزية الرفع فقط ولا تمثل اعتمادًا خارجيًا.','Internal approval means submission readiness only; it is not external accreditation.')}</div></div>
+        <RoleNavigation groups={navigationGroups} ariaLabel={t('التنقل الرئيسي حسب الدور','Role-based main navigation')}/>
+        <div className="mt-3 hidden rounded-2xl border border-slate-200 bg-white p-4 text-xs leading-6 text-slate-500 shadow-sm lg:block"><div>{t('السياق النشط','Active context')}</div><strong className="text-slate-800">{roleLabel}</strong><p className="mt-1 text-[10px] leading-5">{ar?guidance.missionAr:guidance.missionEn}</p><Link href={guidance.startHref} className="mt-3 block rounded-xl bg-teal-50 px-3 py-2 text-center text-[11px] font-black text-teal-900">{ar?guidance.startAr:guidance.startEn}</Link><div className="mt-3 border-t border-slate-100 pt-2 text-[10px] leading-5">{ar?guidance.boundaryAr:guidance.boundaryEn}</div></div>
       </aside>
       <main className="app-shell-main min-w-0">{children}</main>
     </div>
