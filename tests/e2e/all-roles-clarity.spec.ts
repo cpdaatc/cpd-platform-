@@ -97,7 +97,7 @@ test('Auditor can inspect immutable events and has no mutation workspaces',async
   await navigation.getByRole('link',{name:/سجل التدقيق/}).click();
   await expect(page.getByRole('heading',{name:'سجل التدقيق'})).toBeVisible();
   await expect(page.getByText('uat.fixture_created')).toBeVisible();
-  await expect(page.getByText('ORGANIZATION_SYSTEM_ADMIN')).toBeVisible();
+  await expect(page.getByText('ORGANIZATION_SYSTEM_ADMIN').first()).toBeVisible();
   await expectActiveNav(page,'سجل التدقيق');
   await expect(navigation.getByRole('link',{name:/إدارة الأنشطة|أنشطتي|القوالب والإصدارات/})).toHaveCount(0);
 });
