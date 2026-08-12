@@ -5,7 +5,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     coverage: { enabled: false },
-    exclude: [...configDefaults.exclude, 'tests/e2e/**'],
+    exclude: [...configDefaults.exclude, 'tests/e2e/**', 'tests/demo-e2e/**'],
   },
   resolve: {
     alias: {
