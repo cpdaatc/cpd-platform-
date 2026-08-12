@@ -1,1 +1,1 @@
-GitHub Pages deployment trigger — 2026-08-10
+GitHub Pages deployment trigger — 2026-08-12 role-aware release
