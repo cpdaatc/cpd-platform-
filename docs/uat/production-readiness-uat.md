@@ -34,6 +34,7 @@ The browser UAT is supplemented by SQL acceptance suites that execute governed s
 - Phase 10 — production security invariants.
 - Phase 11 — recovery and tenant-isolation regression coverage;
 - Phase 12 — audit/RLS/assignment/privacy/security-governance closure.
+- Phase 13 — role-workspace contract repairs validated by full-role browser UAT.
 
 ## Manual Pilot UAT — required before real users
 
