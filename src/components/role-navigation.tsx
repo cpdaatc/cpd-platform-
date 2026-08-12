@@ -24,7 +24,7 @@ export function RoleNavigation({groups,ariaLabel}:{groups:RoleNavigationGroup[];
       <h2 className="hidden px-3 pt-1 text-[10px] font-black uppercase tracking-[.14em] text-slate-400 lg:block">{group.label}</h2>
       {group.items.map(item=>{
         const active=item.exact?pathname===item.href:pathname===item.href||pathname.startsWith(`${item.href}/`);
-        return <Link key={item.href} href={item.href} aria-current={active?'page':undefined} className={`flex shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition lg:w-full ${active?'bg-teal-900 text-white shadow-sm':'text-slate-700 hover:bg-teal-50 hover:text-teal-950'}`}>
+        return <Link key={item.href} href={item.href} aria-label={item.label} aria-current={active?'page':undefined} className={`flex shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition lg:w-full ${active?'bg-teal-900 text-white shadow-sm':'text-slate-700 hover:bg-teal-50 hover:text-teal-950'}`}>
           <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ${active?'bg-white/15 text-white':'bg-slate-100 text-teal-800'}`}><NavIcon name={item.icon}/></span>
           <span className="min-w-0"><span className="block">{item.label}</span><span className={`mt-0.5 hidden truncate text-[9px] font-medium lg:block ${active?'text-teal-100':'text-slate-400'}`}>{item.hint}</span></span>
         </Link>;
