@@ -52,6 +52,8 @@ jobs:
         run: npm run test:e2e:install
       - name: Public login browser smoke
         run: npm run test:e2e:smoke
+      - name: GitHub Pages operational user journeys
+        run: npm run test:e2e:demo
       - name: Prepare local Supabase compatibility
         run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f tests/sql/00_supabase_stub.sql
       - name: Apply all database migrations in order

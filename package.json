@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:demo": "playwright test --config=playwright.demo.config.ts",
     "test:e2e:smoke": "playwright test tests/e2e/login-smoke.spec.ts tests/e2e/responsive-accessibility.spec.ts",
     "test:e2e:auth": "playwright test tests/e2e/login-role-context.spec.ts tests/e2e/activity-lifecycle.spec.ts tests/e2e/reports-print.spec.ts",
     "test:e2e:roles": "playwright test tests/e2e/all-roles-clarity.spec.ts",

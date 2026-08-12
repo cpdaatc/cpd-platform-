@@ -2,6 +2,12 @@
 
 Independent, Arabic-first CPD governance SaaS MVP.
 
+## Operational demo
+
+[Open the interactive GitHub Pages platform](https://cpdaatc.github.io/cpd-platform-/)
+
+The published demo uses synthetic browser-local data and includes governed role workspaces, editable forms, PDF evidence upload, readiness checks, committee and external-decision registers, HTVI calculation, and A4 report output.
+
 ## Governance principle
 
 The platform does **not** grant SCFHS accreditation. Internal committee approval means readiness for submission only; external accreditation status is recorded separately when an actual SCFHS decision exists.
