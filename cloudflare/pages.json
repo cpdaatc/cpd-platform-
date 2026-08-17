@@ -1,0 +1,7 @@
+{
+  "project_name": "cpd-platform-demo",
+  "production_branch": "main",
+  "build_command": "",
+  "output_directory": "demo",
+  "data_policy": "synthetic-browser-local-only"
+}

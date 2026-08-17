@@ -7,6 +7,7 @@ export default defineConfig([
   ...nextTypeScript,
   globalIgnores([
     '.next/**',
+    '.open-next/**',
     'out/**',
     'build/**',
     'coverage/**',

@@ -8,6 +8,15 @@ Independent, Arabic-first CPD governance SaaS MVP.
 
 The published demo uses synthetic browser-local data and includes governed role workspaces, editable forms, PDF evidence upload, readiness checks, committee and external-decision registers, HTVI calculation, and A4 report output.
 
+## Zero-cost deployment
+
+The deployment is intentionally split into two free surfaces:
+
+- **Cloudflare Pages:** publishes only `demo/` for investor demonstrations. Its records are synthetic and remain in the visitor's browser.
+- **Cloudflare Workers:** runs the authenticated Next.js application through OpenNext and connects to a Supabase Free project.
+
+No service-role or secret key is allowed in Pages, browser code, or source control. See [the Cloudflare + Supabase Free runbook](docs/deployment/cloudflare-supabase-free.md) for setup and cost controls.
+
 ## Governance principle
 
 The platform does **not** grant SCFHS accreditation. Internal committee approval means readiness for submission only; external accreditation status is recorded separately when an actual SCFHS decision exists.

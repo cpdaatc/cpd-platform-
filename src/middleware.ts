@@ -27,7 +27,7 @@ export function isRouteAllowedForRole(pathname:string,role:GovernanceRole){
   return !rule||rule.anyOf.some(permission=>roleHasPermission(role,permission));
 }
 
-export function proxy(request:NextRequest){
+export function middleware(request:NextRequest){
   const value=request.cookies.get(ROLE_COOKIE)?.value;
   if(!value||(GOVERNANCE_ROLES as readonly string[]).includes(value)===false)return NextResponse.next();
   if(isRouteAllowedForRole(request.nextUrl.pathname,value as GovernanceRole))return NextResponse.next();
