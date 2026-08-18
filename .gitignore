@@ -1,5 +1,9 @@
 node_modules/
 .next/
+.open-next/
+.wrangler/
+.dev.vars
+cloudflare-env.d.ts
 .env
 .env.local
 .env.*.local
@@ -8,3 +12,4 @@ playwright-report/
 test-results/
 *.tsbuildinfo
 .DS_Store
+.worktrees/

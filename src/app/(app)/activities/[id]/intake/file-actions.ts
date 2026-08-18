@@ -42,6 +42,12 @@ async function uploadPrivateFile(activityId: string, prefix: string, file: File,
   }
 }
 
+function activityReturnPath(activityId: string, returnTo: FormDataEntryValue | null): string {
+  return returnTo === 'dossier'
+    ? `/activities/${activityId}/dossier`
+    : `/activities/${activityId}/intake`;
+}
+
 export async function saveSpeakerContactAction(formData: FormData): Promise<void> {
   const context = await requireServerAuthContext('activity.fill_submit');
   const activityId = String(formData.get('activityId') ?? '');
@@ -91,21 +97,25 @@ export async function uploadSpeakerCvAction(formData: FormData): Promise<void> {
 
 export async function uploadEvidenceAction(formData: FormData): Promise<void> {
   const activityId = String(formData.get('activityId') ?? '');
+  const returnPath = activityReturnPath(activityId, formData.get('returnTo'));
   const evidenceType = String(formData.get('evidenceType') ?? 'OTHER').trim() || 'OTHER';
   const notes = String(formData.get('notes') ?? '').trim();
   const file = formData.get('file');
-  if (!activityId || !(file instanceof File)) redirect(`/activities/${activityId}/intake?fileError=1`);
+  if (!activityId || !(file instanceof File)) redirect(`${returnPath}?fileError=1`);
 
   const upload = await uploadPrivateFile(activityId, 'evidence', file as File);
-  if (upload.error || !upload.storagePath || !upload.sha256) redirect(`/activities/${activityId}/intake?fileError=1`);
+  if (upload.error || !upload.storagePath || !upload.sha256) redirect(`${returnPath}?fileError=1`);
   const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.rpc('register_activity_evidence_command', {
+  const { error } = await supabase.rpc('register_activity_attachment_command', {
     p_organization_id: upload.context.organizationId,
     p_role_context: upload.context.activeRole,
     p_activity_id: activityId,
     p_evidence_type: evidenceType,
     p_storage_path: upload.storagePath,
     p_sha256: upload.sha256,
+    p_original_filename: file.name,
+    p_mime_type: file.type,
+    p_file_size_bytes: file.size,
     p_notes: notes || null,
   });
   if (error) {
@@ -115,7 +125,7 @@ export async function uploadEvidenceAction(formData: FormData): Promise<void> {
         cleanupError,
       });
     });
-    redirect(`/activities/${activityId}/intake?fileError=1`);
+    redirect(`${returnPath}?fileError=1`);
   }
-  redirect(`/activities/${activityId}/intake?evidenceUploaded=1`);
+  redirect(`${returnPath}?evidenceUploaded=1`);
 }

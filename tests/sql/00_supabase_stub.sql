@@ -45,3 +45,9 @@ $$;
 
 grant usage on schema auth to anon, authenticated, service_role;
 grant select on auth.users to authenticated, service_role;
+
+-- Match Supabase's hosted default function grants. This intentionally grants
+-- EXECUTE directly to API roles so migrations must revoke anon explicitly;
+-- revoking only PUBLIC does not remove a direct anon grant.
+alter default privileges in schema public
+  grant execute on functions to anon, authenticated, service_role;

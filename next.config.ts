@@ -2,6 +2,8 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Avoid the optional Cloudflare Images product so the demo stays on the free path.
+  images: { unoptimized: true },
   outputFileTracingIncludes: {
     '/*': ['./scripts/pdf-extractor-worker.mjs'],
   },

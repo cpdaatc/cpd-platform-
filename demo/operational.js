@@ -12,25 +12,25 @@
       label: 'مسؤول النظام المؤسسي',
       mission: 'إنشاء الأنشطة وتعيين المسؤولين وإدارة العضوية ومتابعة جميع مسارات المؤسسة.',
       boundary: 'لا يصدر القرار العلمي النهائي ولا يعتمد تقرير الأثر.',
-      pages: ['dash', 'admin', 'activities', 'planning', 'committee', 'external', 'impact', 'annual', 'reports', 'evidence', 'notifications', 'templates', 'audit'],
+      pages: ['dash', 'dossiers', 'admin', 'activities', 'planning', 'committee', 'external', 'impact', 'annual', 'reports', 'evidence', 'notifications', 'templates', 'audit'],
     },
     ACTIVITY_OFFICER: {
       label: 'مسؤول النشاط',
       mission: 'استكمال ملف النشاط والأدلة، معالجة نواقص الجاهزية، وتسجيل المتابعة الخارجية والأثر.',
       boundary: 'لا ينشئ سجل النشاط ولا يعتمد قرار اللجنة أو التقرير النهائي.',
-      pages: ['dash', 'activities', 'planning', 'external', 'impact', 'evidence', 'notifications'],
+      pages: ['dash', 'dossiers', 'activities', 'planning', 'external', 'impact', 'evidence', 'notifications'],
     },
     COMMITTEE_SECRETARY: {
       label: 'سكرتير اللجنة',
       mission: 'تنظيم جدول الأعمال وتسجيل النتيجة الجماعية وإعداد محضر الاجتماع.',
       boundary: 'لا يصدر قرار رئيس اللجنة ولا يعتمد المحضر النهائي.',
-      pages: ['dash', 'activities', 'planning', 'committee', 'external', 'impact', 'annual', 'reports', 'evidence', 'notifications'],
+      pages: ['dash', 'dossiers', 'activities', 'planning', 'committee', 'external', 'impact', 'annual', 'reports', 'evidence', 'notifications'],
     },
     COMMITTEE_CHAIR: {
       label: 'رئيس اللجنة',
       mission: 'حسم القرار العلمي الداخلي واعتماد المحاضر وتقارير الأثر والمخرجات العلمية.',
       boundary: 'القرار الداخلي يعني الجاهزية للرفع ولا يمثل اعتماد الهيئة.',
-      pages: ['dash', 'activities', 'planning', 'committee', 'external', 'impact', 'annual', 'reports', 'evidence', 'notifications'],
+      pages: ['dash', 'dossiers', 'activities', 'planning', 'committee', 'external', 'impact', 'annual', 'reports', 'evidence', 'notifications'],
     },
     COMMITTEE_MEMBER: {
       label: 'عضو اللجنة',
@@ -112,6 +112,7 @@
     byId('roleMission').textContent = role.mission;
     byId('roleBoundary').textContent = role.boundary;
     applyPermissions(roleCode);
+    renderDossierRegistry();
     openPage('dash');
   }
 
@@ -200,7 +201,10 @@
   }
 
   function printSheet(sheetId) {
-    if (sheetId === 'activityApplicationReport') syncActivityPrint();
+    if (sheetId === 'activityApplicationReport') {
+      printOfficialFormDemo();
+      return;
+    }
     all('.sheet').forEach((sheet) => sheet.classList.toggle('print-target', sheet.id === sheetId));
     document.body.dataset.lastPrintTarget = sheetId;
     window.print();
@@ -208,13 +212,24 @@
   }
 
   function previewSheet(sheetId) {
-    if (sheetId === 'activityApplicationReport') syncActivityPrint();
+    if (sheetId === 'activityApplicationReport') {
+      byId('officialFormDialog').showModal();
+      return;
+    }
     const target = byId(sheetId);
     all('.sheet').forEach((sheet) => {
       if (sheet !== target) sheet.classList.remove('preview');
     });
     target.classList.toggle('preview');
     if (target.classList.contains('preview')) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function printOfficialFormDemo() {
+    if (byId('officialFormDialog').open) byId('officialFormDialog').close();
+    document.body.classList.add('printing-official-form');
+    document.body.dataset.lastPrintTarget = 'officialFormPrint';
+    window.print();
+    window.setTimeout(() => document.body.classList.remove('printing-official-form'), 250);
   }
 
   function calculateHtvi() {
@@ -286,10 +301,90 @@
     });
   }
 
+  const dossierCategoryLabels = {
+    OFFICIAL_FORM: 'النموذج الرسمي', COMMITTEE_DECISION: 'قرار اللجنة',
+    COMMITTEE_MINUTES: 'محضر اللجنة', FINAL_IMPACT_REPORT: 'تقرير الأثر النهائي',
+    ADDITIONAL_ATTACHMENT: 'مرفق إضافي',
+  };
+
+  function visibleSyntheticDossiers() {
+    const dossiers = window.CPD_ACTIVITY_DOSSIERS || [];
+    if (activeRole === 'ACTIVITY_OFFICER') {
+      return dossiers.filter((item) => item.assignedOfficerId === 'demo-officer-sara');
+    }
+    return dossiers;
+  }
+
+  function renderDossierRegistry() {
+    const table = byId('dossierRegistryTable');
+    if (!table) return;
+    const year = byId('dossierYear').value;
+    const department = byId('dossierDepartment').value;
+    const search = byId('dossierSearch').value.trim().toLowerCase();
+    const rows = visibleSyntheticDossiers().filter((item) =>
+      (!year || String(item.reportingYear) === year)
+      && (!department || item.department.id === department)
+      && (!search || [item.activityCode, item.titleAr, item.titleEn].some((value) => String(value || '').toLowerCase().includes(search)))
+    );
+    const tbody = table.tBodies[0];
+    tbody.replaceChildren();
+    rows.forEach((item) => {
+      const row = tbody.insertRow();
+      appendCell(row, item.activityCode);
+      const titleCell = appendCell(row, item.titleAr);
+      const english = document.createElement('small'); english.className = 'dossier-title-en'; english.textContent = item.titleEn; titleCell.append(english);
+      appendCell(row, String(item.reportingYear));
+      appendCell(row, item.department.nameAr);
+      appendCell(row, item.assignedOfficer);
+      appendCell(row, `${item.committeeComplete}/5`);
+      appendCell(row, `${item.postActivityComplete}/1`);
+      const actionCell = row.insertCell();
+      const button = document.createElement('button'); button.type = 'button'; button.className = 'btn small primary'; button.textContent = 'فتح الملف';
+      button.addEventListener('click', () => openSyntheticDossier(item.id)); actionCell.append(button);
+    });
+    byId('dossierEmpty').classList.toggle('hidden', rows.length !== 0);
+    const annual = byId('annualDossierLink');
+    annual.classList.toggle('hidden', !year || !roles[activeRole].pages.includes('annual'));
+    if (year) annual.textContent = `التقرير السنوي ${year}`;
+  }
+
+  function resetDossierFilters() {
+    byId('dossierYear').value = '';
+    byId('dossierDepartment').value = '';
+    byId('dossierSearch').value = '';
+  }
+
+  function openSyntheticDossier(activityId) {
+    const dossier = visibleSyntheticDossiers().find((item) => item.id === activityId);
+    if (!dossier) { showToast('هذا النشاط غير مسند إلى مسؤول النشاط الحالي.'); return; }
+    const documentRows = dossier.documents.map((document) => `<tr><td>${dossierCategoryLabels[document.category]}</td><td>${document.filename}</td><td>v${document.version}</td><td><span class="badge ${document.state.includes('RETURNED') ? 'warning' : ''}">${document.state}</span></td><td><button type="button" class="btn small demo-document-action" data-document-category="${document.category}">فتح / تحميل</button></td></tr>`).join('');
+    const container = byId('demoDossier');
+    container.innerHTML = `<div class="card panel dossier-heading"><div><span class="eyebrow">ملف عرض مصطنع · Contract v${dossier.contractVersion}</span><h2>${dossier.titleAr}</h2><p class="ltr">${dossier.titleEn}</p></div><button type="button" class="btn small" id="closeDemoDossier">إغلاق الملف</button></div>
+      <div class="dossier-grid"><div>
+        <section class="card panel"><h3>1. ملخص النشاط</h3><div class="dossier-meta"><div><span>الرمز</span><b class="ltr">${dossier.activityCode}</b></div><div><span>القسم</span><b>${dossier.department.nameAr}</b></div><div><span>مسؤول النشاط</span><b>${dossier.assignedOfficer}</b></div><div><span>قرار اللجنة</span><b>${dossier.committeeDecision || 'لم يصدر'}</b></div></div></section>
+        <section class="card panel"><h3>2–5. النموذج، اللجنة، الأثر والمرفقات</h3><div class="table-wrap"><table class="data-table compact"><thead><tr><th>الفئة</th><th>الملف</th><th>الإصدار</th><th>الحالة</th><th>الإجراء</th></tr></thead><tbody>${documentRows}</tbody></table></div><div class="actions dossier-actions"><button class="btn secondary" type="button" id="showOfficialFormDemo">معاينة النموذج الرسمي 6 صفحات</button><button class="btn secondary" type="button" id="openImpactFromDossier">تعبئة / عرض L1–L4</button></div><label class="upload-box" data-roles="ORGANIZATION_SYSTEM_ADMIN ACTIVITY_OFFICER"><span><b>رفع مرفق إضافي</b><small>PDF أو DOCX أو JPG أو PNG — عرض محلي فقط</small><input id="demoDossierAttachment" type="file" accept=".pdf,.docx,.jpg,.jpeg,.png"></span></label></section>
+      </div><aside><section class="card panel"><h3>6. الجاهزية</h3><div class="dossier-readiness"><div><strong>${dossier.committeeComplete}/5</strong><span>قبل اللجنة</span></div><div><strong>${dossier.postActivityComplete}/1</strong><span>ما بعد النشاط</span></div></div><p class="report-note">تقرير الأثر النهائي لا يدخل ضمن جاهزية ما قبل اللجنة.</p></section><section class="card panel"><h3>7. سجل التدقيق</h3><ol class="dossier-audit"><li>فتح الملف بالدور ${roles[activeRole].label}</li><li>آخر تحديث تجريبي: 18/08/2026</li><li>البيانات مصطنعة ولا تُرسل خارجيًا</li></ol></section></aside></div>`;
+    container.classList.remove('hidden');
+    applyPermissions(activeRole);
+    byId('closeDemoDossier').addEventListener('click', () => container.classList.add('hidden'));
+    byId('showOfficialFormDemo').addEventListener('click', () => byId('officialFormDialog').showModal());
+    byId('openImpactFromDossier').addEventListener('click', () => openPage('impact'));
+    all('.demo-document-action', container).forEach((button) => button.addEventListener('click', () => {
+      if (button.dataset.documentCategory === 'OFFICIAL_FORM') byId('officialFormDialog').showModal();
+      else showToast('تم فتح المستند التجريبي في وضع العرض دون تنزيل بيانات حقيقية.');
+    }));
+    byId('demoDossierAttachment').addEventListener('change', (event) => {
+      const file = event.currentTarget.files?.[0];
+      if (file) showToast(`تمت إضافة ${file.name} محليًا إلى ملف العرض.`);
+    });
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   byId('loginForm').addEventListener('submit', (event) => {
     event.preventDefault();
     byId('login').classList.add('hidden');
     byId('app').classList.remove('hidden');
+    resetDossierFilters();
     applyRole(byId('role').value);
   });
 
@@ -302,7 +397,18 @@
   all('[data-goto]').forEach((button) => button.addEventListener('click', () => openPage(button.dataset.goto)));
   all('[data-preview]').forEach((button) => button.addEventListener('click', () => previewSheet(button.dataset.preview)));
   all('[data-print]').forEach((button) => button.addEventListener('click', () => printSheet(button.dataset.print)));
+  const officialFormRegisterRow = document.querySelector('[data-preview="activityApplicationReport"]')?.closest('tr');
+  if (officialFormRegisterRow) {
+    officialFormRegisterRow.cells[0].textContent = 'النموذج الرسمي المطابق للمصدر';
+    officialFormRegisterRow.cells[2].textContent = 'v1 مقفل المصدر';
+    officialFormRegisterRow.cells[4].textContent = '6 Letter';
+    officialFormRegisterRow.cells[5].textContent = 'حسب النموذج المرفوع';
+  }
   all('[data-filter-table]').forEach((input) => input.addEventListener('input', () => filterTable(input)));
+  ['dossierYear', 'dossierDepartment'].forEach((id) => byId(id).addEventListener('change', renderDossierRegistry));
+  byId('dossierSearch').addEventListener('input', renderDossierRegistry);
+  byId('annualDossierLink').addEventListener('click', (event) => { event.preventDefault(); openPage('annual'); });
+  byId('printOfficialFormDemo').addEventListener('click', printOfficialFormDemo);
 
   byId('openActivityDialog').addEventListener('click', () => byId('activityDialog').showModal());
   byId('openTemplateDialog').addEventListener('click', () => byId('templateDialog').showModal());
@@ -340,7 +446,7 @@
     showToast('تم حفظ مسودة ملف النشاط داخل المتصفح.');
   });
   byId('checkReadiness').addEventListener('click', () => checkActivityReadiness());
-  byId('printActivity').addEventListener('click', () => printSheet('activityApplicationReport'));
+  byId('printActivity').addEventListener('click', () => byId('officialFormDialog').showModal());
 
   byId('runPlanningCheck').addEventListener('click', () => {
     const thirdObjective = byId('objectivesTable').tBodies[0].rows[2];

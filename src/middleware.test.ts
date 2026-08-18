@@ -1,5 +1,5 @@
 import {describe,expect,it} from 'vitest';
-import {isRouteAllowedForRole} from './proxy';
+import {isRouteAllowedForRole} from './middleware';
 
 describe('role-context route clarity guard',()=>{
   it('sends users only to top-level workspaces visible to the active role',()=>{

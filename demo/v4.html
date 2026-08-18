@@ -66,6 +66,7 @@
       </div>
       <nav class="nav" aria-label="التنقل الرئيسي">
         <button class="active" data-page="dash" data-title="لوحة القيادة">لوحة القيادة</button>
+        <button data-page="dossiers" data-title="سجل ملفات الأنشطة">سجل ملفات الأنشطة</button>
         <button data-page="admin" data-title="إدارة الأنشطة">إدارة الأنشطة</button>
         <button data-page="activities" data-title="الأنشطة ومساحة العمل">الأنشطة ومساحة العمل</button>
         <button data-page="planning" data-title="التخطيط والمراجعة المسبقة">التخطيط والمراجعة المسبقة</button>
@@ -123,6 +124,20 @@
             <div class="step done">التخطيط ✓</div><div class="step done">المراجعة المسبقة ✓</div><div class="step done">اللجنة ✓</div><div class="step done">قرار الرئيس ✓</div><div class="step done">الاعتماد الخارجي ✓</div><div class="step current">قياس الأثر</div>
           </div>
         </div>
+      </section>
+
+      <section class="page" id="dossiers" aria-labelledby="dossiersHeading">
+        <div class="page-heading"><div><span class="eyebrow">بيانات عرض مصطنعة</span><h2 id="dossiersHeading">سجل ملفات الأنشطة والاعتماد</h2><p>فلترة بالسنة والقسم والبحث باسم البرنامج أو رمزه، ثم فتح جميع مستندات النشاط في شاشة جاهزة للمراجعة.</p></div><a class="btn secondary hidden" id="annualDossierLink" href="#annual">التقرير السنوي للسنة المحددة</a></div>
+        <div class="card panel">
+          <div class="filters">
+            <div class="field"><label for="dossierYear">السنة</label><select id="dossierYear"><option value="">كل السنوات</option><option value="2026">2026</option><option value="2025">2025</option></select></div>
+            <div class="field"><label for="dossierDepartment">القسم</label><select id="dossierDepartment"><option value="">كل الأقسام</option><option value="education">إدارة التعليم والتطوير</option><option value="quality">إدارة الجودة وسلامة المرضى</option></select></div>
+            <div class="field search"><label for="dossierSearch">اسم البرنامج أو رمزه</label><input id="dossierSearch" placeholder="عربي / English / HT-2026"></div>
+          </div>
+          <div class="table-wrap"><table class="data-table" id="dossierRegistryTable"><thead><tr><th>الرمز</th><th>البرنامج</th><th>السنة</th><th>القسم</th><th>مسؤول النشاط</th><th>جاهزية اللجنة</th><th>ما بعد النشاط</th><th>الإجراء</th></tr></thead><tbody></tbody></table></div>
+          <div class="empty-state hidden" id="dossierEmpty">لا توجد أنشطة مطابقة للفلاتر الحالية.</div>
+        </div>
+        <div id="demoDossier" class="hidden" aria-live="polite"></div>
       </section>
 
       <section class="page" id="admin" aria-labelledby="adminHeading">
@@ -394,7 +409,15 @@
     </form>
   </dialog>
 
+  <dialog id="officialFormDialog" class="official-form-dialog" aria-labelledby="officialFormDialogTitle">
+    <div class="dialog-head"><div><span class="eyebrow">SOURCE-LOCKED · 6 US LETTER PAGES</span><h2 id="officialFormDialogTitle">النموذج الرسمي المطابق للمرفوع</h2></div><button class="btn small" type="button" data-close-dialog="officialFormDialog">إغلاق</button></div>
+    <div class="dialog-body official-form-preview"><img src="./templates/schs-activity-application-v1/page-1.png" alt="صفحة النموذج الرسمي 1 من 6"><img src="./templates/schs-activity-application-v1/page-2.png" alt="صفحة النموذج الرسمي 2 من 6"><img src="./templates/schs-activity-application-v1/page-3.png" alt="صفحة النموذج الرسمي 3 من 6"><img src="./templates/schs-activity-application-v1/page-4.png" alt="صفحة النموذج الرسمي 4 من 6"><img src="./templates/schs-activity-application-v1/page-5.png" alt="صفحة النموذج الرسمي 5 من 6"><img src="./templates/schs-activity-application-v1/page-6.png" alt="صفحة النموذج الرسمي 6 من 6"></div>
+    <div class="dialog-actions"><button class="btn primary" id="printOfficialFormDemo" type="button">طباعة 6 صفحات Letter</button></div>
+  </dialog>
+  <div id="officialFormPrint" aria-hidden="true"><img src="./templates/schs-activity-application-v1/page-1.png" alt=""><img src="./templates/schs-activity-application-v1/page-2.png" alt=""><img src="./templates/schs-activity-application-v1/page-3.png" alt=""><img src="./templates/schs-activity-application-v1/page-4.png" alt=""><img src="./templates/schs-activity-application-v1/page-5.png" alt=""><img src="./templates/schs-activity-application-v1/page-6.png" alt=""></div>
+
   <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
-  <script src="./operational.js?v=20260812-1"></script>
+  <script src="./activity-dossiers.synthetic.js?v=20260818-1"></script>
+  <script src="./operational.js?v=20260818-1"></script>
 </body>
 </html>

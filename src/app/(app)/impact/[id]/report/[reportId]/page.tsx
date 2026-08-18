@@ -16,7 +16,7 @@ export default async function ImpactReportPage({params}:{params:Promise<{id:stri
   const a=activityQ.data; const r=reportQ.data; const snap=(r.snapshot_json??{}) as Json; const scores=(snap.level_scores??{}) as Json; const domains=(snap.impact_domains??{}) as Json; const objectives=(snap.objectives??[]) as Json[];
   const isFinal=String(r.kind)==='FINAL';
   return <section className="impact-report-root space-y-4">
-    <div className="no-print flex flex-wrap items-center justify-between gap-3"><Link href={`/impact/${id}`} className="font-bold text-teal-800">← العودة إلى قياس الأثر</Link><PrintButton/></div>
+    <div className="no-print flex flex-wrap items-center justify-between gap-3"><div className="flex gap-3"><Link href={`/activities/${id}/dossier`} className="font-bold text-teal-800">← ملف النشاط</Link><Link href={`/impact/${id}`} className="font-bold text-slate-600">قياس الأثر</Link></div><PrintButton/></div>
     {!isFinal?<div className="no-print rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold text-amber-900">INTERIM — غير نهائي. HTVI يبقى PENDING.</div>:null}
 
     <article className="report-page mx-auto bg-white p-8 shadow-sm print:shadow-none">

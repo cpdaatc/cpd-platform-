@@ -21,7 +21,7 @@ async function signIn(page: import('@playwright/test').Page, role = 'ORGANIZATIO
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
-  await expect(page).toHaveURL(/v4\.html\?release=20260812-1/);
+  await expect(page).toHaveURL(/v4\.html\?release=20260818-1/);
   await page.evaluate(() => localStorage.clear());
   await page.reload();
 });
@@ -66,8 +66,9 @@ test('administrator creates an activity, uploads PDF, validates readiness, print
 
   await page.evaluate(() => { window.print = () => undefined; });
   await page.locator('#printActivity').click();
-  await expect(page.locator('body')).toHaveAttribute('data-last-print-target', 'activityApplicationReport');
-  await expect(page.locator('#printActivityTitle')).toContainText('دورة تطوير مهارات التواصل');
+  await expect(page.locator('#officialFormDialog')).toBeVisible();
+  await expect(page.locator('#officialFormDialog .official-form-preview img')).toHaveCount(6);
+  await page.locator('#officialFormDialog [data-close-dialog]').click();
 
   await page.getByRole('button', { name: 'قياس الأثر وHTVI' }).click();
   await page.locator('#l1Score').fill('90');
@@ -175,4 +176,33 @@ test('mobile workspace keeps forms readable without page-level horizontal overfl
   await expect(page.locator('#activityTitle')).toBeVisible();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(1);
+});
+
+test('dossier registry filters with AND semantics and Activity Officer sees only assignments', async ({ page }) => {
+  await signIn(page, 'ORGANIZATION_SYSTEM_ADMIN');
+  await page.getByRole('button', { name: 'سجل ملفات الأنشطة' }).click();
+  await expect(page.locator('#dossierRegistryTable tbody tr')).toHaveCount(3);
+  await page.locator('#dossierYear').selectOption('2026');
+  await page.locator('#dossierDepartment').selectOption('quality');
+  await page.locator('#dossierSearch').fill('patient safety');
+  await expect(page.locator('#dossierRegistryTable tbody tr')).toHaveCount(1);
+  await expect(page.locator('#dossierRegistryTable')).toContainText('HT-2026-002');
+  await page.locator('#logout').click();
+
+  await signIn(page, 'ACTIVITY_OFFICER');
+  await page.getByRole('button', { name: 'سجل ملفات الأنشطة' }).click();
+  await expect(page.locator('#dossierRegistryTable tbody tr')).toHaveCount(2);
+  await expect(page.locator('#dossierRegistryTable')).not.toContainText('HT-2026-002');
+  await page.locator('#dossierRegistryTable tbody tr').first().getByRole('button', { name: 'فتح الملف' }).click();
+  await expect(page.locator('#demoDossier')).toContainText('قرار اللجنة');
+  await expect(page.locator('#demoDossier')).toContainText('تقرير الأثر النهائي');
+});
+
+test('official uploaded form preview preserves six Letter source pages', async ({ page }) => {
+  await signIn(page, 'ACTIVITY_OFFICER');
+  await page.getByRole('button', { name: 'سجل ملفات الأنشطة' }).click();
+  await page.locator('#dossierRegistryTable tbody tr').first().getByRole('button', { name: 'فتح الملف' }).click();
+  await page.getByRole('button', { name: 'معاينة النموذج الرسمي 6 صفحات' }).click();
+  await expect(page.locator('#officialFormDialog .official-form-preview img')).toHaveCount(6);
+  await expect(page.locator('#officialFormPrint img')).toHaveCount(6);
 });

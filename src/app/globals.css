@@ -22,6 +22,12 @@ a { color: inherit; text-decoration: none; }
 :focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 35%, transparent); outline-offset: 2px; }
 
 .report-page { width: min(210mm, 100%); min-height: 297mm; }
+.official-form-print-root { display: grid; gap: 16px; justify-content: center; }
+.schs-letter-page { position: relative; width: min(8.5in, 100%); aspect-ratio: 8.5 / 11; overflow: hidden; background: #fff; box-shadow: 0 6px 24px rgb(15 23 42 / 12%); }
+.schs-letter-artwork { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
+.schs-field-overlay { position: absolute; z-index: 1; overflow: hidden; white-space: pre-wrap; color: #000; font-family: Arial, "Noto Sans Arabic", sans-serif; line-height: 1.1; background: transparent; }
+
+@page schs-letter { size: Letter portrait; margin: 0; }
 
 @media print {
   @page { size: A4; margin: 0; }
@@ -61,5 +67,18 @@ a { color: inherit; text-decoration: none; }
   }
   .impact-report-root .report-page:last-child { break-after: auto; page-break-after: auto; }
   .annual-print-root article { box-shadow: none !important; border: 0 !important; }
+  .minutes-print-root .report-page,.annual-print-root .report-page {
+    display: block !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 !important;
+    padding: 15mm 14mm !important;
+    box-shadow: none !important;
+  }
   table { break-inside: avoid; page-break-inside: avoid; }
+  html:has(.official-form-print-root),body:has(.official-form-print-root) { width: 8.5in !important; }
+  .app-shell:has(.official-form-print-root),.app-shell-content:has(.official-form-print-root),.app-shell-main:has(.official-form-print-root) { width: 8.5in !important; }
+  .official-form-print-root { display: block !important; width: 8.5in !important; margin: 0 !important; padding: 0 !important; }
+  .schs-letter-page { page: schs-letter; display: block !important; width: 8.5in !important; height: 11in !important; aspect-ratio: auto !important; margin: 0 !important; box-shadow: none !important; break-after: page; page-break-after: always; }
+  .schs-letter-page:last-child { break-after: auto; page-break-after: auto; }
 }
