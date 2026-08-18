@@ -52,7 +52,7 @@ export function ActivityDashboard({
       </p>
       <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-slate-950">ملفات الأنشطة والاعتماد</h1>
+          <h1 className="text-3xl font-black text-slate-950">{officer ? 'أنشطتي' : 'ملفات الأنشطة والاعتماد'}</h1>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
             {officer
               ? 'تظهر فقط الأنشطة المسندة إليك، مع النموذج الرسمي وقرار اللجنة والمحضر وقياس الأثر والمرفقات.'
@@ -100,7 +100,7 @@ export function ActivityDashboard({
             <div className="rounded-xl bg-teal-50 p-2"><strong className="block text-lg text-teal-900">{activity.committeeComplete}/5</strong>جاهزية اللجنة</div>
             <div className="rounded-xl bg-violet-50 p-2"><strong className="block text-lg text-violet-900">{activity.postActivityComplete}/1</strong>ما بعد النشاط</div>
           </div>
-          <Link href={`/activities/${activity.id}/dossier`} className="rounded-xl bg-teal-900 px-4 py-3 text-center text-sm font-black text-white">فتح الملف</Link>
+          <Link href={`/activities/${activity.id}/dossier`} className="rounded-xl bg-teal-900 px-4 py-3 text-center text-sm font-black text-white">ملف النشاط</Link>
         </article>)}
       </div>}
     </div>
