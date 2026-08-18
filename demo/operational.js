@@ -348,6 +348,12 @@
     if (year) annual.textContent = `التقرير السنوي ${year}`;
   }
 
+  function resetDossierFilters() {
+    byId('dossierYear').value = '';
+    byId('dossierDepartment').value = '';
+    byId('dossierSearch').value = '';
+  }
+
   function openSyntheticDossier(activityId) {
     const dossier = visibleSyntheticDossiers().find((item) => item.id === activityId);
     if (!dossier) { showToast('هذا النشاط غير مسند إلى مسؤول النشاط الحالي.'); return; }
@@ -378,6 +384,7 @@
     event.preventDefault();
     byId('login').classList.add('hidden');
     byId('app').classList.remove('hidden');
+    resetDossierFilters();
     applyRole(byId('role').value);
   });
 
