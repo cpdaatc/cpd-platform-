@@ -1,0 +1,48 @@
+window.CPD_ACTIVITY_DOSSIERS = Object.freeze([
+  {
+    contractVersion: 1,
+    id: 'demo-activity-001', activityCode: 'HT-2026-001', reportingYear: 2026,
+    titleAr: 'دورة تطوير مهارات التواصل', titleEn: 'Communication Skills Development',
+    department: { id: 'education', nameAr: 'إدارة التعليم والتطوير' },
+    assignedOfficerId: 'demo-officer-sara', assignedOfficer: 'د. سارة العتيبي',
+    internalState: 'FINAL_IMPACT_REPORT', committeeDecision: 'APPROVED_FOR_SCFHS_SUBMISSION',
+    externalState: 'APPROVED', impactState: 'FINAL', committeeComplete: 5, committeeMissing: 0,
+    postActivityComplete: 1, postActivityMissing: 0,
+    documents: [
+      { id: 'form-001', category: 'OFFICIAL_FORM', filename: 'SCHS-Activity-Form-HT-2026-001.docx', version: 2, state: 'VERIFIED' },
+      { id: 'decision-001', category: 'COMMITTEE_DECISION', filename: 'قرار اللجنة الداخلي', version: 1, state: 'APPROVED_FOR_SCFHS_SUBMISSION' },
+      { id: 'minutes-001', category: 'COMMITTEE_MINUTES', filename: 'محضر اللجنة النهائي', version: 1, state: 'FINAL' },
+      { id: 'impact-001', category: 'FINAL_IMPACT_REPORT', filename: 'تقرير الأثر النهائي', version: 1, state: 'FINAL' },
+      { id: 'attachment-001', category: 'ADDITIONAL_ATTACHMENT', filename: 'سجل الحضور.pdf', version: 1, state: 'UPLOADED' },
+    ],
+  },
+  {
+    contractVersion: 1,
+    id: 'demo-activity-002', activityCode: 'HT-2026-002', reportingYear: 2026,
+    titleAr: 'سلامة المرضى', titleEn: 'Patient Safety',
+    department: { id: 'quality', nameAr: 'إدارة الجودة وسلامة المرضى' },
+    assignedOfficerId: 'demo-officer-khalid', assignedOfficer: 'أ. خالد الشهري',
+    internalState: 'UNDER_COMMITTEE_REVIEW', committeeDecision: null,
+    externalState: null, impactState: null, committeeComplete: 5, committeeMissing: 0,
+    postActivityComplete: 0, postActivityMissing: 1,
+    documents: [
+      { id: 'form-002', category: 'OFFICIAL_FORM', filename: 'SCHS-Activity-Form-HT-2026-002.docx', version: 1, state: 'VERIFIED' },
+      { id: 'attachment-002', category: 'ADDITIONAL_ATTACHMENT', filename: 'السير الذاتية للمتحدثين.pdf', version: 1, state: 'UPLOADED' },
+    ],
+  },
+  {
+    contractVersion: 1,
+    id: 'demo-activity-003', activityCode: 'HT-2025-003', reportingYear: 2025,
+    titleAr: 'جودة الخدمات الصحية', titleEn: 'Healthcare Service Quality',
+    department: { id: 'quality', nameAr: 'إدارة الجودة وسلامة المرضى' },
+    assignedOfficerId: 'demo-officer-sara', assignedOfficer: 'د. سارة العتيبي',
+    internalState: 'RETURNED_FOR_CORRECTION', committeeDecision: 'RETURNED_FOR_CORRECTION',
+    externalState: null, impactState: null, committeeComplete: 4, committeeMissing: 1,
+    postActivityComplete: 0, postActivityMissing: 1,
+    documents: [
+      { id: 'form-003', category: 'OFFICIAL_FORM', filename: 'SCHS-Activity-Form-HT-2025-003.docx', version: 1, state: 'VERIFIED' },
+      { id: 'decision-003', category: 'COMMITTEE_DECISION', filename: 'تقرير إعادة الاستكمال', version: 1, state: 'RETURNED_FOR_CORRECTION' },
+      { id: 'minutes-003', category: 'COMMITTEE_MINUTES', filename: 'محضر اللجنة النهائي', version: 1, state: 'FINAL' },
+    ],
+  },
+]);

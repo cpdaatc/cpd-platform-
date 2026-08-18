@@ -13,9 +13,10 @@ describe('GitHub Pages full-platform demo', () => {
       readFile(join(root, 'demo', 'logo.png')),
     ]);
 
-    expect(index).toContain('./v4.html?release=20260812-1');
+    expect(index).toContain('./v4.html?release=20260818-1');
     expect(html).toContain('./logo.png?v=20260812-1');
-    expect(html).toContain('./operational.js?v=20260812-1');
+    expect(html).toContain('./operational.js?v=20260818-1');
+    expect(html).toContain('./activity-dossiers.synthetic.js?v=20260818-1');
     expect(html).toContain('./operational.css?v=20260812-1');
     for (const role of ['PLATFORM_SUPER_ADMIN','ORGANIZATION_SYSTEM_ADMIN','ACTIVITY_OFFICER','COMMITTEE_SECRETARY','COMMITTEE_CHAIR','COMMITTEE_MEMBER','MANAGEMENT_VIEWER','MANAGEMENT_APPROVER','AUDITOR']) {
       expect(html).toContain(`value="${role}"`);
@@ -36,8 +37,8 @@ describe('GitHub Pages full-platform demo', () => {
     const elementIds = [...document.querySelectorAll<HTMLElement>('[id]')]
       .map((item) => item.id);
 
-    expect(navPages).toHaveLength(13);
-    expect(pageIds).toHaveLength(13);
+    expect(navPages).toHaveLength(14);
+    expect(pageIds).toHaveLength(14);
     expect(new Set(navPages)).toEqual(new Set(pageIds));
     expect(new Set(elementIds).size).toBe(elementIds.length);
     expect(document.querySelectorAll('.logo-img').length).toBeGreaterThanOrEqual(6);
@@ -54,7 +55,7 @@ describe('GitHub Pages full-platform demo', () => {
     const document = new DOMParser().parseFromString(html, 'text/html');
     const pages = [...document.querySelectorAll<HTMLElement>('section.page')];
 
-    expect(pages).toHaveLength(13);
+    expect(pages).toHaveLength(14);
     for (const page of pages) {
       expect(page.querySelector('table, form'), `${page.id} must expose a real table or form`).not.toBeNull();
     }
@@ -68,9 +69,10 @@ describe('GitHub Pages full-platform demo', () => {
     expect(document.querySelectorAll('select').length).toBeGreaterThanOrEqual(20);
     expect(document.querySelectorAll('textarea').length).toBeGreaterThanOrEqual(8);
     expect(document.querySelectorAll('input[type="file"][accept*="application/pdf"]').length).toBeGreaterThanOrEqual(12);
-    expect(document.querySelectorAll('dialog')).toHaveLength(2);
+    expect(document.querySelectorAll('dialog')).toHaveLength(3);
     expect(document.querySelectorAll('[data-mutate], [data-roles]').length).toBeGreaterThanOrEqual(20);
     expect(document.querySelectorAll('#impactReport > .paper')).toHaveLength(2);
     expect(document.querySelector('#reportsRegisterTable')?.textContent).toContain('2 A4');
+    expect(document.querySelectorAll('#officialFormPrint img')).toHaveLength(6);
   });
 });
